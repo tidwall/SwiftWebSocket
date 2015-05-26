@@ -22,7 +22,7 @@ import Foundation
 /// A WebSocket object provides support for creating and managing a WebSocket connection to a server, as well as for sending and receiving data on the connection.
 @objc public class WebSocket {
     /// The WebSocket.ReadyState enum is used by the readyState property to describe the status of the WebSocket connection.
-    enum ReadyState : Int, Printable {
+    public enum ReadyState : Int, Printable {
         /// The connection is not yet open.
         case Connecting = 0
         /// The connection is open and ready to communicate.
@@ -39,7 +39,7 @@ import Foundation
                 return false
             }
         }
-        var description : String {
+        public var description : String {
             switch self {
             case Connecting: return "Connecting"
             case Open: return "Open"
@@ -49,12 +49,12 @@ import Foundation
         }
     }
     /// The WebSocket.BinaryType enum is used by the binaryType property and indicates the type of binary data being transmitted by the WebSocket connection.
-    enum BinaryType : Printable {
+    public enum BinaryType : Printable {
         /// The WebSocket should transmit [UInt8] objects.
         case UInt8Array
         /// The WebSocket should transmit NSData objects.
         case NSData
-        var description : String {
+        public var description : String {
             switch self {
             case UInt8Array: return "UInt8Array"
             case NSData: return "NSData"
@@ -62,30 +62,30 @@ import Foundation
         }
     }
     /// The WebSocket.Events class is used by the events property and manages the events for the WebSocket connection.
-    class Events {
+    public class Events {
         /// Strict event synchronization with background connection. Forces the connection to wait until an event has returned before processing the next frame.
-        var synced = false
+        public var synced = false
         /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
-        var open : ()->() = {}
+        public var open : ()->() = {}
         /// An event to be called when the WebSocket connection's readyState changes to .Closed.
-        var close : (code : Int, reason : String, wasClean : Bool)->() = {(code, reason, wasClean) in}
+        public var close : (code : Int, reason : String, wasClean : Bool)->() = {(code, reason, wasClean) in}
         /// An event to be called when an error occurs.
-        var error : (error : NSError)->() = {(error) in}
+        public var error : (error : NSError)->() = {(error) in}
         /// An event to be called when a message is received from the server.
-        var message : (data : Any)->() = {(data) in}
+        public var message : (data : Any)->() = {(data) in}
         /// An event to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
-        var end : (code : Int, reason : String, wasClean : Bool, error : NSError?)->() = {(code, reason, wasClean, error) in}
+        public var end : (code : Int, reason : String, wasClean : Bool, error : NSError?)->() = {(code, reason, wasClean, error) in}
     }
     
     private static let defaultMaxWindowBits = 15
     /// The WebSocket.Compression struct is used by the compression property and manages the compression options for the WebSocket connection.
-    struct Compression {
+    public struct Compression {
         // Used to accept compressed messages from the server. Default is true.
-        var on = false
+        public var on = false
         // request no context takeover.
-        var noContextTakeover = false
+        public var noContextTakeover = false
         // request max window bits.
-        var maxWindowBits = WebSocket.defaultMaxWindowBits
+        public var maxWindowBits = WebSocket.defaultMaxWindowBits
     }
     
     private let request : NSURLRequest!
@@ -96,26 +96,26 @@ import Foundation
     private var closeCode = 0
     private var closeReason = ""
     /// The compression options of the WebSocket.
-    var compression = Compression()
+    public var compression = Compression()
     /// The delegate of the WebSocket.
-    var delegate : WebSocketDelegate?
+    public var delegate : WebSocketDelegate?
     /// The events of the WebSocket.
-    var event = Events()
+    public var event = Events()
     
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
-    convenience init(url: String){
+    public convenience init(url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
-    convenience init(url: String, subProtocols : [String]){
+    public convenience init(url: String, subProtocols : [String]){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
     }
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
-    convenience init(url: String, subProtocol : String){
+    public convenience init(url: String, subProtocol : String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
     }
     /// Create a WebSocket connection from an NSURLRequest; Also include a list of protocols.
-    init(request: NSURLRequest, subProtocols : [String] = []){
+    public init(request: NSURLRequest, subProtocols : [String] = []){
         pthread_mutex_init(&mutex, nil)
         pthread_cond_init(&cond, nil)
         self.request = request
@@ -139,12 +139,12 @@ import Foundation
     }
     
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
-    var url : String {
+    public var url : String {
         return request.URL!.description
     }
     /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
     private var _subProtocol = ""
-    var subProtocol : String {
+    public var subProtocol : String {
         pthread_mutex_lock(&mutex)
         var ret = _subProtocol
         pthread_mutex_unlock(&mutex)
@@ -152,7 +152,7 @@ import Foundation
     }
     private var _readyState = ReadyState.Connecting
     /// The current state of the connection; this is one of the WebSocket.ReadyState constants. Read only.
-    var readyState : ReadyState {
+    public var readyState : ReadyState {
         pthread_mutex_lock(&mutex)
         var ret = _readyState
         pthread_mutex_unlock(&mutex)
@@ -160,7 +160,7 @@ import Foundation
     }
     private var _binaryType = BinaryType.UInt8Array
     /// A WebSocket.BinaryType value indicating the type of binary data being transmitted by the connection. Default is .UInt8Array.
-    var binaryType : BinaryType {
+    public var binaryType : BinaryType {
         get {
             pthread_mutex_lock(&mutex)
             var ret = _binaryType
@@ -209,7 +209,6 @@ import Foundation
             dispatch_async(dispatch_get_main_queue(), block)
         }
     }
-    internal var tInflatedInput = [[UInt8]]()
     private func main(inout defers : [()->()], compression : Compression, events : Events, delegate : WebSocketDelegate?) {
         var (err, werr, rerr) : (NSError?, NSError?, NSError?)
         var closeClean = false
@@ -339,7 +338,7 @@ import Foundation
     :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
     :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
     */
-    func close(code : Int = 1000, reason : String = "Normal Closure") -> NSError? {
+    public func close(code : Int = 1000, reason : String = "Normal Closure") -> NSError? {
         pthread_mutex_lock(&mutex)
         if _readyState.isClosed {
             pthread_mutex_unlock(&mutex)
@@ -373,7 +372,7 @@ import Foundation
     
     :param: message The data to be sent to the server. Must be NSData, [UInt8], or String
     */
-    func send(message : Any) -> NSError? {
+    public func send(message : Any) -> NSError? {
         var f = Frame()
         if message is String {
             f.code = .Text
@@ -1212,6 +1211,5 @@ private extension WebSocket {
             (f.code, f.statusCode, f.utf8.text) = (.Close, code, reason)
             return writeFrame(f)
         }
-        
     }
 }
