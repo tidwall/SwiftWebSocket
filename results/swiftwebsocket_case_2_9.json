@@ -1,0 +1,199 @@
+{
+   "agent": "SwiftWebSocket",
+   "behavior": "OK",
+   "behaviorClose": "OK",
+   "case": 25,
+   "closedByMe": true,
+   "createStats": true,
+   "createWirelog": true,
+   "description": "Send unsolicited pong with payload. Send ping with payload. Verify pong for ping is received.",
+   "droppedByMe": true,
+   "duration": 1,
+   "expectation": "Nothing in reply to own Pong, but Pong with payload echo'ed in reply to Ping. Clean close with normal code.",
+   "expected": {
+      "OK": [
+         [
+            "pong",
+            "ping payload"
+         ]
+      ]
+   },
+   "expectedClose": {
+      "closeCode": [
+         1000
+      ],
+      "closedByMe": true,
+      "requireClean": true
+   },
+   "failedByMe": false,
+   "httpRequest": "GET /runCase?case=25&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=25&agent=SwiftWebSocket\r\nSec-WebSocket-Key: 0ZXzKtJl/60JBce5YZR5Hg==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 9+MplNIG8uqtukxmKbGBUFQSQYM=\r\n\r\n",
+   "id": "2.9",
+   "isServer": true,
+   "localCloseCode": 1000,
+   "localCloseReason": null,
+   "received": [
+      [
+         "pong",
+         "ping payload"
+      ]
+   ],
+   "remoteCloseCode": null,
+   "remoteCloseReason": null,
+   "reportCompressionRatio": false,
+   "reportTime": false,
+   "result": "Actual events match at least one expected.",
+   "resultClose": "Connection was properly closed",
+   "rxFrameStats": {
+      "8": 1,
+      "10": 1
+   },
+   "rxOctetStats": {
+      "6": 1,
+      "18": 1,
+      "283": 1
+   },
+   "started": "2015-05-26T20:31:44.359Z",
+   "trafficStats": null,
+   "txFrameStats": {
+      "8": 1,
+      "9": 1,
+      "10": 1
+   },
+   "txOctetStats": {
+      "4": 1,
+      "14": 1,
+      "26": 1,
+      "206": 1
+   },
+   "wasClean": true,
+   "wasCloseHandshakeTimeout": false,
+   "wasNotCleanReason": null,
+   "wasOpenHandshakeTimeout": false,
+   "wasServerConnectionDropTimeout": false,
+   "wirelog": [
+      [
+         "RO",
+         [
+            283,
+            "474554202f72756e436173653f636173653d3235266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+         ]
+      ],
+      [
+         "TO",
+         [
+            206,
+            "485454502f312e312031303120537769746368696e672050726f746f636f6c730d0a5365727665723a204175746f6261686e5465737453756974652f302e372e ..."
+         ],
+         false
+      ],
+      [
+         "TF",
+         [
+            24,
+            "unsolicited pong payload"
+         ],
+         10,
+         true,
+         0,
+         null,
+         null,
+         null,
+         false
+      ],
+      [
+         "TO",
+         [
+            26,
+            "8a18756e736f6c69636974656420706f6e67207061796c6f6164"
+         ],
+         false
+      ],
+      [
+         "TF",
+         [
+            12,
+            "ping payload"
+         ],
+         9,
+         true,
+         0,
+         null,
+         null,
+         null,
+         false
+      ],
+      [
+         "TO",
+         [
+            14,
+            "890c70696e67207061796c6f6164"
+         ],
+         false
+      ],
+      [
+         "TI",
+         1
+      ],
+      [
+         "RO",
+         [
+            18,
+            "8a8cab4f4830db2626578b3f2949c7202954"
+         ]
+      ],
+      [
+         "RF",
+         [
+            12,
+            "ping payload"
+         ],
+         10,
+         true,
+         0,
+         true,
+         "ab4f4830"
+      ],
+      [
+         "TF",
+         [
+            2,
+            "0x03e8"
+         ],
+         8,
+         true,
+         0,
+         null,
+         null,
+         null,
+         false
+      ],
+      [
+         "TO",
+         [
+            4,
+            "880203e8"
+         ],
+         false
+      ],
+      [
+         "RO",
+         [
+            6,
+            "8880a20c170d"
+         ]
+      ],
+      [
+         "RF",
+         [
+            0,
+            ""
+         ],
+         8,
+         true,
+         0,
+         true,
+         "a20c170d"
+      ]
+   ]
+}

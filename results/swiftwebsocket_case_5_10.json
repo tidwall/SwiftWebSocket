@@ -1,0 +1,168 @@
+{
+   "agent": "SwiftWebSocket",
+   "behavior": "OK",
+   "behaviorClose": "OK",
+   "case": 54,
+   "closedByMe": false,
+   "createStats": true,
+   "createWirelog": true,
+   "description": "Send unfragmented Text Message after Continuation Frame with FIN = true, where there is nothing to continue, sent in per-frame chops.",
+   "droppedByMe": true,
+   "duration": 1,
+   "expectation": "The connection is failed immediately, since there is no message to continue.",
+   "expected": {
+      "OK": []
+   },
+   "expectedClose": {
+      "closeCode": [
+         1002
+      ],
+      "closedByMe": false,
+      "requireClean": false
+   },
+   "failedByMe": false,
+   "httpRequest": "GET /runCase?case=54&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=54&agent=SwiftWebSocket\r\nSec-WebSocket-Key: xx3hD1q5G4Gp6U2spyhdDA==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: zI77o/VT9CJC0t5afHxZEUyYRmQ=\r\n\r\n",
+   "id": "5.10",
+   "isServer": true,
+   "localCloseCode": 1000,
+   "localCloseReason": null,
+   "received": [],
+   "remoteCloseCode": 1002,
+   "remoteCloseReason": "Protocol error",
+   "reportCompressionRatio": false,
+   "reportTime": false,
+   "result": "Actual events match at least one expected.",
+   "resultClose": "Connection was properly closed",
+   "rxFrameStats": {
+      "8": 1
+   },
+   "rxOctetStats": {
+      "22": 1,
+      "283": 1
+   },
+   "started": "2015-05-26T20:31:44.552Z",
+   "trafficStats": null,
+   "txFrameStats": {
+      "0": 1,
+      "1": 1,
+      "8": 1
+   },
+   "txOctetStats": {
+      "4": 1,
+      "15": 1,
+      "26": 1,
+      "206": 1
+   },
+   "wasClean": true,
+   "wasCloseHandshakeTimeout": false,
+   "wasNotCleanReason": null,
+   "wasOpenHandshakeTimeout": false,
+   "wasServerConnectionDropTimeout": false,
+   "wirelog": [
+      [
+         "RO",
+         [
+            283,
+            "474554202f72756e436173653f636173653d3534266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+         ]
+      ],
+      [
+         "TO",
+         [
+            206,
+            "485454502f312e312031303120537769746368696e672050726f746f636f6c730d0a5365727665723a204175746f6261686e5465737453756974652f302e372e ..."
+         ],
+         false
+      ],
+      [
+         "TF",
+         [
+            24,
+            "non-continuation payload"
+         ],
+         0,
+         true,
+         0,
+         null,
+         null,
+         null,
+         true
+      ],
+      [
+         "TO",
+         [
+            26,
+            "80186e6f6e2d636f6e74696e756174696f6e207061796c6f6164"
+         ],
+         true
+      ],
+      [
+         "TF",
+         [
+            13,
+            "Hello, world!"
+         ],
+         1,
+         true,
+         0,
+         null,
+         null,
+         null,
+         true
+      ],
+      [
+         "KL",
+         1
+      ],
+      [
+         "TO",
+         [
+            15,
+            "810d48656c6c6f2c20776f726c6421"
+         ],
+         true
+      ],
+      [
+         "RO",
+         [
+            22,
+            "88908dbc8fc98e56dfbbe2c8e0aae2d0afacffcee0bb"
+         ]
+      ],
+      [
+         "RF",
+         [
+            16,
+            "0x03ea50726f746f636f6c206572726f72"
+         ],
+         8,
+         true,
+         0,
+         true,
+         "8dbc8fc9"
+      ],
+      [
+         "TF",
+         [
+            2,
+            "0x03e8"
+         ],
+         8,
+         true,
+         0,
+         null,
+         null,
+         null,
+         false
+      ],
+      [
+         "TO",
+         [
+            4,
+            "880203e8"
+         ],
+         false
+      ]
+   ]
+}

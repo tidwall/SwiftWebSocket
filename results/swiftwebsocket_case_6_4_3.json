@@ -1,0 +1,177 @@
+{
+   "agent": "SwiftWebSocket",
+   "behavior": "OK",
+   "behaviorClose": "OK",
+   "case": 76,
+   "closedByMe": false,
+   "createStats": true,
+   "createWirelog": true,
+   "description": "Same as Case 6.4.1, but we send message not in 3 frames, but in 3 chops of the same message frame.\n<br><br>MESSAGE PARTS:<br>\nPART1 = cebae1bdb9cf83cebcceb5<br>\nPART2 = f4908080<br>\nPART3 = 656469746564<br>\n",
+   "droppedByMe": true,
+   "duration": 1002,
+   "expectation": "The first chop is accepted, we expect to timeout on the first wait. The 2nd chop should be rejected immediately (fail fast on UTF-8). If we timeout, we expect the connection is failed at least then, since the complete message payload is not valid UTF-8.",
+   "expected": {
+      "NON-STRICT": [
+         [
+            "timeout",
+            "A"
+         ],
+         [
+            "timeout",
+            "B"
+         ]
+      ],
+      "OK": [
+         [
+            "timeout",
+            "A"
+         ]
+      ]
+   },
+   "expectedClose": {
+      "closeCode": [
+         1007
+      ],
+      "closedByMe": false,
+      "closedByWrongEndpointIsFatal": true,
+      "requireClean": false
+   },
+   "failedByMe": false,
+   "httpRequest": "GET /runCase?case=76&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=76&agent=SwiftWebSocket\r\nSec-WebSocket-Key: HXHOq/1xd2QJRc5YAMae+A==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 8S/RYnfQIsA4doFCekbH3xZ1MOs=\r\n\r\n",
+   "id": "6.4.3",
+   "isServer": true,
+   "localCloseCode": 1000,
+   "localCloseReason": null,
+   "received": [
+      [
+         "timeout",
+         "A"
+      ]
+   ],
+   "remoteCloseCode": 1007,
+   "remoteCloseReason": "Invalid frame payload data",
+   "reportCompressionRatio": false,
+   "reportTime": false,
+   "result": "Actual events match at least one expected.",
+   "resultClose": "Connection was properly closed",
+   "rxFrameStats": {
+      "8": 1
+   },
+   "rxOctetStats": {
+      "34": 1,
+      "283": 1
+   },
+   "started": "2015-05-26T20:31:48.702Z",
+   "trafficStats": null,
+   "txFrameStats": {
+      "8": 1
+   },
+   "txOctetStats": {
+      "2": 1,
+      "4": 2,
+      "11": 1,
+      "206": 1
+   },
+   "wasClean": true,
+   "wasCloseHandshakeTimeout": false,
+   "wasNotCleanReason": null,
+   "wasOpenHandshakeTimeout": false,
+   "wasServerConnectionDropTimeout": false,
+   "wirelog": [
+      [
+         "RO",
+         [
+            283,
+            "474554202f72756e436173653f636173653d3736266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+         ]
+      ],
+      [
+         "TO",
+         [
+            206,
+            "485454502f312e312031303120537769746368696e672050726f746f636f6c730d0a5365727665723a204175746f6261686e5465737453756974652f302e372e ..."
+         ],
+         false
+      ],
+      [
+         "TO",
+         [
+            2,
+            "0115"
+         ],
+         false
+      ],
+      [
+         "TO",
+         [
+            11,
+            "cebae1bdb9cf83cebcceb5"
+         ],
+         false
+      ],
+      [
+         "CT",
+         1,
+         "A"
+      ],
+      [
+         "CTE",
+         "A"
+      ],
+      [
+         "TO",
+         [
+            4,
+            "f4908080"
+         ],
+         false
+      ],
+      [
+         "CT",
+         1,
+         "B"
+      ],
+      [
+         "RO",
+         [
+            34,
+            "889ced2fc950eec0803e9b4ea539890faf228c42ac709d4eb03c824ead70894ebd31"
+         ]
+      ],
+      [
+         "RF",
+         [
+            28,
+            "0x03ef496e76616c6964206672616d65207061796c6f61642064617461"
+         ],
+         8,
+         true,
+         0,
+         true,
+         "ed2fc950"
+      ],
+      [
+         "TF",
+         [
+            2,
+            "0x03e8"
+         ],
+         8,
+         true,
+         0,
+         null,
+         null,
+         null,
+         false
+      ],
+      [
+         "TO",
+         [
+            4,
+            "880203e8"
+         ],
+         false
+      ]
+   ]
+}
