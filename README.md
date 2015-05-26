@@ -1,10 +1,10 @@
 # SwiftWebSocket
 
-<a href="https://oncastdev.github.io/SwiftWebSocket/results/"><img src="https://oncastdev.github.io/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
+<a href="https://tidwall.github.io/SwiftWebSocket/results/"><img src="https://tidwall.github.io/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
 
-[Test results for SwiftWebSocket](https://oncastdev.github.io/SwiftWebSocket/results/). You can compare to the popular [Objective-C Library](http://square.github.io/SocketRocket/results/)
+[Test results for SwiftWebSocket](https://tidwall.github.io/SwiftWebSocket/results/). You can compare to the popular [Objective-C Library](http://square.github.io/SocketRocket/results/)
 
 SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
