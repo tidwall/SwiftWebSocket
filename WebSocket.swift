@@ -95,6 +95,7 @@ import Foundation
     private var frames = [Frame]()
     private var closeCode = 0
     private var closeReason = ""
+    private var closeClient = false
     /// The compression options of the WebSocket.
     public var compression = Compression()
     /// The delegate of the WebSocket.
@@ -249,13 +250,15 @@ import Foundation
             if rerr != nil && rerr! == WebSocket.ErrSocket {
                 err = rerr
             }
-            if err != nil && err!.code == WebSocket.ErrCode.Protocol.rawValue {
-                (self.closeCode, self.closeReason) = (1002, "Protocol error")
-            } else if err != nil && err!.code == ErrCode.Payload.rawValue {
-                (self.closeCode, self.closeReason) = (1007, "Invalid frame payload data")
-            } else {
-                if closeClean == false {
-                    (self.closeCode, self.closeReason) = (1006, "Abnormal Closure")
+            if !self.closeClient {
+                if err != nil && err!.code == WebSocket.ErrCode.Protocol.rawValue {
+                    (self.closeCode, self.closeReason) = (1002, "Protocol error")
+                } else if err != nil && err!.code == ErrCode.Payload.rawValue {
+                    (self.closeCode, self.closeReason) = (1007, "Invalid frame payload data")
+                } else {
+                    if closeClean == false {
+                        (self.closeCode, self.closeReason) = (1006, "Abnormal Closure")
+                    }
                 }
             }
             err = s.close(code: UInt16(self.closeCode), reason: self.closeReason)
@@ -344,7 +347,7 @@ import Foundation
             pthread_mutex_unlock(&mutex)
             return WebSocket.ErrClosed
         }
-        (closeCode, closeReason, _readyState) = (code, reason, .Closing)
+        (closeCode, closeReason, closeClient, _readyState) = (code, reason, true, .Closing)
         pthread_cond_broadcast(&cond)
         pthread_mutex_unlock(&mutex)
         return nil
@@ -610,7 +613,7 @@ private extension WebSocket {
             func deflate(bufin : UnsafePointer<UInt8>, length : Int, final : Bool) -> (p : UnsafeMutablePointer<UInt8>, n : Int, err : NSError?){
                 return (nil, 0, nil)
             }
-
+            
         }
         class Inflater {
             var windowBits = 0
@@ -999,7 +1002,7 @@ private extension WebSocket {
                     }
                 }
             }
-
+            
             if leaderCode == .Text || leaderCode == .Close {
                 var take = Int(len)
                 do {
@@ -1133,7 +1136,7 @@ private extension WebSocket {
             }
             payloadLen += payloadBytes!.count
             if deflate {
-
+                
             }
             var usingStatusCode = false
             if f.statusCode != 0 && payloadLen != 0 {
