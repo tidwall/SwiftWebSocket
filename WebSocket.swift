@@ -731,7 +731,7 @@ private extension WebSocket {
             opened = true
             rd.open()
             wr.open()
-            var path = self.req.URL!.path!
+            var path = CFURLCopyPath(self.req.URL!) as! String
             if path == "" {
                 path = "/"
             }
