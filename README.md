@@ -17,6 +17,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 - TLS / WSS support.
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
 - Zero asserts. All networking, stream, and protocol errors are routed through the `error` event.
+- Send pings and receive pong events.
 - High performance. 
 
 ##Install (iOS and OS X)
@@ -42,7 +43,7 @@ You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -
 There is no need for `import SwiftWebSocket` when manually installing.
 
 
-###Example
+##Example
 
 
 ```swift
