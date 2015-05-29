@@ -193,7 +193,7 @@ func runCase(caseIdx : Int, caseCount : Int, block : (err : NSError?)->()) {
                 ws.compression.maxWindowBits = 8
             }
         }
-        ws.binaryType = .NSData
+        //ws.binaryType = .NSData
         ws.event.end = { (code, reason, clean, err) in
             responseError = err
             if responseError == nil {
@@ -218,11 +218,13 @@ func runCase(caseIdx : Int, caseCount : Int, block : (err : NSError?)->()) {
 func printFailure(err : NSError?){
     if err == nil || err!.localizedDescription == "" {
         println("[ERR] FAILED")
+        exit(1)
     } else {
         if err!.localizedDescription == "INFORMATIONAL" {
             //printinfo("INFORMATIONAL")
         } else {
             println("[ERR] FAILED: \(err!.localizedDescription)")
+            exit(1)
         }
     }
 }

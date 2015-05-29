@@ -13,10 +13,18 @@ import Foundation
 
 /// Delegate methods that are common to all forms of WebSocket. These are all optional. For pure Swift projects, it's recommended to use the WebSocket.Event object instead.
 @objc public protocol WebSocketDelegate {
+    /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
     optional func webSocketDidOpen(webSocket: WebSocket)
+    /// An event to be called when the WebSocket connection's readyState changes to .Closed.
     optional func webSocket(webSocket: WebSocket, didCloseWithCode code: Int, reason: String, wasClean : Bool)
+    /// An event to be called when a message is received from the server.
     optional func webSocket(webSocket: WebSocket, didReceiveMessage message : AnyObject)
+    /// An event to be called when a pong is received from the server.
+    optional func webSocket(webSocket: WebSocket, didReceivePong message : AnyObject)
+    /// An event to be called when an error occurs.
     optional func webSocket(webSocket: WebSocket, didFailWithError error : NSError)
+    /// An event to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
+    optional func webSocket(webSocket: WebSocket, didEndWithCode code: Int, reason: String, wasClean : Bool, error : NSError?)
 }
 
 /// A WebSocket object provides support for creating and managing a WebSocket connection to a server, as well as for sending and receiving data on the connection.
@@ -73,6 +81,8 @@ import Foundation
         public var error : (error : NSError)->() = {(error) in}
         /// An event to be called when a message is received from the server.
         public var message : (data : Any)->() = {(data) in}
+        /// An event to be called when a pong is received from the server.
+        public var pong : (data : Any)->() = {(data) in}
         /// An event to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
         public var end : (code : Int, reason : String, wasClean : Bool, error : NSError?)->() = {(code, reason, wasClean, error) in}
     }
@@ -175,32 +185,51 @@ import Foundation
         }
     }
     private enum Event {
-        case Opened, Closed, Error, Text, Binary, End
+        case Opened, Closed, Error, Text, Binary, End, Pong
     }
     private func fireEvent(events : Events, delegate : WebSocketDelegate?, event : Event, arg1 : AnyObject? = nil, arg2 : AnyObject? = nil, arg3 : AnyObject? = nil, arg4 : AnyObject? = nil){
         let block : ()->() = {
+            let binaryType = self.binaryType
             switch event {
             case .End:
                 events.end(code: arg1 as! Int, reason: arg2 as! String, wasClean: arg3 as! Bool, error: arg4 as? NSError)
+                delegate?.webSocket?(self, didEndWithCode: arg1 as! Int, reason: arg2 as! String, wasClean: arg3 as! Bool, error: arg4 as? NSError)
             case .Opened:
-                delegate?.webSocketDidOpen?(self)
                 events.open()
+                delegate?.webSocketDidOpen?(self)
             case .Closed:
-                delegate?.webSocket?(self, didCloseWithCode: arg1 as! Int, reason: arg2 as! String, wasClean: arg3 as! Bool)
                 events.close(code: arg1 as! Int, reason: arg2 as! String, wasClean: arg3 as! Bool)
+                delegate?.webSocket?(self, didCloseWithCode: arg1 as! Int, reason: arg2 as! String, wasClean: arg3 as! Bool)
             case .Error:
-                delegate?.webSocket?(self, didFailWithError: arg1 as! NSError)
                 events.error(error: arg1 as! NSError)
+                delegate?.webSocket?(self, didFailWithError: arg1 as! NSError)
             case .Text:
-                delegate?.webSocket?(self, didReceiveMessage: arg1!)
                 events.message(data: (arg1 as! Frame).utf8.text)
-            case .Binary:
-                delegate?.webSocket?(self, didReceiveMessage: arg1!)
+                delegate?.webSocket?(self, didReceiveMessage: (arg1 as! Frame).utf8.text)
+            case .Binary, .Pong:
                 var bytes = (arg1 as! Frame).payload.bytes
-                if self.binaryType == .NSData {
-                    events.message(data: NSData(bytes: &bytes, length: bytes.count))
+                var nsdata : NSData?
+                if binaryType == .NSData || delegate != nil {
+                    nsdata = NSData(bytes: &bytes, length: bytes.count)
+                }
+                if event == .Binary {
+                    if binaryType == .NSData {
+                        events.message(data: nsdata!)
+                    } else {
+                        events.message(data: bytes)
+                    }
+                    if delegate != nil {
+                       delegate?.webSocket?(self, didReceiveMessage: nsdata!)
+                    }
                 } else {
-                    events.message(data: bytes)
+                    if binaryType == .NSData {
+                        events.pong(data: nsdata!)
+                    } else {
+                        events.pong(data: bytes)
+                    }
+                    if delegate != nil {
+                       delegate?.webSocket?(self, didReceivePong: nsdata!)
+                    }
                 }
             }
         }
@@ -390,6 +419,27 @@ import Foundation
             memcpy(&f.payload.bytes, data.bytes, data.length)
         } else {
             return WebSocket.makeError("Invalid message type. Expecting String, [UInt8], or NSData.")
+        }
+        return sendFrame(f)
+    }
+    /**
+    Transmits a ping to the server over the WebSocket connection.
+    
+    :param: optional message The data to be sent to the server. Must be NSData, [UInt8]
+    */
+    public func ping(message : AnyObject? = nil) -> NSError? {
+        var f = Frame()
+        f.code = .Ping
+        if message != nil {
+            if message is [UInt8] {
+                f.payload.bytes = message as! [UInt8]
+            } else if message is NSData {
+                var data = message as! NSData
+                f.payload.bytes = [UInt8](count: data.length, repeatedValue: 0)
+                memcpy(&f.payload.bytes, data.bytes, data.length)
+            } else {
+                return WebSocket.makeError("Invalid message type. Expecting [UInt8], or NSData.")
+            }
         }
         return sendFrame(f)
     }
