@@ -355,6 +355,8 @@ import Foundation
                 pongFrames += [f!]
                 pthread_cond_broadcast(&self.cond)
                 pthread_mutex_unlock(&self.mutex)
+            case .Pong:
+                fireEvent(events, delegate: delegate, event: .Pong, arg1: f)
             case .Text:
                 fireEvent(events, delegate: delegate, event: .Text, arg1: f)
             case .Binary:
