@@ -47,6 +47,7 @@ import Foundation
                 return false
             }
         }
+        /// Returns a string that represents the ReadyState value.
         public var description : String {
             switch self {
             case Connecting: return "Connecting"
@@ -62,6 +63,7 @@ import Foundation
         case UInt8Array
         /// The WebSocket should transmit NSData objects.
         case NSData
+        /// Returns a string that represents the ReadyState value.
         public var description : String {
             switch self {
             case UInt8Array: return "UInt8Array"
@@ -112,6 +114,8 @@ import Foundation
     public var delegate : WebSocketDelegate?
     /// The events of the WebSocket.
     public var event = Events()
+    /// A Boolean value that determines whether the WebSocket uses background VOIP service.
+    public var voipEnabled = false
     
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(url: String){
@@ -135,9 +139,10 @@ import Foundation
             let compression_ = self.compression
             let events_ = self.event
             let delegate_ = self.delegate
+            let voipEnabled_ = self.voipEnabled
             dispatch_async(dispatch_queue_create(nil, nil), {
                 var defers : [()->()] = []
-                self.main(&defers, compression: compression_, events: events_, delegate: delegate_)
+                self.main(&defers, compression: compression_, events: events_, delegate: delegate_, voipEnabled: voipEnabled_)
                 for var i = defers.count-1; i >= 0; i-- {
                     defers[i]()
                 }
@@ -153,8 +158,8 @@ import Foundation
     public var url : String {
         return request.URL!.description
     }
-    /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
     private var _subProtocol = ""
+    /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
     public var subProtocol : String {
         pthread_mutex_lock(&mutex)
         var ret = _subProtocol
@@ -239,7 +244,7 @@ import Foundation
             dispatch_async(dispatch_get_main_queue(), block)
         }
     }
-    private func main(inout defers : [()->()], compression : Compression, events : Events, delegate : WebSocketDelegate?) {
+    private func main(inout defers : [()->()], compression : Compression, events : Events, delegate : WebSocketDelegate?, voipEnabled: Bool) {
         var (err, werr, rerr) : (NSError?, NSError?, NSError?)
         var closeClean = false
         defers += [{
@@ -248,7 +253,7 @@ import Foundation
             }
             self.fireEvent(events, delegate: delegate, event: .End, arg1: self.closeCode, arg2: self.closeReason, arg3: closeClean, arg4: err)
         }]
-        let s = Stream(request: request, subProtocols: subProtocols, usingVOIP: false, compression: compression)
+        let s = Stream(request: request, subProtocols: subProtocols, voipEnabled: voipEnabled, compression: compression)
         err = s.open()
         if err != nil {
             return
@@ -739,7 +744,7 @@ private extension WebSocket {
         var delegate = DelegatePlaceholder()
         var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
         var subProtocol = ""
-        init(request : NSURLRequest, subProtocols : [String], usingVOIP : Bool, compression : Compression){
+        init(request : NSURLRequest, subProtocols : [String], voipEnabled : Bool, compression : Compression){
             self.compression = compression
             req = request.mutableCopy() as! NSMutableURLRequest
             req.setValue("websocket", forHTTPHeaderField: "Upgrade")
@@ -770,7 +775,7 @@ private extension WebSocket {
                 rd.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
                 wr.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
             }
-            if usingVOIP {
+            if voipEnabled {
                 rd.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
                 wr.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
             }
