@@ -224,7 +224,7 @@ import Foundation
                         events.message(data: bytes)
                     }
                     if delegate != nil {
-                       delegate?.webSocket?(self, didReceiveMessage: nsdata!)
+                        delegate?.webSocket?(self, didReceiveMessage: nsdata!)
                     }
                 } else {
                     if binaryType == .NSData {
@@ -233,7 +233,7 @@ import Foundation
                         events.pong(data: bytes)
                     }
                     if delegate != nil {
-                       delegate?.webSocket?(self, didReceivePong: nsdata!)
+                        delegate?.webSocket?(self, didReceivePong: nsdata!)
                     }
                 }
             }
@@ -245,13 +245,32 @@ import Foundation
         }
     }
     private func main(inout defers : [()->()], compression : Compression, events : Events, delegate : WebSocketDelegate?, voipEnabled: Bool) {
+        var fireMutex = pthread_mutex_t()
         var (err, werr, rerr) : (NSError?, NSError?, NSError?)
         var closeClean = false
+        var unrolled = false
+        var lockunroll = false
+        var eventsAllowed = true
+        pthread_mutex_init(&fireMutex, nil)
         defers += [{
-            if err != nil {
-                self.fireEvent(events, delegate: delegate, event: .Error, arg1: err)
+            pthread_mutex_lock(&self.mutex)
+            var unrolled_ = unrolled
+            pthread_mutex_unlock(&self.mutex)
+            if !unrolled_ {
+                if err != nil {
+                    pthread_mutex_lock(&fireMutex)
+                    if eventsAllowed {
+                        self.fireEvent(events, delegate: delegate, event: .Error, arg1: err)
+                    }
+                    pthread_mutex_unlock(&fireMutex)
+                }
+                pthread_mutex_lock(&fireMutex)
+                if eventsAllowed {
+                    self.fireEvent(events, delegate: delegate, event: .End, arg1: self.closeCode, arg2: self.closeReason, arg3: closeClean, arg4: err)
+                }
+                pthread_mutex_unlock(&fireMutex)
             }
-            self.fireEvent(events, delegate: delegate, event: .End, arg1: self.closeCode, arg2: self.closeReason, arg3: closeClean, arg4: err)
+            pthread_mutex_destroy(&fireMutex)
         }]
         let s = Stream(request: request, subProtocols: subProtocols, voipEnabled: voipEnabled, compression: compression)
         err = s.open()
@@ -262,16 +281,28 @@ import Foundation
         _subProtocol = s.subProtocol
         _readyState = .Open
         pthread_mutex_unlock(&mutex)
-        self.fireEvent(events, delegate: delegate, event: .Opened)
+        pthread_mutex_lock(&fireMutex)
+        if eventsAllowed {
+            self.fireEvent(events, delegate: delegate, event: .Opened)
+        }
+        pthread_mutex_unlock(&fireMutex)
         defers += [{
             pthread_mutex_lock(&self.mutex)
             self._readyState = .Closed
-            var (closeCode, closeReason) = (self.closeCode, self.closeReason)
+            var (closeCode, closeReason, unrolled_) = (self.closeCode, self.closeReason, unrolled)
             pthread_mutex_unlock(&self.mutex)
-            self.fireEvent(events, delegate: delegate, event: .Closed, arg1: closeCode, arg2: closeReason, arg3: closeClean)
+            if !unrolled_ {
+                pthread_mutex_lock(&fireMutex)
+                if eventsAllowed {
+                    self.fireEvent(events, delegate: delegate, event: .Closed, arg1: closeCode, arg2: closeReason, arg3: closeClean)
+                }
+                pthread_mutex_unlock(&fireMutex)
+            }
         }]
         defers += [{
             pthread_mutex_lock(&self.mutex)
+            lockunroll = true
+            var unrolled_ = unrolled
             self._readyState = .Closing
             rerr = err
             if rerr == nil {
@@ -295,7 +326,9 @@ import Foundation
                     }
                 }
             }
-            err = s.close(code: UInt16(self.closeCode), reason: self.closeReason)
+            if !unrolled_ {
+                err = s.close(code: UInt16(self.closeCode), reason: self.closeReason)
+            }
             pthread_mutex_unlock(&self.mutex)
             if err != nil{
                 return
@@ -308,7 +341,31 @@ import Foundation
                 pthread_mutex_lock(&self.mutex)
                 for ;; {
                     if rerr != nil || self._readyState.isClosed {
+                        var unrolled_ = false
+                        var closeReason = self.closeReason
+                        var closeCode = self.closeCode
+                        var closeClean = false
+                        if self.closeClient && !lockunroll{
+                            while pongFrames.count != 0 {
+                                s.writeFrame(pongFrames.removeAtIndex(0))
+                            }
+                            while self.frames.count != 0 {
+                                s.writeFrame(self.frames.removeAtIndex(0))
+                            }
+                            s.close(code: UInt16(closeCode), reason: closeReason)
+                            unrolled = true
+                            unrolled_ = true
+                        }
                         pthread_mutex_unlock(&self.mutex)
+                        if unrolled_ {
+                            pthread_mutex_lock(&fireMutex)
+                            if eventsAllowed {
+                                self.fireEvent(events, delegate: delegate, event: .Closed, arg1: closeCode, arg2: closeReason, arg3: closeClean)
+                                self.fireEvent(events, delegate: delegate, event: .End, arg1: closeCode, arg2: closeReason, arg3: closeClean, arg4: nil)
+                            }
+                            eventsAllowed = false
+                            pthread_mutex_unlock(&fireMutex)
+                        }
                         break outer
                     } else if pongFrames.count != 0 || self.frames.count != 0 {
                         break
@@ -336,10 +393,12 @@ import Foundation
             pthread_cond_broadcast(&self.cond)
             pthread_mutex_unlock(&self.mutex)
         })
+        
+
         var f : Frame?
         for ;; {
             pthread_mutex_lock(&self.mutex)
-            if werr != nil || _readyState.isClosed {
+            if werr != nil || _readyState.isClosed || unrolled {
                 pthread_mutex_unlock(&self.mutex)
                 break
             }
@@ -348,6 +407,12 @@ import Foundation
             if err != nil {
                 return
             }
+            pthread_mutex_lock(&self.mutex)
+            if werr != nil || _readyState.isClosed || unrolled {
+                pthread_mutex_unlock(&self.mutex)
+                break
+            }
+            pthread_mutex_unlock(&self.mutex)
             switch f!.code {
             case .Close:
                 pthread_mutex_lock(&self.mutex)
@@ -361,11 +426,23 @@ import Foundation
                 pthread_cond_broadcast(&self.cond)
                 pthread_mutex_unlock(&self.mutex)
             case .Pong:
-                fireEvent(events, delegate: delegate, event: .Pong, arg1: f)
+                pthread_mutex_lock(&fireMutex)
+                if eventsAllowed {
+                    fireEvent(events, delegate: delegate, event: .Pong, arg1: f)
+                }
+                pthread_mutex_unlock(&fireMutex)
             case .Text:
-                fireEvent(events, delegate: delegate, event: .Text, arg1: f)
+                pthread_mutex_lock(&fireMutex)
+                if eventsAllowed {
+                    fireEvent(events, delegate: delegate, event: .Text, arg1: f)
+                }
+                pthread_mutex_unlock(&fireMutex)
             case .Binary:
-                fireEvent(events, delegate: delegate, event: .Binary, arg1: f)
+                pthread_mutex_lock(&fireMutex)
+                if eventsAllowed {
+                    fireEvent(events, delegate: delegate, event: .Binary, arg1: f)
+                }
+                pthread_mutex_unlock(&fireMutex)
             default:
                 break
             }
