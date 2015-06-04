@@ -37,7 +37,7 @@ The `import SwiftWebSocket` directive is required in order to access SwiftWebSoc
 
 ###Drop-in
 
-Just drop the `WebSocket.swift` file into your project.  
+Just drop the `SwiftWebSocket\WebSocket.swift` file into your project.  
 You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
 
 There is no need for `import SwiftWebSocket` when manually installing.
