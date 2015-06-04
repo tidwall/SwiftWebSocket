@@ -20,6 +20,36 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 - Send pings and receive pong events.
 - High performance. 
 
+##Example
+
+```swift
+func echoTest(){
+    var messageNum = 1
+    var ws = WebSocket(url: "wss://echo.websocket.org")
+    var send : ()->() = {
+        var msg = "#\(messageNum++): \(NSDate().description)"
+        println("send: \(msg)")
+        ws.send(msg)
+    }
+    ws.event.open = {
+        println("opened")
+        send()
+    }
+    ws.event.close = { (code, reason, clean) in
+        println("close")
+    }
+    ws.event.error = { (error) in
+        println("error \(error.localizedDescription)")
+    }
+    ws.event.message = { (message) in
+        if let text = message as? String {
+            println("recv: \(text)")
+            send()
+        }
+    }
+}
+```
+
 ##Installation (iOS and OS X)
 
 ### [Carthage]
@@ -62,37 +92,6 @@ Copy the `SwiftWebSocket\WebSocket.swift` file into your project.
 You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
 
 There is no need for `import SwiftWebSocket` when manually installing.
-
-##Example
-
-
-```swift
-func echoTest(){
-    var messageNum = 1
-    var ws = WebSocket(url: "wss://echo.websocket.org")
-    var send : ()->() = {
-        var msg = "#\(messageNum++): \(NSDate().description)"
-        println("send: \(msg)")
-        ws.send(msg)
-    }
-    ws.event.open = {
-        println("opened")
-        send()
-    }
-    ws.event.close = { (code, reason, clean) in
-        println("close")
-    }
-    ws.event.error = { (error) in
-        println("error \(error.localizedDescription)")
-    }
-    ws.event.message = { (message) in
-        if let text = message as? String {
-            println("recv: \(text)")
-            send()
-        }
-    }
-}
-```
 
 ## Contact
 Josh Baker [@tidwall](http://twitter.com/tidwall)
