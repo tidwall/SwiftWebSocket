@@ -361,7 +361,7 @@ import Foundation
                             pthread_mutex_lock(&fireMutex)
                             if eventsAllowed {
                                 self.fireEvent(events, delegate: delegate, event: .Closed, arg1: closeCode, arg2: closeReason, arg3: closeClean)
-                                self.fireEvent(events, delegate: delegate, event: .End, arg1: closeCode, arg2: closeReason, arg3: closeClean, arg4: nil)
+                                self.fireEvent(events, delegate: delegate, event: .End, arg1: closeCode, arg2: closeReason, arg3: closeClean)
                             }
                             eventsAllowed = false
                             pthread_mutex_unlock(&fireMutex)
@@ -387,6 +387,21 @@ import Foundation
             pthread_mutex_lock(&self.mutex)
             if err != nil{
                 werr = err
+                if !unrolled && !lockunroll {
+                    unrolled = true
+                    self._readyState = .Closed
+                    pthread_mutex_unlock(&self.mutex)
+                    pthread_mutex_lock(&fireMutex)
+                    if eventsAllowed {
+                        self.fireEvent(events, delegate: delegate, event: .Closed, arg1: 0, arg2: "", arg3: false)
+                        self.fireEvent(events, delegate: delegate, event: .Error, arg1: werr)
+                        self.fireEvent(events, delegate: delegate, event: .End, arg1: 0, arg2: "", arg3: false, arg4: werr)
+                    }
+                    eventsAllowed = false
+                    pthread_mutex_unlock(&fireMutex)
+                    pthread_mutex_lock(&self.mutex)
+                }
+                
             } else {
                 werr = WebSocket.ErrSocket
             }
@@ -394,7 +409,7 @@ import Foundation
             pthread_mutex_unlock(&self.mutex)
         })
         
-
+        
         var f : Frame?
         for ;; {
             pthread_mutex_lock(&self.mutex)
@@ -847,7 +862,9 @@ private extension WebSocket {
             }
             var (rdo, wro) : (NSInputStream?, NSOutputStream?)
             NSStream.getStreamsToHostWithName(self.req.URL!.host!, port: port, inputStream: &rdo, outputStream: &wro)
+
             (rd, wr) = (rdo!, wro!)
+            
             if req.URL!.scheme! == "wss" || req.URL!.scheme! == "https"  {
                 rd.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
                 wr.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
