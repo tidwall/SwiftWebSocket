@@ -1,6 +1,8 @@
 #<img src="https://tidwall.github.com/SwiftWebSocket/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
 <a href="https://tidwall.github.io/SwiftWebSocket/results/"><img src="https://tidwall.github.io/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
+<a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
+
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
 
