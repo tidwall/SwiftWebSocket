@@ -8,9 +8,11 @@ Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client li
 
 SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
+**Built for Swift 2.0** - For Swift 1.2 support use v0.1.18 or earlier.
+
 ## Features
 
-- Pure Swift solution. No need for Objective-C Bridging.
+- Swift 2.0. No need for Objective-C Bridging.
 - Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
 - Strict UTF-8 processing. 
 - The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
@@ -24,27 +26,31 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 
 ```swift
 func echoTest(){
-    var messageNum = 1
-    var ws = WebSocket(url: "wss://echo.websocket.org")
-    var send : ()->() = {
-        var msg = "#\(messageNum++): \(NSDate().description)"
-        println("send: \(msg)")
+    var messageNum = 0
+    let ws = WebSocket("wss://echo.websocket.org")
+    let send : ()->() = {
+        let msg = "\(++messageNum): \(NSDate().description)"
+        print("send: \(msg)")
         ws.send(msg)
     }
     ws.event.open = {
-        println("opened")
+        print("opened")
         send()
     }
-    ws.event.close = { (code, reason, clean) in
-        println("close")
+    ws.event.close = { code, reason, clean in
+        print("close")
     }
-    ws.event.error = { (error) in
-        println("error \(error.localizedDescription)")
+    ws.event.error = { error in
+        print("error \(error)")
     }
-    ws.event.message = { (message) in
+    ws.event.message = { message in
         if let text = message as? String {
-            println("recv: \(text)")
-            send()
+            print("recv: \(text)")
+            if messageNum == 10 {
+                ws.close()
+            } else {
+                send()
+            }
         }
     }
 }
