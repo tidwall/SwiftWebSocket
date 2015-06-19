@@ -192,7 +192,10 @@ public class WebSocket {
         return request.URL!.description
     }
     /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
-    private(set) var subProtocol : String {
+    public var subProtocol : String {
+        get { return privateSubProtocol }
+    }
+    private var privateSubProtocol : String {
         get { lock(); defer { unlock() }; return _subProtocol }
         set { lock(); defer { unlock() }; _subProtocol = newValue }
     }
@@ -217,7 +220,10 @@ public class WebSocket {
         set { lock(); defer { unlock() }; _binaryType = newValue }
     }
     /// The current state of the connection; this is one of the WebSocketReadyState constants. Read only.
-    private(set) var readyState : WebSocketReadyState {
+    public var readyState : WebSocketReadyState {
+        get { return privateReadyState }
+    }
+    private var privateReadyState : WebSocketReadyState {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
@@ -357,14 +363,14 @@ public class WebSocket {
                     }
                 }
                 ws.close(closeCode, reason: closeReason)
-                readyState = WebSocketReadyState.Closed
+                privateReadyState = WebSocketReadyState.Closed
                 fireEvent(.Closed, code: closeCode, reason: closeReason, wasClean: closeClean)
             }
         }
         do {
             let ws = try WebSocketConn(self.request, services: TCPConnService(self.services.rawValue), protocols: self.subProtocols, compression: self.compression)
             wso = ws
-            self.subProtocol = ws.subProtocol
+            self.privateSubProtocol = ws.subProtocol
             fireEvent(.Opened)
             var pongFrames : [Frame] = []
             dispatch_async(dispatch_queue_create(nil, nil)) {
@@ -417,7 +423,7 @@ public class WebSocket {
                 }
             }
             defer {
-                readyState = .Closing
+                privateReadyState = .Closing
             }
             for ;; {
                 ws.readDeadline = NSDate().dateByAddingTimeInterval(60)
