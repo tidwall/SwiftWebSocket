@@ -31,7 +31,7 @@ printf "\033[0;33m[BUILDING]\033[0m\n"
 rm -fr reports
 mkdir -p reports
 mkdir -p /tmp/SwiftWebSocket/tests
-cat ../SwiftWebSocket/WebSocket.swift > /tmp/SwiftWebSocket/tests/main.swift
+cat ../Source/WebSocket.swift > /tmp/SwiftWebSocket/tests/main.swift
 echo "" >> /tmp/SwiftWebSocket/tests/main.swift
 cat autobahn.swift >> /tmp/SwiftWebSocket/tests/main.swift
 swift -Ounchecked /tmp/SwiftWebSocket/tests/main.swift
