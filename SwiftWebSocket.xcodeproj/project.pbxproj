@@ -7,17 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03D1E7091B20897100AC49AC /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 03D1E7081B20897100AC49AC /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		03D1E7201B208A3C00AC49AC /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D1E71F1B208A3C00AC49AC /* WebSocket.swift */; };
 		03D1E7221B208A5C00AC49AC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 03D1E7211B208A5C00AC49AC /* libz.dylib */; };
+		D71948F51B35E5670015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D71948F61B35E5670015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
+		D719491A1B35E6640015C529 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
+		D719491B1B35E7510015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D719491E1B35EF910015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		03D1E7031B20897100AC49AC /* SwiftWebSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftWebSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		03D1E7071B20897100AC49AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		03D1E7081B20897100AC49AC /* SwiftWebSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftWebSocket.h; sourceTree = "<group>"; };
-		03D1E71F1B208A3C00AC49AC /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
 		03D1E7211B208A5C00AC49AC /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		D71948F11B35E5670015C529 /* SwiftWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftWebSocket.h; sourceTree = "<group>"; };
+		D71948F21B35E5670015C529 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		D71948F41B35E5670015C529 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D71948FA1B35E59D0015C529 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
+		D71949011B35E6130015C529 /* SwiftWebSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftWebSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D71949041B35E6140015C529 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,14 +35,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D71948FD1B35E6130015C529 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D719491A1B35E6640015C529 /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		03D1E6F91B20897100AC49AC = {
 			isa = PBXGroup;
 			children = (
+				D71948FA1B35E59D0015C529 /* libz.dylib */,
 				03D1E7211B208A5C00AC49AC /* libz.dylib */,
-				03D1E7051B20897100AC49AC /* SwiftWebSocket */,
+				D71948F01B35E5670015C529 /* Source */,
+				D71948F31B35E5670015C529 /* SwiftWebSocket-iOS */,
+				D71949021B35E6140015C529 /* SwiftWebSocket-OSX */,
 				03D1E7041B20897100AC49AC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -45,26 +62,34 @@
 			isa = PBXGroup;
 			children = (
 				03D1E7031B20897100AC49AC /* SwiftWebSocket.framework */,
+				D71949011B35E6130015C529 /* SwiftWebSocket.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		03D1E7051B20897100AC49AC /* SwiftWebSocket */ = {
+		D71948F01B35E5670015C529 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				03D1E71F1B208A3C00AC49AC /* WebSocket.swift */,
-				03D1E7081B20897100AC49AC /* SwiftWebSocket.h */,
-				03D1E7061B20897100AC49AC /* Supporting Files */,
+				D71948F11B35E5670015C529 /* SwiftWebSocket.h */,
+				D71948F21B35E5670015C529 /* WebSocket.swift */,
 			);
-			path = SwiftWebSocket;
+			path = Source;
 			sourceTree = "<group>";
 		};
-		03D1E7061B20897100AC49AC /* Supporting Files */ = {
+		D71948F31B35E5670015C529 /* SwiftWebSocket-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				03D1E7071B20897100AC49AC /* Info.plist */,
+				D71948F41B35E5670015C529 /* Info.plist */,
 			);
-			name = "Supporting Files";
+			path = "SwiftWebSocket-iOS";
+			sourceTree = "<group>";
+		};
+		D71949021B35E6140015C529 /* SwiftWebSocket-OSX */ = {
+			isa = PBXGroup;
+			children = (
+				D71949041B35E6140015C529 /* Info.plist */,
+			);
+			path = "SwiftWebSocket-OSX";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,16 +99,24 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D1E7091B20897100AC49AC /* SwiftWebSocket.h in Headers */,
+				D71948F51B35E5670015C529 /* SwiftWebSocket.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D71948FE1B35E6130015C529 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D719491B1B35E7510015C529 /* SwiftWebSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		03D1E7021B20897100AC49AC /* SwiftWebSocket */ = {
+		03D1E7021B20897100AC49AC /* SwiftWebSocket-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 03D1E7191B20897100AC49AC /* Build configuration list for PBXNativeTarget "SwiftWebSocket" */;
+			buildConfigurationList = 03D1E7191B20897100AC49AC /* Build configuration list for PBXNativeTarget "SwiftWebSocket-iOS" */;
 			buildPhases = (
 				03D1E6FE1B20897100AC49AC /* Sources */,
 				03D1E6FF1B20897100AC49AC /* Frameworks */,
@@ -94,9 +127,27 @@
 			);
 			dependencies = (
 			);
-			name = SwiftWebSocket;
+			name = "SwiftWebSocket-iOS";
 			productName = SwiftWebSocket;
 			productReference = 03D1E7031B20897100AC49AC /* SwiftWebSocket.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		D71949001B35E6130015C529 /* SwiftWebSocket-OSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D71949141B35E6160015C529 /* Build configuration list for PBXNativeTarget "SwiftWebSocket-OSX" */;
+			buildPhases = (
+				D71948FC1B35E6130015C529 /* Sources */,
+				D71948FD1B35E6130015C529 /* Frameworks */,
+				D71948FE1B35E6130015C529 /* Headers */,
+				D71948FF1B35E6130015C529 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "SwiftWebSocket-OSX";
+			productName = "SwiftWebSocket-OSX";
+			productReference = D71949011B35E6130015C529 /* SwiftWebSocket.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -110,6 +161,9 @@
 				ORGANIZATIONNAME = "ONcast, LLC";
 				TargetAttributes = {
 					03D1E7021B20897100AC49AC = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+					D71949001B35E6130015C529 = {
 						CreatedOnToolsVersion = 6.3.2;
 					};
 				};
@@ -126,13 +180,21 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				03D1E7021B20897100AC49AC /* SwiftWebSocket */,
+				03D1E7021B20897100AC49AC /* SwiftWebSocket-iOS */,
+				D71949001B35E6130015C529 /* SwiftWebSocket-OSX */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		03D1E7011B20897100AC49AC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D71948FF1B35E6130015C529 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -146,7 +208,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D1E7201B208A3C00AC49AC /* WebSocket.swift in Sources */,
+				D71948F61B35E5670015C529 /* WebSocket.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D71948FC1B35E6130015C529 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D719491E1B35EF910015C529 /* WebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,16 +316,17 @@
 		03D1E71A1B20897100AC49AC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = SwiftWebSocket/Info.plist;
+				INFOPLIST_FILE = "SwiftWebSocket-iOS/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oncast.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SwiftWebSocket;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -263,17 +334,65 @@
 		03D1E71B1B20897100AC49AC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = SwiftWebSocket/Info.plist;
+				INFOPLIST_FILE = "SwiftWebSocket-iOS/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oncast.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SwiftWebSocket;
 				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		D71949151B35E6160015C529 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "SwiftWebSocket-OSX/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = SwiftWebSocket;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		D71949161B35E6160015C529 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = "SwiftWebSocket-OSX/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = SwiftWebSocket;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
@@ -289,11 +408,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		03D1E7191B20897100AC49AC /* Build configuration list for PBXNativeTarget "SwiftWebSocket" */ = {
+		03D1E7191B20897100AC49AC /* Build configuration list for PBXNativeTarget "SwiftWebSocket-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				03D1E71A1B20897100AC49AC /* Debug */,
 				03D1E71B1B20897100AC49AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D71949141B35E6160015C529 /* Build configuration list for PBXNativeTarget "SwiftWebSocket-OSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D71949151B35E6160015C529 /* Debug */,
+				D71949161B35E6160015C529 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
