@@ -12,6 +12,7 @@
 		D71948F61B35E5670015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
 		D719491A1B35E6640015C529 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
 		D719491B1B35E7510015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D719491E1B35EF910015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -215,6 +216,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D719491E1B35EF910015C529 /* WebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,6 +424,7 @@
 				D71949161B35E6160015C529 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
