@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "03D1E7021B20897100AC49AC"
+               BlueprintIdentifier = "D71949001B35E6130015C529"
                BuildableName = "SwiftWebSocket.framework"
-               BlueprintName = "SwiftWebSocket"
-               ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "03D1E70D1B20897100AC49AC"
-               BuildableName = "SwiftWebSocketTests.xctest"
-               BlueprintName = "SwiftWebSocketTests"
+               BlueprintName = "SwiftWebSocket-OSX"
                ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,26 +28,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "03D1E70D1B20897100AC49AC"
-               BuildableName = "SwiftWebSocketTests.xctest"
-               BlueprintName = "SwiftWebSocketTests"
-               ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "03D1E7021B20897100AC49AC"
-            BuildableName = "SwiftWebSocket.framework"
-            BlueprintName = "SwiftWebSocket"
-            ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -75,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "03D1E7021B20897100AC49AC"
+            BlueprintIdentifier = "D71949001B35E6130015C529"
             BuildableName = "SwiftWebSocket.framework"
-            BlueprintName = "SwiftWebSocket"
+            BlueprintName = "SwiftWebSocket-OSX"
             ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -93,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "03D1E7021B20897100AC49AC"
+            BlueprintIdentifier = "D71949001B35E6130015C529"
             BuildableName = "SwiftWebSocket.framework"
-            BlueprintName = "SwiftWebSocket"
+            BlueprintName = "SwiftWebSocket-OSX"
             ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
