@@ -9,61 +9,62 @@ let stopOnInfo = false
 let stopAfterOne = false
 let showDuration = false
 
-let startCase = 1
+let startCase =  1 
 let stopAtCase = 999
 
-private func jsonObject(text : String) throws -> [String: AnyObject] {
-    if let data = text.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false),
-        let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as? [String : AnyObject] {
-            return json
+private func jsonObject(text : String) -> [String: AnyObject]? {
+    if let data = text.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
+        return NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as? [String : AnyObject]
     }
-    throw makeError("not json")
+    return nil
+}
+private func makeError(error : String) -> NSError {
+    return NSError(domain: "com.github.tidwall.SwiftSocket.test", code: -19010, userInfo: [NSLocalizedDescriptionKey:error])
 }
 
 // autobahn api
-func getCaseCount(block:(count : Int, error : ErrorType?)->()){
-    let ws = WebSocket(baseURL + "/getCaseCount")
+func getCaseCount(block:(count : Int, err : NSError?)->()){
+    var ws = WebSocket(url: baseURL + "/getCaseCount")
     ws.event.message = { (msg) in
         if let text = msg as? String {
             ws.close()
-            if let i = Int(text) {
-                block(count: i, error: nil)
+            if let i = text.toInt() {
+                block(count: i, err: nil)
             } else {
-                block(count: 0, error: makeError("invalid response"))
+                block(count: 0, err: makeError("invalid response"))
             }
         }
     }
-    ws.event.error = { error in
-        block(count: 0, error: error)
+    ws.event.error = { (err) in
+        block(count: 0, err: err)
     }
 }
 
-func getCaseInfo(caseIdx : Int, block :(id : String, description : String, error : ErrorType?)->()){
-    let ws = WebSocket(baseURL + "/getCaseInfo?case=\(caseIdx+1)")
+func getCaseInfo(caseIdx : Int, block :(id : String, description : String, err : NSError?)->()){
+    var ws = WebSocket(url: baseURL + "/getCaseInfo?case=\(caseIdx+1)")
     ws.event.message = { (msg) in
         if let text = msg as? String {
             ws.close()
-            do {
-                let json = try jsonObject(text)
+            if let json = jsonObject(text) {
                 if json["id"] == nil || json["description"] == nil {
-                    block(id: "", description: "", error: makeError("invalid response"))
+                    block(id: "", description: "", err: makeError("invalid response"))
                 }
-                block(id: json["id"] as! String, description: json["description"] as! String, error: nil)
-            } catch {
-                block(id: "", description: "", error: error)
+                block(id: json["id"] as! String, description: json["description"] as! String, err: nil)
+            } else {
+                block(id: "", description: "", err: makeError("not json"))
             }
         }
     }
-    ws.event.error = { error in
-        block(id: "", description: "", error: error)
+    ws.event.error = { (err) in
+        block(id: "", description: "", err: err)
     }
 }
 
-func getCaseStatus(caseIdx : Int, block : (error : ErrorType?)->()){
+func getCaseStatus(caseIdx : Int, block : (err : NSError?)->()){
     var responseText = ""
-    let ws = WebSocket(baseURL + "/getCaseStatus?case=\(caseIdx+1)&agent=\(agent)")
-    ws.event.error = { error in
-        block(error: error)
+    var ws = WebSocket(url: baseURL + "/getCaseStatus?case=\(caseIdx+1)&agent=\(agent)")
+    ws.event.error = { (err) in
+        block(err: err)
     }
     ws.event.message = { (msg) in
         if let text = msg as? String {
@@ -72,27 +73,25 @@ func getCaseStatus(caseIdx : Int, block : (error : ErrorType?)->()){
         }
     }
     ws.event.close = { (code, reason, clean) in
-        do {
-            let json = try jsonObject(responseText)
+        if let json = jsonObject(responseText){
             if let behavior = json["behavior"] as? String {
                 if behavior == "OK" {
-                    block(error: nil)
+                    block(err: nil)
                 } else if behavior == "FAILED"{
-                    block(error: makeError(""))
+                    block(err: makeError(""))
                 } else {
-                    block(error: makeError(behavior))
+                    block(err: makeError(behavior))
                 }
                 return
             }
-        } catch {
-            block(error: error)
         }
+        block(err: makeError("invalid json"))
     }
 }
 
 func updateReports(echo: Bool = false, block : ()->()){
     var success = false
-    let ws = WebSocket(baseURL + "/updateReports?agent=\(agent)")
+    var ws = WebSocket(url: baseURL + "/updateReports?agent=\(agent)")
     ws.event.close = { (code, reason, clean) in
         if echo {
             if !success{
@@ -108,62 +107,60 @@ func updateReports(echo: Bool = false, block : ()->()){
     }
 }
 
-func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
-//    var start = NSDate().timeIntervalSince1970
-//    var evstart = NSTimeInterval(0)
-    getCaseInfo(caseIdx, block: { (id, description, error) in
-        if error != nil{
-            print("[ERR] getCaseInfo failed: \(error!)\n")
+func runCase(caseIdx : Int, caseCount : Int, block : (err : NSError?)->()) {
+    var start = NSDate().timeIntervalSince1970
+    var evstart = NSTimeInterval(0)
+    getCaseInfo(caseIdx, { (id, description, err) in
+        if err != nil{
+            println("[ERR] getCaseInfo failed: \(err!)\n")
             exit(1)
         }
 
 
-        print("[CASE] #\(caseIdx+1)/\(caseCount): \(id): \(description)")
+        println("[CASE] #\(caseIdx+1)/\(caseCount): \(id): \(description)")
         let failed : (message : String)->() = { (message) in
-            block(error: makeError(message))
+            block(err: makeError(message))
         }
         let warn : (message : String)->() = { (message) in
             printFailure(makeError(message))
         }
         let next = { ()->() in
-//            if showDuration {
-//                let now = NSDate().timeIntervalSince1970
-//                let recv = evstart == 0 ? 0 : (evstart - start) * 1000
-//                let total = (now - start) * 1000
-//                let send = total - recv
-//                println("[DONE] %.0f ms (recv: %.0f ms, send: %.0f ms)", total, recv, send)
-//            }
-            getCaseStatus(caseIdx){ error in
-                let f : ()->() = {
-                    if let error = error as? NSError {
-                        if error.localizedDescription == "INFORMATIONAL" {
+            if showDuration {
+                var now = NSDate().timeIntervalSince1970
+                var recv = evstart == 0 ? 0 : (evstart - start) * 1000
+                var total = (now - start) * 1000
+                var send = total - recv
+                //println("[DONE] %.0f ms (recv: %.0f ms, send: %.0f ms)", total, recv, send)
+            }
+            getCaseStatus(caseIdx){ (err) in
+                var f : ()->() = {
+                    if err != nil{
+                        if err!.localizedDescription == "INFORMATIONAL" {
                             if stopOnInfo {
-                                failed(message : error.localizedDescription)
+                                failed(message : err!.localizedDescription)
                                 return
                             }
                         } else if stopOnFailure {
-                            failed(message : error.localizedDescription)
+                            failed(message : err!.localizedDescription)
                             return
                         }
-                        warn(message : error.localizedDescription)
+                        warn(message : err!.localizedDescription)
                     }
                     if caseIdx+1 == caseCount || stopAfterOne || (caseIdx+1 == stopAtCase){
-                        block(error: nil)
+                        block(err: nil)
                     } else {
-                        runCase(caseIdx+1, caseCount: caseCount, block: block)
+                        runCase(caseIdx+1, caseCount, block)
                     }
                 }
                 if keepStatsUpdated {
-                    updateReports(false, block: f)
+                    updateReports(echo: false, f)
                 } else {
                     f()
                 }
             }
         }
-        var responseError : ErrorType?
-        //print(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
-        let ws = WebSocket(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
-//        ws.flag = true
+        var responseError : NSError?
+        var ws = WebSocket(url: baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
         ws.event.synced = true
         if id.hasPrefix("13.") || id.hasPrefix("12.") {
             ws.compression.on = true
@@ -197,14 +194,14 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
             }
         }
         //ws.binaryType = .NSData
-        ws.event.end = { (code, reason, clean, error) in
-            responseError = error
+        ws.event.end = { (code, reason, clean, err) in
+            responseError = err
             if responseError == nil {
                 next()
             } else {
                 var message = ""
-                if let error = responseError as? NSError {
-                    message += error.localizedDescription
+                if responseError != nil{
+                    message += responseError!.localizedDescription
                 }
                 if code != 0 {
                     message += " with code '\(code)' and reason '\(reason)'"
@@ -213,41 +210,41 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
             }
         }
         ws.event.message = { (msg) in
-//            evstart = NSDate().timeIntervalSince1970
+            evstart = NSDate().timeIntervalSince1970
             ws.send(msg)
         }
     })
 }
-func printFailure(error : ErrorType?){
-    let error = error as? NSError
-    if error == nil || error!.localizedDescription == "" {
-        print("[ERR] FAILED")
+func printFailure(err : NSError?){
+    if err == nil || err!.localizedDescription == "" {
+        println("[ERR] FAILED")
         exit(1)
     } else {
-        if error!.localizedDescription == "INFORMATIONAL" {
+        if err!.localizedDescription == "INFORMATIONAL" {
             //printinfo("INFORMATIONAL")
         } else {
-            print("[ERR] FAILED: \(error!.localizedDescription)")
+            println("[ERR] FAILED: \(err!.localizedDescription)")
             exit(1)
         }
     }
 }
 
-getCaseCount { (count, error) in
-    if error != nil{
-        print("[ERR] getCaseCount failed: \(error!)")
+getCaseCount { (count, err) in
+    if err != nil{
+        println("[ERR] getCaseCount failed: \(err!)")
         exit(1)
     }
-    runCase(startCase-1, caseCount: count){ (error) in
-        if error == nil{
+    runCase(startCase-1, count){ (err) in
+        if err == nil{
         } else {
-            printFailure(error)
+            printFailure(err)
             exit(1)
         }
-        updateReports(true){
+        updateReports(echo: true){
             exit(0)
         }
     }
 }
+
 
 NSRunLoop.mainRunLoop().run()

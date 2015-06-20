@@ -1,8 +1,6 @@
 #<img src="https://tidwall.github.com/SwiftWebSocket/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
 <a href="https://tidwall.github.io/SwiftWebSocket/results/"><img src="https://tidwall.github.io/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
-<a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
-
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
 
@@ -10,11 +8,9 @@ Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client li
 
 SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
-**Built for Swift 2.0** - For Swift 1.2 support use v0.1.18 or earlier.
-
 ## Features
 
-- Swift 2.0. No need for Objective-C Bridging.
+- Pure Swift solution. No need for Objective-C Bridging.
 - Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
 - Strict UTF-8 processing. 
 - The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
@@ -28,31 +24,27 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 
 ```swift
 func echoTest(){
-    var messageNum = 0
-    let ws = WebSocket("wss://echo.websocket.org")
-    let send : ()->() = {
-        let msg = "\(++messageNum): \(NSDate().description)"
-        print("send: \(msg)")
+    var messageNum = 1
+    var ws = WebSocket(url: "wss://echo.websocket.org")
+    var send : ()->() = {
+        var msg = "#\(messageNum++): \(NSDate().description)"
+        println("send: \(msg)")
         ws.send(msg)
     }
     ws.event.open = {
-        print("opened")
+        println("opened")
         send()
     }
-    ws.event.close = { code, reason, clean in
-        print("close")
+    ws.event.close = { (code, reason, clean) in
+        println("close")
     }
-    ws.event.error = { error in
-        print("error \(error)")
+    ws.event.error = { (error) in
+        println("error \(error.localizedDescription)")
     }
-    ws.event.message = { message in
+    ws.event.message = { (message) in
         if let text = message as? String {
-            print("recv: \(text)")
-            if messageNum == 10 {
-                ws.close()
-            } else {
-                send()
-            }
+            println("recv: \(text)")
+            send()
         }
     }
 }

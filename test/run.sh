@@ -18,7 +18,7 @@ cleanup() {
 		if [ -d "reports/clients/" ]; then
 			cp -f res/failing.png reports/build.png
 			printf "\033[0;31m[FAILURE]\033[0m\n"
-		else
+		else 
 			printf "\033[0;31m[FAILURE]\033[0m Cancelled Early\n"
 			exit
 		fi
@@ -36,3 +36,4 @@ echo "" >> /tmp/SwiftWebSocket/tests/main.swift
 cat autobahn.swift >> /tmp/SwiftWebSocket/tests/main.swift
 swift -Ounchecked /tmp/SwiftWebSocket/tests/main.swift
 SUCCESS=1
+
