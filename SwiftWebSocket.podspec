@@ -9,9 +9,9 @@ Pod::Spec.new do |s|
   s.social_media_url      = "https://twitter.com/tidwall"
   s.ios.platform          = :ios, '8.0'
   s.ios.deployment_target = "8.0"
-  s.osx.platform          = :osx, '10.10'
-  s.osx.deployment_target = "10.10"
-  s.source_files          = "SwiftWebSocket/*.swift"
+  s.osx.platform          = :osx, '10.9'
+  s.osx.deployment_target = "10.9"
+  s.source_files          = "Source/*.swift"
   s.requires_arc          = true
   s.libraries             = 'z'
 end
