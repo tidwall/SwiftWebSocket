@@ -117,15 +117,23 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
             exit(1)
         }
 
+        var next = { ()->() in }
+
 
         print("[CASE] #\(caseIdx+1)/\(caseCount): \(id): \(description)")
         let failed : (message : String)->() = { (message) in
-            block(error: makeError(message))
+            let error = makeError(message)
+            printFailure(error)
+            if stopOnFailure {
+                block(error: error)    
+            } else {
+                next()
+            }
         }
         let warn : (message : String)->() = { (message) in
             printFailure(makeError(message))
         }
-        let next = { ()->() in
+        next = { ()->() in
 //            if showDuration {
 //                let now = NSDate().timeIntervalSince1970
 //                let recv = evstart == 0 ? 0 : (evstart - start) * 1000
@@ -153,7 +161,7 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
                         runCase(caseIdx+1, caseCount: caseCount, block: block)
                     }
                 }
-                if keepStatsUpdated {
+                if keepStatsUpdated || caseIdx % 10 == 0 {
                     updateReports(false, block: f)
                 } else {
                     f()
@@ -228,7 +236,6 @@ func printFailure(error : ErrorType?){
             //printinfo("INFORMATIONAL")
         } else {
             print("[ERR] FAILED: \(error!.localizedDescription)")
-            exit(1)
         }
     }
 }
@@ -240,12 +247,13 @@ getCaseCount { (count, error) in
     }
     runCase(startCase-1, caseCount: count){ (error) in
         if error == nil{
+            updateReports(true){
+               exit(0)
+            }
         } else {
-            printFailure(error)
-            exit(1)
-        }
-        updateReports(true){
-            exit(0)
+            updateReports(true){
+               exit(1)
+            }
         }
     }
 }
