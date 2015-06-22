@@ -370,7 +370,8 @@ public class WebSocket {
         do {
             let ws = try WebSocketConn(self.request, services: TCPConnService(self.services.rawValue), protocols: self.subProtocols, compression: self.compression)
             wso = ws
-            self.privateSubProtocol = ws.subProtocol
+            privateSubProtocol = ws.subProtocol
+            privateReadyState = .Open
             fireEvent(.Opened)
             var pongFrames : [Frame] = []
             dispatch_async(dispatch_queue_create(nil, nil)) {
