@@ -415,7 +415,15 @@ public class WebSocket {
                             break
                         }
                         if frame != nil{
-                            try ws.writeFrame(frame!)
+                            do {
+                                ws.writeDeadline = NSDate().dateByAddingTimeInterval(1)
+                                try ws.writeFrame(frame!)
+                            } catch {
+                                let error = error as NSError
+                                if error.code != -102 || error.localizedDescription != "timeout" {
+                                    throw error
+                                }
+                            }
                             frame = nil
                         }
                     }
@@ -1541,7 +1549,6 @@ private class WebSocketConn {
         written = 0
         if payloadBytes != nil {
             while written < payloadBytes!.count {
-                
                 let n = try self.c!.write((&payloadBytes!)+written, length: payloadBytes!.count-written)
                 if n == -1 {
                     break
