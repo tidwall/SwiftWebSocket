@@ -455,8 +455,8 @@ public class WebSocket {
             }
             if nserror.localizedDescription != "eof" {
                 finalError = error
-                if nserror.localizedDescription != "closed" {
-                    finalErrorIsClosed = true
+                finalErrorIsClosed = nserror.localizedDescription == "closed"
+                if !finalErrorIsClosed {
                     fireEvent(.Error, error: error)
                 }
             }
