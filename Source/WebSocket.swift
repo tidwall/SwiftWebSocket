@@ -335,7 +335,10 @@ public class WebSocket {
             if finalErrorIsClosed {
                 finalError = nil
             }
-            fireEvent(.End, error: finalError, code: closeCode, reason: closeReason, wasClean: closeClean)
+            lock()
+            let (_closeCode, _closeReason, _closeClean) = (closeCode, closeReason, closeClean)
+            unlock()
+            fireEvent(.End, error: finalError, code: _closeCode, reason: _closeReason, wasClean: _closeClean)
             lock()
             signal()
             unlock()
@@ -345,7 +348,6 @@ public class WebSocket {
             if let ws = wso {
                 lock()
                 let cclose = self.cclose
-                unlock()
                 if !cclose {
                     var err : NSError?
                     if finalError != nil {
@@ -362,9 +364,11 @@ public class WebSocket {
                         }
                     }
                 }
-                ws.close(closeCode, reason: closeReason)
+                let (_closeCode, _closeReason, _closeClean) = (closeCode, closeReason, closeClean)
+                unlock()
+                ws.close(_closeCode, reason: _closeReason)
                 privateReadyState = WebSocketReadyState.Closed
-                fireEvent(.Closed, code: closeCode, reason: closeReason, wasClean: closeClean)
+                fireEvent(.Closed, code: _closeCode, reason: _closeReason, wasClean: _closeClean)
             }
         }
         do {
@@ -379,9 +383,10 @@ public class WebSocket {
                 defer {
                     if cclose {
                         self.lock()
-                        let (ccode, creason) = (self.ccode, self.creason)
+                        (closeCode, closeReason, closeClean) = (self.ccode, self.creason, true)
+                        let (_closeCode, _closeReason) = (closeCode, closeReason)
                         self.unlock()
-                        ws.close(ccode, reason: creason)
+                        ws.close(_closeCode, reason: _closeReason)
                     } else {
                         ws.close()
                     }
@@ -439,7 +444,9 @@ public class WebSocket {
                 let f = try ws.readFrame()
                 switch f.code {
                 case .Close:
+                    lock()
                     (closeCode, closeReason, closeClean) = (Int(f.statusCode), f.utf8.text, true)
+                    unlock()
                     return
                 case .Ping:
                     f.code = .Pong
