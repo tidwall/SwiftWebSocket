@@ -148,26 +148,26 @@ public struct WebSocketCompression {
 
 
 /// The WebSocketService options are used by the services property and manages the underlying socket services.
-public struct WebSocketService : RawOptionSetType {
+public struct WebSocketService :  OptionSetType {
     public typealias RawValue = UInt
     var value: UInt = 0
     init(_ value: UInt) { self.value = value }
     public init(rawValue value: UInt) { self.value = value }
     public init(nilLiteral: ()) { self.value = 0 }
-    public static var allZeros: WebSocketService { return self(0) }
-    static func fromMask(raw: UInt) -> WebSocketService { return self(raw) }
+    public static var allZeros: WebSocketService { return self.init(0) }
+    static func fromMask(raw: UInt) -> WebSocketService { return self.init(raw) }
     public var rawValue: UInt { return self.value }
     
     /// No services.
-    static var None: WebSocketService { return self(TCPConnService.None.rawValue) }
+    static var None: WebSocketService { return self.init(TCPConnService.None.rawValue) }
     /// Allow socket to handle VoIP.
-    static var VoIP: WebSocketService { return self(TCPConnService.VoIP.rawValue) }
+    static var VoIP: WebSocketService { return self.init(TCPConnService.VoIP.rawValue) }
     /// Allow socket to handle video.
-    static var Video: WebSocketService { return self(TCPConnService.Video.rawValue) }
+    static var Video: WebSocketService { return self.init(TCPConnService.Video.rawValue) }
     /// Allow socket to run in background.
-    static var Background: WebSocketService { return self(TCPConnService.Background.rawValue) }
+    static var Background: WebSocketService { return self.init(TCPConnService.Background.rawValue) }
     /// Allow socket to handle voice.
-    static var Voice: WebSocketService { return self(TCPConnService.Voice.rawValue) }
+    static var Voice: WebSocketService { return self.init(TCPConnService.Voice.rawValue) }
 }
 
 public class WebSocket {
@@ -575,20 +575,20 @@ private enum TCPConnSecurity {
     case NegoticatedSSL
 }
 
-private struct TCPConnService : RawOptionSetType {
+private struct TCPConnService : OptionSetType {
     typealias RawValue = UInt
     var value: UInt = 0
     init(_ value: UInt) { self.value = value }
     init(rawValue value: UInt) { self.value = value }
     init(nilLiteral: ()) { self.value = 0 }
-    static var allZeros: TCPConnService { return self(0) }
-    static func fromMask(raw: UInt) -> TCPConnService { return self(raw) }
+    static var allZeros: TCPConnService { return self.init(0) }
+    static func fromMask(raw: UInt) -> TCPConnService { return self.init(raw) }
     var rawValue: UInt { return self.value }
-    static var None: TCPConnService { return self(0) }
-    static var VoIP: TCPConnService { return self(1 << 0) }
-    static var Video: TCPConnService { return self(1 << 1) }
-    static var Background: TCPConnService { return self(1 << 2) }
-    static var Voice: TCPConnService { return self(1 << 3) }
+    static var None: TCPConnService { return self.init(0) }
+    static var VoIP: TCPConnService { return self.init(1 << 0) }
+    static var Video: TCPConnService { return self.init(1 << 1) }
+    static var Background: TCPConnService { return self.init (1 << 2) }
+    static var Voice: TCPConnService { return self.init(1 << 3) }
 }
 
 private enum WaitResult {
@@ -629,19 +629,19 @@ private class TCPConn {
         }
         rd.setProperty(securityLevel, forKey: NSStreamSocketSecurityLevelKey)
         wr.setProperty(securityLevel, forKey: NSStreamSocketSecurityLevelKey)
-        if services & .VoIP != nil {
+        if services.contains(.VoIP) {
             rd.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
         }
-        if services & .Video != nil {
+        if services.contains(.Video) {
             rd.setProperty(NSStreamNetworkServiceTypeVideo, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeVideo, forKey: NSStreamNetworkServiceType)
         }
-        if services & .Background != nil {
+        if services.contains(.Background) {
             rd.setProperty(NSStreamNetworkServiceTypeBackground, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeBackground, forKey: NSStreamNetworkServiceType)
         }
-        if services & .Voice != nil {
+        if services.contains(.Voice) {
             rd.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
         }
@@ -1082,7 +1082,7 @@ private class WebSocketConn {
     var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
     init(_ request : NSURLRequest, protocols : [String] = [], services : TCPConnService = TCPConnService(0), compression : WebSocketCompression = WebSocketCompression()) throws {
         if request.URL == nil {
-            try TCPConn("")
+            let _ = try TCPConn("")
         }
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
@@ -1099,7 +1099,7 @@ private class WebSocketConn {
             req.setValue(";".join(protocols), forHTTPHeaderField: "Sec-WebSocket-Protocol")
         }
         if req.URL!.scheme != "wss" && req.URL!.scheme != "ws" {
-            try TCPConn("")
+            let _ = try TCPConn("")
         }
         if compression.on {
             var val = "permessage-deflate"
