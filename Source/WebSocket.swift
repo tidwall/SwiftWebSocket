@@ -47,7 +47,65 @@ private let errAddress = makeError("invalid address")
 private let errNegative = makeError("length cannot be negative")
 
 private class BoxedBytes {
-    var bytes = [UInt8]()
+    var ptr : UnsafeMutablePointer<UInt8>
+    var cap : Int
+    var len : Int
+    init(){
+        len = 0
+        cap = 1024 * 16
+        ptr = UnsafeMutablePointer<UInt8>(malloc(cap))
+    }
+    deinit{
+        free(ptr)
+    }
+    var count : Int {
+        get {
+            return len
+        }
+        set {
+            if newValue > cap {
+                while cap < newValue {
+                    cap *= 2
+                }
+                ptr = UnsafeMutablePointer<UInt8>(realloc(ptr, cap))
+            }
+            len = newValue
+        }
+    }
+    func append(bytes: UnsafePointer<UInt8>, length: Int){
+        let prevLen = len
+        count = len+length
+        memcpy(ptr+prevLen, bytes, length)
+    }
+    var array : [UInt8] {
+        get {
+            var array = [UInt8](count: count, repeatedValue: 0)
+            memcpy(&array, ptr, count)
+            return array
+        }
+        set {
+            count = 0
+            append(newValue, length: newValue.count)
+        }
+    }
+    var nsdata : NSData {
+        get {
+            return NSData(bytes: ptr, length: count)
+        }
+        set {
+            count = 0
+            append(UnsafePointer<UInt8>(newValue.bytes), length: newValue.length)
+        }
+    }
+    var buffer : UnsafeBufferPointer<UInt8> {
+        get {
+            return UnsafeBufferPointer<UInt8>(start: ptr, count: count)
+        }
+        set {
+            count = 0
+            append(newValue.baseAddress, length: newValue.count)
+        }
+    }
 }
 
 private enum OpCode : UInt8, CustomStringConvertible {
@@ -75,8 +133,6 @@ private enum OpCode : UInt8, CustomStringConvertible {
 
 /// The WebSocketEvents struct is used by the events property and manages the events for the WebSocket connection.
 public struct WebSocketEvents {
-    /// Strict event synchronization with background connection. Forces the connection to wait until an event has returned before processing the next frame.
-    public var synced = false
     /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
     public var open : ()->() = {}
     /// An event to be called when the WebSocket connection's readyState changes to .Closed.
@@ -97,11 +153,13 @@ public enum WebSocketBinaryType : CustomStringConvertible {
     case UInt8Array
     /// The WebSocket should transmit NSData objects.
     case NSData
-    /// Returns a string that represents the ReadyState value.
+    /// The WebSocket should transmit UnsafeBufferPointer<UInt8> objects. This buffer is only valid during the scope of the message event. Use at your own risk.
+    case UInt8UnsafeBufferPointer
     public var description : String {
         switch self {
         case UInt8Array: return "UInt8Array"
         case NSData: return "NSData"
+        case UInt8UnsafeBufferPointer: return "UInt8UnsafeBufferPointer"
         }
     }
 }
@@ -288,7 +346,7 @@ public class WebSocket {
         let binaryType = _binaryType
         let events = _event
         unlock()
-        let action : ()->() = {
+        dispatch_sync(dispatch_get_main_queue()) {
             switch event {
             case .Opened:
                 events.open()
@@ -301,30 +359,20 @@ public class WebSocket {
             case .Text:
                 events.message(data: frame!.utf8.text)
             case .Binary, .Pong:
-                var bytes = frame!.payload.bytes
-                var nsdata : NSData?
-                if binaryType == .NSData {
-                    nsdata = NSData(bytes: &bytes, length: bytes.count)
-                }
                 if event == .Binary {
-                    if binaryType == .NSData {
-                        events.message(data: nsdata!)
-                    } else {
-                        events.message(data: bytes)
+                    switch binaryType{
+                    case .UInt8Array: events.message(data: frame!.payload.array)
+                    case .NSData: events.message(data: frame!.payload.nsdata)
+                    case .UInt8UnsafeBufferPointer: events.message(data: frame!.payload.buffer)
                     }
                 } else {
-                    if binaryType == .NSData {
-                        events.pong(data: nsdata!)
-                    } else {
-                        events.pong(data: bytes)
+                    switch binaryType{
+                    case .UInt8Array: events.pong(data: frame!.payload.array)
+                    case .NSData: events.pong(data: frame!.payload.nsdata)
+                    case .UInt8UnsafeBufferPointer: events.pong(data: frame!.payload.buffer)
                     }
                 }
             }
-        }
-        if events.synced {
-            dispatch_sync(dispatch_get_main_queue()) { action() }
-        } else {
-            dispatch_async(dispatch_get_main_queue()) { action() }
         }
     }
     private func main(){
@@ -522,11 +570,13 @@ public class WebSocket {
             f.utf8.text = message
         } else if let message = message as? [UInt8] {
             f.code = .Binary
-            f.payload.bytes = message
+            f.payload.array = message
+        } else if let message = message as? UnsafeBufferPointer<UInt8> {
+            f.code = .Binary
+            f.payload.append(message.baseAddress, length: message.count)
         } else if let message = message as? NSData {
             f.code = .Binary
-            f.payload.bytes = [UInt8](count: message.length, repeatedValue: 0)
-            memcpy(&f.payload.bytes, message.bytes, message.length)
+            f.payload.nsdata = message
         } else {
             f.code = .Text
             f.utf8.text = "\(message)"
@@ -550,12 +600,13 @@ public class WebSocket {
         let f = Frame()
         f.code = .Ping
         if let message = message as? String {
-            f.payload.bytes = UTF8.bytes(message)
+            f.payload.array = UTF8.bytes(message)
         } else if let message = message as? [UInt8] {
-            f.payload.bytes = message
+            f.payload.array = message
+        } else if let message = message as? UnsafeBufferPointer<UInt8> {
+            f.payload.append(message.baseAddress, length: message.count)
         } else if let message = message as? NSData {
-            f.payload.bytes = [UInt8](count: message.length, repeatedValue: 0)
-            memcpy(&f.payload.bytes, message.bytes, message.length)
+            f.payload.nsdata = message
         } else {
             f.utf8.text = "\(message)"
         }
@@ -1265,8 +1316,10 @@ private class WebSocketConn {
             }
         }
     }
+
     var savedFrame : Frame?
     func readFrame() throws -> Frame {
+
         var (f, fin): (Frame, Bool) = (Frame(), false)
         if savedFrame != nil {
             (f, fin) = (savedFrame!, false)
@@ -1294,6 +1347,8 @@ private class WebSocketConn {
         }
         return f
     }
+
+    var reusedBoxedBytes = BoxedBytes()
     func readFrameFragment(var leader : Frame?) throws -> Frame {
         var b = UInt8(0)
         do {
@@ -1301,7 +1356,6 @@ private class WebSocketConn {
         } catch {
             throw makeError(error, .Protocol)
         }
-        
         var inflate = false
         let fin = b >> 7 & 0x1 == 0x1
         let rsv1 = b >> 6 & 0x1 == 0x1
@@ -1378,7 +1432,8 @@ private class WebSocketConn {
         } else {
             leaderCode = code
             utf8 = UTF8()
-            payload = BoxedBytes()
+            payload = reusedBoxedBytes
+            payload.count = 0
         }
         if leaderCode == .Close {
             if len == 1 {
@@ -1435,9 +1490,9 @@ private class WebSocketConn {
                 take -= n
             } while take > 0
         } else {
-            var start = payload.bytes.count
+            var start = payload.count
             if !inflate {
-                payload.bytes += [UInt8](count: len, repeatedValue: 0)
+                payload.count += len
             }
             var take = Int(len)
             repeat {
@@ -1461,12 +1516,11 @@ private class WebSocketConn {
                         throw makeError(error, .Payload)
                     }
                     if bytesLen > 0 {
-                        payload.bytes += [UInt8](count: bytesLen, repeatedValue: 0)
-                        memcpy((&payload.bytes)+payload.bytes.count-bytesLen, bytes, bytesLen)
+                        payload.append(bytes, length: bytesLen)
                     }
                 } else if take > 0 {
                     do {
-                        n = try self.c!.read(&payload.bytes+start, length: take)
+                        n = try self.c!.read(payload.ptr+start, length: take)
                     } catch {
                         throw makeError(error, .Payload)
                     }
@@ -1494,14 +1548,14 @@ private class WebSocketConn {
             }
         }
         head[hlen++] = b | f.code.rawValue
-        var payloadBytes : [UInt8]?
+        var payloadBytes : [UInt8]
         var payloadLen = 0
         if f.utf8.text != "" {
             payloadBytes = UTF8.bytes(f.utf8.text)
         } else {
-            payloadBytes = f.payload.bytes
+            payloadBytes = f.payload.array
         }
-        payloadLen += payloadBytes!.count
+        payloadLen += payloadBytes.count
         if deflate {
             
         }
@@ -1537,11 +1591,11 @@ private class WebSocketConn {
                 head[hlen++] = sc[0]
                 head[hlen++] = sc[1]
                 for var i = 2; i < payloadLen; i++ {
-                    payloadBytes![i-2] ^= maskBytes[i % 4]
+                    payloadBytes[i-2] ^= maskBytes[i % 4]
                 }
             } else {
                 for var i = 0; i < payloadLen; i++ {
-                    payloadBytes![i] ^= maskBytes[i % 4]
+                    payloadBytes[i] ^= maskBytes[i % 4]
                 }
             }
         }
@@ -1554,22 +1608,12 @@ private class WebSocketConn {
             written += n
         }
         written = 0
-        if payloadBytes != nil {
-            while written < payloadBytes!.count {
-                let n = try self.c!.write((&payloadBytes!)+written, length: payloadBytes!.count-written)
-                if n == -1 {
-                    break
-                }
-                written += n
+        while written < payloadBytes.count {
+            let n = try self.c!.write((&payloadBytes)+written, length: payloadBytes.count-written)
+            if n == -1 {
+                break
             }
-        } else {
-            while written < f.payload.bytes.count {
-                let n = try self.c!.write((&f.payload.bytes)+written, length: f.payload.bytes.count-written)
-                if n == -1 {
-                    break
-                }
-                written += n
-            }
+            written += n
         }
     }
     var readDeadline : NSDate {
