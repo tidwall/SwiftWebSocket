@@ -737,6 +737,16 @@ private extension WebSocket {
             return ""
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     class Stream {
         class Deflater {
             var windowBits = 0
@@ -825,7 +835,12 @@ private extension WebSocket {
                 return (buffer, buflen, nil)
             }
         }
-        class DelegatePlaceholder : NSObject, NSStreamDelegate { }
+        class ConnDelegate : NSObject, NSStreamDelegate {
+            var stream : Stream!
+            @objc private func stream(aStream: NSStream, handleEvent eventCode: NSStreamEvent) {
+                stream.signal()
+            }
+        }
         var req : NSMutableURLRequest
         var compression : Compression
         var rd : NSInputStream!
@@ -833,10 +848,14 @@ private extension WebSocket {
         var opened = false
         var inflater : Inflater?
         var deflater : Deflater?
-        var delegate = DelegatePlaceholder()
+        var delegate = ConnDelegate()
+        var mutex = pthread_mutex_t()
+        var cond = pthread_cond_t()
         var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
         var subProtocol = ""
         init(request : NSURLRequest, subProtocols : [String], voipEnabled : Bool, compression : Compression){
+            pthread_mutex_init(&mutex, nil)
+            pthread_cond_init(&cond, nil)
             self.compression = compression
             req = request.mutableCopy() as! NSMutableURLRequest
             req.setValue("websocket", forHTTPHeaderField: "Upgrade")
@@ -873,10 +892,20 @@ private extension WebSocket {
                 rd.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
                 wr.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
             }
+            delegate.stream = self
             rd.delegate = delegate
             wr.delegate = delegate
-            rd.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-            wr.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            rd.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+            wr.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        }
+        deinit{
+            pthread_cond_destroy(&cond)
+            pthread_mutex_init(&mutex, nil)
+        }
+        func signal(){
+            pthread_mutex_lock(&mutex)
+            pthread_cond_broadcast(&cond)
+            pthread_mutex_unlock(&mutex)
         }
         func open() -> NSError? {
             if opened {
@@ -927,15 +956,15 @@ private extension WebSocket {
             var have = header.count
             var sent = 0
             var n = 0
+            var err : NSError?
             while have > 0 {
-                n = wr.write(&header+sent, maxLength: have)
-                if n < 1 {
-                    if wr.streamError != nil{
-                        return wr.streamError
-                    }
+                (n, err) = write(&header+sent, maxLength: have)
+                if err != nil {
+                    return err
                 }
                 have -= n
             }
+
             var needsCompression = false
             var serverMaxWindowBits = WebSocket.defaultMaxWindowBits
             var clientMaxWindowBits = WebSocket.defaultMaxWindowBits
@@ -1016,32 +1045,37 @@ private extension WebSocket {
             }
             return nil
         }
-        func close(code: UInt16 = 1001, reason: String = "Going Away") -> NSError?{
+        func close(code: UInt16 = 1001, reason: String = "Going Away") -> NSError? {
+            pthread_mutex_lock(&mutex)
             if !opened {
+                pthread_mutex_unlock(&mutex)
                 return WebSocket.ErrClosed
             }
-            opened = false
             var f = Frame()
             (f.code, f.statusCode, f.utf8.text) = (.Close, code, reason)
+            pthread_mutex_unlock(&mutex)
             writeFrame(f)
+            pthread_mutex_lock(&mutex)
+            opened = false
             wr.close()
             rd.close()
-            wr.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-            rd.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+            rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
             wr.delegate = nil
             rd.delegate = nil
+            delegate.stream = nil
+            pthread_cond_broadcast(&cond)
+            pthread_mutex_unlock(&mutex)
             return nil
         }
         @inline(__always) func readByte(inout b : UInt8) -> NSError? {
             for ;; {
-                let n = rd.read(&b, maxLength: 1)
-                switch n {
-                case 1:
+                let (n, err) = read(&b, maxLength: 1)
+                if err != nil {
+                    return err
+                }
+                if n == 1 {
                     return nil
-                default:
-                    if rd!.streamError != nil{
-                        return rd!.streamError
-                    }
                 }
             }
         }
@@ -1157,14 +1191,15 @@ private extension WebSocket {
             if leaderCode == .Text || leaderCode == .Close {
                 var take = Int(len)
                 do {
+                    var err : NSError?
                     var n : Int = 0
                     if take > 0 {
                         var c = take
                         if c > buffer.count {
                             c = buffer.count
                         }
-                        n = rd.read(&buffer, maxLength: c)
-                        if let err = rd.streamError {
+                        (n, err) = read(&buffer, maxLength: c)
+                        if let err = err {
                             return (nil, WebSocket.makeError(err.localizedDescription, code: .Payload))
                         }
                     }
@@ -1191,6 +1226,7 @@ private extension WebSocket {
                 }
                 var take = Int(len)
                 do {
+                    var err : NSError?
                     var n : Int = 0
                     if inflate {
                         if take > 0 {
@@ -1198,8 +1234,8 @@ private extension WebSocket {
                             if c > buffer.count {
                                 c = buffer.count
                             }
-                            n = rd.read(&buffer, maxLength: c)
-                            if let err = rd.streamError {
+                            (n, err) = read(&buffer, maxLength: c)
+                            if let err = err {
                                 return (nil, WebSocket.makeError(err.localizedDescription, code: .Payload))
                             }
                         }
@@ -1212,8 +1248,8 @@ private extension WebSocket {
                             memcpy((&payload.bytes)+payload.bytes.count-bytesLen, bytes, bytesLen)
                         }
                     } else if take > 0 {
-                        n = rd.read(&payload.bytes+start, maxLength: take)
-                        if let err = rd.streamError {
+                        (n, err) = read(&payload.bytes+start, maxLength: take)
+                        if let err = err {
                             return (nil, WebSocket.makeError(err.localizedDescription, code: .Payload))
                         }
                         start += n
@@ -1225,6 +1261,53 @@ private extension WebSocket {
             (f.code, f.payload, f.utf8, f.statusCode, f.inflate, f.finished) = (code, payload, utf8, statusCode, inflate, fin)
             return (f, nil)
         }
+        @inline(__always) func read(buffer: UnsafeMutablePointer<UInt8>, maxLength len: Int) -> (Int, NSError?) {
+            var error : NSError?
+            var result = 0
+            pthread_mutex_lock(&mutex)
+            for ;; {
+                if !opened {
+                    error = WebSocket.makeError("closed")
+                    break
+                }
+                if rd.hasBytesAvailable {
+                    result = rd.read(buffer, maxLength: len)
+                    break
+                }
+                if rd.streamError != nil {
+                    error = rd.streamError
+                    break
+                }
+                pthread_cond_wait(&cond, &mutex)
+            }
+            pthread_mutex_unlock(&mutex)
+            return (result, error)
+        }
+        
+        @inline(__always) func write(buffer: UnsafePointer<UInt8>, maxLength len: Int) -> (Int, NSError?) {
+            var error : NSError?
+            var result = 0
+            pthread_mutex_lock(&mutex)
+            for ;; {
+                if !opened {
+                    error = WebSocket.makeError("closed")
+                    break
+                }
+                if wr.hasSpaceAvailable {
+                    result = wr.write(buffer, maxLength: len)
+                    break
+                }
+                if wr.streamError != nil {
+                    error = wr.streamError
+                    break
+                }
+                pthread_cond_wait(&cond, &mutex)
+            }
+            pthread_mutex_unlock(&mutex)
+            return (result, error)
+
+        }
+        
         var savedFrame : Frame?
         func readFrame() -> (f : Frame?, err : NSError?){
             var (f : Frame?, fin : Bool, err : NSError?) = (nil, false, nil)
@@ -1331,34 +1414,31 @@ private extension WebSocket {
             }
             var written = 0
             while written < hlen {
-                let n = wr!.write((&head)+written, maxLength: hlen-written)
-                if n == -1 {
-                    break
+                let (n, err) = write((&head)+written, maxLength: hlen-written)
+                if err != nil{
+                     return err
                 }
                 written += n
-            }
-            if let err = wr!.streamError {
-                return err
             }
             written = 0
             if payloadBytes != nil {
                 while written < payloadBytes!.count {
-                    let n = wr!.write((&payloadBytes!)+written, maxLength: payloadBytes!.count-written)
-                    if n == -1 {
-                        break
+                    let (n, err) = write((&payloadBytes!)+written, maxLength: payloadBytes!.count-written)
+                    if err != nil {
+                        return err
                     }
                     written += n
                 }
             } else {
                 while written < f.payload.bytes.count {
-                    let n = wr!.write((&f.payload.bytes)+written, maxLength: f.payload.bytes.count-written)
-                    if n == -1 {
-                        break
+                    let (n, err) = write((&f.payload.bytes)+written, maxLength: f.payload.bytes.count-written)
+                    if err != nil {
+                        return err
                     }
                     written += n
                 }
             }
-            return wr!.streamError
+            return nil
         }
         func writeClose(code : UInt16, reason : String) -> NSError?{
             var f = Frame()
