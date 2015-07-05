@@ -244,6 +244,7 @@ public class WebSocket {
     private var _event = WebSocketEvents()
     private var _binaryType = WebSocketBinaryType.UInt8Array
     private var _readyState = WebSocketReadyState.Connecting
+    private var _networkTimeout = NSTimeInterval(-1)
     
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String {
@@ -285,7 +286,7 @@ public class WebSocket {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
-    
+
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
@@ -488,7 +489,7 @@ public class WebSocket {
                 privateReadyState = .Closing
             }
             for ;; {
-                ws.readDeadline = NSDate().dateByAddingTimeInterval(60)
+                ws.readDeadline = NSDate().dateByAddingTimeInterval(oneHundredYears)
                 let f = try ws.readFrame()
                 switch f.code {
                 case .Close:
