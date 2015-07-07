@@ -11,10 +11,12 @@
 
 import Foundation
 
+private let windowBufferSize = 0x2000
+
 public var WebSocketDebug = false
 public func printx<T>(value: T){
     if WebSocketDebug {
-        print(value)
+        NSLog("%@", "\(value)")
     }
 }
 
@@ -25,7 +27,7 @@ private class BoxedBytes {
     var len : Int
     init(){
         len = 0
-        cap = 1024 * 16
+        cap = windowBufferSize
         ptr = UnsafeMutablePointer<UInt8>(malloc(cap))
     }
     deinit{
@@ -195,7 +197,7 @@ public struct WebSocketService :  OptionSetType {
     static var Voice: WebSocketService { return self.init(1 << 3) }
 }
 
-private var queue = dispatch_queue_create("com.oncast.SwiftWebSocket", DISPATCH_QUEUE_SERIAL)
+private var queue = dispatch_queue_create("SwiftWebSocket", DISPATCH_QUEUE_SERIAL)
 
 public class WebSocket {
     private var mutex = pthread_mutex_t()
@@ -291,10 +293,10 @@ public class WebSocket {
         pthread_cond_init(&cond, nil)
         self.request = request
         self.subProtocols = subProtocols
-        self.outputBytes = UnsafeMutablePointer<UInt8>.alloc(1024)
-        self.outputBytesSize = 1024
-        self.inputBytes = UnsafeMutablePointer<UInt8>.alloc(1024)
-        self.inputBytesSize = 1024
+        self.outputBytes = UnsafeMutablePointer<UInt8>.alloc(windowBufferSize)
+        self.outputBytesSize = windowBufferSize
+        self.inputBytes = UnsafeMutablePointer<UInt8>.alloc(windowBufferSize)
+        self.inputBytesSize = windowBufferSize
         self.delegate = Delegate()
         self.delegate.ws = self
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
@@ -330,7 +332,6 @@ public class WebSocket {
         case Exit
     }
     
-    private static var gnum = 0
     private var stage = Stage.OpenConn
     private var rd : NSInputStream!
     private var wr : NSOutputStream!
@@ -341,7 +342,6 @@ public class WebSocket {
     private var acceptNoMoreOutput = false
     private var acceptNoMoreInput = false
     private var finalError : ErrorType?
-    private var num = 0
     private var exit = false
 
     private func step(event: NSStreamEvent){
@@ -359,15 +359,14 @@ public class WebSocket {
             try handleEvent(event)
             switch stage {
             case .OpenConn:
-                num = WebSocket.gnum++
                 try openConn()
                 stage = .ReadResponse
             case .ReadResponse:
                 try readResponse()
                 stage = .HandleFrames
                 privateReadyState = .Open
-                printx("😄\(self.num) open")
-                dispatch_async(queue) { self.event.open() }
+                printx("😄open")
+                self.event.open()
                 nextStep = true
             case .HandleFrames:
                 try handleAllOutputFrames()
@@ -380,13 +379,13 @@ public class WebSocket {
                 let frame = try handleNextInputFrame()
                 switch frame.code {
                 case .Text:
-                    printx("😄\(self.num) message['text']")
-                    dispatch_async(queue) { self.event.message(data: frame.utf8.text) }
+                    printx("😄message['text']")
+                    self.event.message(data: frame.utf8.text)
                 case .Binary:
-                    printx("😄\(self.num) binary['binary']")
+                    printx("😄binary['binary']")
                     switch binaryType{
-                    case .UInt8Array: dispatch_async(queue) { self.event.message(data: frame.payload.array) }
-                    case .NSData: dispatch_async(queue) { self.event.message(data: frame.payload.nsdata) }
+                    case .UInt8Array: self.event.message(data: frame.payload.array)
+                    case .NSData: self.event.message(data: frame.payload.nsdata)
                     }
                 case .Ping:
                     let nframe = frame.copy()
@@ -395,13 +394,13 @@ public class WebSocket {
                     frames += [nframe]
                     unlock()
                 case .Pong:
-                    printx("😄\(self.num) message['pong']")
+                    printx("😄message['pong']")
                     switch binaryType{
-                    case .UInt8Array: dispatch_async(queue) { self.event.pong(data: frame.payload.array) }
-                    case .NSData: dispatch_async(queue) { self.event.pong(data: frame.payload.nsdata) }
+                    case .UInt8Array: self.event.pong(data: frame.payload.array)
+                    case .NSData: self.event.pong(data: frame.payload.nsdata)
                     }
                 case .Close:
-                    printx("😄\(self.num) message['close']")
+                    printx("😄message['close']")
                     lock()
                     frames += [frame]
                     unlock()
@@ -412,24 +411,24 @@ public class WebSocket {
                 break
             case .CloseConn:
                 if let error = finalError {
-                    printx("😄\(self.num) error")
-                    dispatch_async(queue) { self.event.error(error: error) }
+                    printx("😄error")
+                    self.event.error(error: error)
                 }
                 privateReadyState  == .Closed
                 if rd != nil {
                     closeConn()
-                    printx("😄\(self.num) close")
-                    dispatch_async(queue) { self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal) }
+                    printx("😄close")
+                    self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
                 }
                 stage = .End
                 nextStep = true
             case .End:
-                printx("😄\(self.num) end")
-                dispatch_async(queue) { self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError) }
+                printx("😄end")
+                self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError)
                 stage = .Exit
                 nextStep = false
             case .Exit:
-                printx("😄\(self.num) exit")
+                printx("😄exit")
                 exit = true
                 break
             }
@@ -479,10 +478,10 @@ public class WebSocket {
     }
     
     private func handleBuffers() throws {
-        if rd != nil && rd.hasBytesAvailable {
+        if rd != nil {
             while rd.hasBytesAvailable {
                 var size = inputBytesSize
-                while size-(inputBytesStart+inputBytesLength) < 1024 {
+                while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
                     size *= 2
                 }
                 if size > inputBytesSize {
@@ -499,21 +498,19 @@ public class WebSocket {
                 }
             }
         }
-        if wr != nil && wr.hasSpaceAvailable {
-            if outputBytesLength > 0 {
-                let n = wr.write(outputBytes+outputBytesStart, maxLength: outputBytesLength)
-                if n > 0 {
-                    outputBytesLength -= n
-                    if outputBytesLength == 0 {
-                        outputBytesStart = 0
-                    } else {
-                        outputBytesStart += n
-                    }
+        if wr != nil && wr.hasSpaceAvailable && outputBytesLength > 0 {
+            let n = wr.write(outputBytes+outputBytesStart, maxLength: outputBytesLength)
+            if n > 0 {
+                outputBytesLength -= n
+                if outputBytesLength == 0 {
+                    outputBytesStart = 0
+                } else {
+                    outputBytesStart += n
                 }
             }
         }
     }
-    
+
     private func handleEvent(event: NSStreamEvent) throws {
         switch event {
         case NSStreamEvent.ErrorOccurred:
@@ -538,7 +535,7 @@ public class WebSocket {
         if !closeFinal {
             for frame in frames {
                 try writeFrame(frame)
-                printx("💜--> \(frame.code)")
+                //printx("💜--> \(frame.code)")
                 if frame.code == .Close {
                     closeCode = frame.statusCode
                     closeReason = frame.utf8.text
@@ -552,7 +549,7 @@ public class WebSocket {
         lock()
         defer { unlock() }
         let frame = try readFrame()
-        printx("💜--> \(frame.code)")
+        //printx("💜--> \(frame.code)")
         return frame
     }
     
@@ -672,7 +669,7 @@ public class WebSocket {
                 path += "?" + q
             }
         }
-        printx("🔵\(self.num) open \(path)")
+        printx("🔵open \(path)")
         var reqs = "GET \(path) HTTP/1.1\r\n"
         for key in req.allHTTPHeaderFields!.keys.array {
             if let val = req.valueForHTTPHeaderField(key) {
@@ -821,9 +818,6 @@ public class WebSocket {
                 throw WebSocketError.InvalidCompressionOptions("deflater init")
             }
         }
-        
-        
-        
         inputBytesLength -= bufferCount+4
         if inputBytesLength == 0 {
             inputBytesStart = 0
@@ -831,9 +825,7 @@ public class WebSocket {
             inputBytesStart += bufferCount+4
         }
     }
-    
-   
-    
+
     private class ByteReader {
         var start : UnsafePointer<UInt8>
         var end : UnsafePointer<UInt8>
@@ -863,7 +855,7 @@ public class WebSocket {
             }
         }
     }
-    
+
     private var fragStateSaved = false
     private var fragStatePosition = 0
     private var fragStateInflate = false
@@ -875,8 +867,7 @@ public class WebSocket {
     private var fragStatePayload = BoxedBytes()
     private var fragStateStatusCode = UInt16(0)
     private var fragStateHeaderLen = 0
-    
-    private var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
+    private var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
     private var reusedBoxedBytes = BoxedBytes()
     private func readFrameFragment(var leader : Frame?) throws -> Frame {
         var inflate : Bool
@@ -1033,37 +1024,19 @@ public class WebSocket {
             fragStateSaved = true
             throw WebSocketError.FrameNotReady
         }
-        
-        
-        
-        
-        
+
         inputBytesLength -= reader.position
         if inputBytesLength == 0 {
             inputBytesStart = 0
         } else {
             inputBytesStart += reader.position
         }
-        
+
         let f = Frame()
         (f.code, f.payload, f.utf8, f.statusCode, f.inflate, f.finished) = (code, payload, utf8, statusCode, inflate, fin)
         return f
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     private var head = [UInt8](count: 0xFF, repeatedValue: 0)
     private func writeFrame(f : Frame) throws {
         if !f.finished{
@@ -1133,14 +1106,7 @@ public class WebSocket {
         try write(head, length: hlen)
         try write(payloadBytes, length: payloadBytes.count)
     }
-    
-    
-    
-    
-    
-    
-    
-    
+
     /**
     Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
     
@@ -1215,7 +1181,6 @@ public class WebSocket {
     }
 }
 
-
 public enum WebSocketError : ErrorType, CustomStringConvertible {
     case None
     case Memory
@@ -1254,7 +1219,6 @@ public enum WebSocketError : ErrorType, CustomStringConvertible {
         default: return ""
         }
     }
-    
 }
 
 private class Delegate : NSObject, NSStreamDelegate {
@@ -1350,8 +1314,8 @@ private class Inflater {
     var strm = z_stream()
     var tInput = [[UInt8]]()
     var inflateEnd : [UInt8] = [0x00, 0x00, 0xFF, 0xFF]
-    var bufferSize = 1024
-    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
+    var bufferSize = windowBufferSize
+    var buffer = UnsafeMutablePointer<UInt8>(malloc(windowBufferSize))
     init?(windowBits : Int){
         if buffer == nil {
             return nil
@@ -1411,8 +1375,8 @@ private class Deflater {
     var windowBits = 0
     var memLevel = 0
     var strm = z_stream()
-    var bufferSize = 1024
-    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
+    var bufferSize = windowBufferSize
+    var buffer = UnsafeMutablePointer<UInt8>(malloc(windowBufferSize))
     init?(windowBits : Int, memLevel : Int){
         if buffer == nil {
             return nil
@@ -1432,7 +1396,6 @@ private class Deflater {
         return (nil, 0, nil)
     }
 }
-
 
 private class UTF8 {
     var text : String = ""

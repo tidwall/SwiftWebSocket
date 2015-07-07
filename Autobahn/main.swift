@@ -297,8 +297,9 @@ if false {
         }
     }
 } else {
-    WebSocketDebug = true
-    let ws = WebSocket(baseURL + "/runCase?case=293&agent=SwiftWebSocket")
+    WebSocketDebug = false
+    let ws = WebSocket(baseURL + "/runCase?case=306&agent=SwiftWebSocket")
+    ws.compression.on = true
     ws.event.open = {
         print(("open"))
     }
@@ -313,7 +314,7 @@ if false {
         
     }
     ws.event.message = { (msg) in
-        print(msg)
+        //print(msg)
         ws.send(msg)
     }
 }

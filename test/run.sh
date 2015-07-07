@@ -7,8 +7,7 @@ if [ ! -f "$WSTEST" ] || [ "$UPGRADE" == "1" ]; then
 	pip install --user --upgrade autobahntestsuite
 	WSTEST=$(ls $HOME/Library/Python/2.*/bin/wstest)
 fi
-$WSTEST -m fuzzingserver
-exit
+$WSTEST -m fuzzingserver &
 WSTEST_PID=$!
 cleanup() {
 	kill $WSTEST_PID
