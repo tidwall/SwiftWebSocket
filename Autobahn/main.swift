@@ -9,7 +9,7 @@ let stopOnInfo = false
 let stopAfterOne = false
 let showDuration = false
 
-let startCase = 1
+let startCase = 306
 let stopAtCase = 999
 
 private enum ErrCode : Int, CustomStringConvertible {
@@ -277,44 +277,46 @@ func printFailure(error : ErrorType?){
 //    print(error)
 //}
 
-//
-//getCaseCount { count, error in
-//    if error != nil{
-//        print("[ERR] getCaseCount failed: \(error!)")
-//        exit(1)
-//    }
-//    print("\(count) Cases")
-//    runCase(startCase-1, caseCount: count){ (error) in
-//        if error == nil{
-//            updateReports(true){
-//                exit(0)
-//            }
-//        } else {
-//            updateReports(true){
-//                exit(1)
-//            }
-//        }
-//    }
-//}
-
-
-
-let ws = WebSocket(baseURL + "/runCase?case=76&agent=SwiftWebSocket")
-ws.event.open = {
-    print(("open"))
-}
-
-ws.event.end = { (code, reason, clean, error) in
-    print(("end",code,reason,clean,error))
-    updateReports(true){
-        exit(0)
+if false {
+    getCaseCount { count, error in
+        if error != nil{
+            print("[ERR] getCaseCount failed: \(error!)")
+            exit(1)
+        }
+        print("\(count) Cases")
+        runCase(startCase-1, caseCount: count){ (error) in
+            if error == nil{
+                updateReports(true){
+                    exit(0)
+                }
+            } else {
+                updateReports(true){
+                    exit(1)
+                }
+            }
+        }
+    }
+} else {
+    WebSocketDebug = true
+    let ws = WebSocket(baseURL + "/runCase?case=293&agent=SwiftWebSocket")
+    ws.event.open = {
+        print(("open"))
+    }
+    ws.event.end = { (code, reason, clean, error) in
+        print(("end",code,reason,clean,error))
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1e9/8)), dispatch_get_main_queue()){
+            WebSocketDebug = false
+            updateReports(true){
+                exit(0)
+            }
+        }
+        
+    }
+    ws.event.message = { (msg) in
+        print(msg)
+        ws.send(msg)
     }
 }
-ws.event.message = { (msg) in
-    print(msg)
-    ws.send(msg)
-}
-
 
 
 

@@ -350,23 +350,30 @@ public class WebSocket {
         dispatch_sync(dispatch_get_main_queue()) {
             switch event {
             case .Opened:
+                print("😄\(0) open")
                 events.open()
             case .Closed:
+                print("😄\(0) close")
                 events.close(code: code, reason: reason, wasClean: wasClean)
             case .End:
+                print("😄\(0) end")
                 events.end(code: code, reason: reason, wasClean: wasClean, error: error)
             case .Error:
+                print("😄\(0) error")
                 events.error(error: error!)
             case .Text:
+                print("😄\(0) message['text']")
                 events.message(data: frame!.utf8.text)
             case .Binary, .Pong:
                 if event == .Binary {
+                    print("😄\(0) message['pong']")
                     switch binaryType{
                     case .UInt8Array: events.message(data: frame!.payload.array)
                     case .NSData: events.message(data: frame!.payload.nsdata)
                     case .UInt8UnsafeBufferPointer: events.message(data: frame!.payload.buffer)
                     }
                 } else {
+                    print("😄\(0) message['binary']")
                     switch binaryType{
                     case .UInt8Array: events.pong(data: frame!.payload.array)
                     case .NSData: events.pong(data: frame!.payload.nsdata)
@@ -1185,6 +1192,8 @@ private class WebSocketConn {
                 path += "?" + q
             }
         }
+        print("🔵\(0) open \(path)")
+
         var reqs = "GET \(path) HTTP/1.1\r\n"
         for key in req.allHTTPHeaderFields!.keys.array {
             if let val = req.valueForHTTPHeaderField(key) {

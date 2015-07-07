@@ -10,7 +10,7 @@
 		03285D2B1B4A9F1A0078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
 		03285D331B4B3A720078A1AA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D321B4B3A720078A1AA /* main.swift */; };
 		03285D381B4B3A9E0078A1AA /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
-		03285D3C1B4B9A920078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
+		03285D421B4C03A20078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
 		03D1E7221B208A5C00AC49AC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 03D1E7211B208A5C00AC49AC /* libz.dylib */; };
 		D71948F51B35E5670015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D719491A1B35E6640015C529 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
@@ -266,7 +266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03285D331B4B3A720078A1AA /* main.swift in Sources */,
-				03285D3C1B4B9A920078A1AA /* WebSocket.swift in Sources */,
+				03285D421B4C03A20078A1AA /* WebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

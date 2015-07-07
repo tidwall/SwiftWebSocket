@@ -11,6 +11,14 @@
 
 import Foundation
 
+public var WebSocketDebug = false
+public func printx<T>(value: T){
+    if WebSocketDebug {
+        print(value)
+    }
+}
+
+
 private class BoxedBytes {
     var ptr : UnsafeMutablePointer<UInt8>
     var cap : Int
@@ -117,13 +125,10 @@ public enum WebSocketBinaryType : CustomStringConvertible {
     case UInt8Array
     /// The WebSocket should transmit NSData objects.
     case NSData
-    /// The WebSocket should transmit UnsafeBufferPointer<UInt8> objects. This buffer is only valid during the scope of the message event. Use at your own risk.
-    case UInt8UnsafeBufferPointer
     public var description : String {
         switch self {
         case UInt8Array: return "UInt8Array"
         case NSData: return "NSData"
-        case UInt8UnsafeBufferPointer: return "UInt8UnsafeBufferPointer"
         }
     }
 }
@@ -361,7 +366,7 @@ public class WebSocket {
                 try readResponse()
                 stage = .HandleFrames
                 privateReadyState = .Open
-                print("😄\(self.num) open")
+                printx("😄\(self.num) open")
                 dispatch_async(queue) { self.event.open() }
                 nextStep = true
             case .HandleFrames:
@@ -375,14 +380,13 @@ public class WebSocket {
                 let frame = try handleNextInputFrame()
                 switch frame.code {
                 case .Text:
-                    print("😄\(self.num) message['text']")
+                    printx("😄\(self.num) message['text']")
                     dispatch_async(queue) { self.event.message(data: frame.utf8.text) }
                 case .Binary:
-                    print("😄\(self.num) binary['text']")
+                    printx("😄\(self.num) binary['binary']")
                     switch binaryType{
                     case .UInt8Array: dispatch_async(queue) { self.event.message(data: frame.payload.array) }
                     case .NSData: dispatch_async(queue) { self.event.message(data: frame.payload.nsdata) }
-                    case .UInt8UnsafeBufferPointer: dispatch_sync(queue) { self.event.message(data: frame.payload.buffer) }
                     }
                 case .Ping:
                     let nframe = frame.copy()
@@ -391,14 +395,13 @@ public class WebSocket {
                     frames += [nframe]
                     unlock()
                 case .Pong:
-                    print("😄\(self.num) message['pong']")
+                    printx("😄\(self.num) message['pong']")
                     switch binaryType{
                     case .UInt8Array: dispatch_async(queue) { self.event.pong(data: frame.payload.array) }
                     case .NSData: dispatch_async(queue) { self.event.pong(data: frame.payload.nsdata) }
-                    case .UInt8UnsafeBufferPointer: dispatch_sync(queue) { self.event.pong(data: frame.payload.buffer) }
                     }
                 case .Close:
-                    print("😄\(self.num) message['close']")
+                    printx("😄\(self.num) message['close']")
                     lock()
                     frames += [frame]
                     unlock()
@@ -409,24 +412,24 @@ public class WebSocket {
                 break
             case .CloseConn:
                 if let error = finalError {
-                    print("😄\(self.num) error")
+                    printx("😄\(self.num) error")
                     dispatch_async(queue) { self.event.error(error: error) }
                 }
                 privateReadyState  == .Closed
                 if rd != nil {
                     closeConn()
-                    print("😄\(self.num) close")
+                    printx("😄\(self.num) close")
                     dispatch_async(queue) { self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal) }
                 }
                 stage = .End
                 nextStep = true
             case .End:
-                print("😄\(self.num) end")
+                printx("😄\(self.num) end")
                 dispatch_async(queue) { self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError) }
                 stage = .Exit
                 nextStep = false
             case .Exit:
-                print("😄\(self.num) exit")
+                printx("😄\(self.num) exit")
                 exit = true
                 break
             }
@@ -457,14 +460,14 @@ public class WebSocket {
                 if let frame = frame {
                     if frame.statusCode == 1007 {
                         self.lock()
-                        print("[close] fail fast")
+                        printx("[close] fail fast")
                         self.frames = [frame]
                         self.unlock()
                         self.step(.None)
                     } else {
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), queue){
                             self.lock()
-                            print("[close] fail slow")
+                            printx("[close] fail slow")
                             self.frames += [frame]
                             self.unlock()
                         }
@@ -535,9 +538,8 @@ public class WebSocket {
         if !closeFinal {
             for frame in frames {
                 try writeFrame(frame)
-                print("--> \(frame.code)")
+                printx("💜--> \(frame.code)")
                 if frame.code == .Close {
-                    print("😎\(self.num)  -> close")
                     closeCode = frame.statusCode
                     closeReason = frame.utf8.text
                     closeFinal = true
@@ -549,16 +551,19 @@ public class WebSocket {
     private func handleNextInputFrame() throws -> Frame {
         lock()
         defer { unlock() }
-        return try readFrame()
+        let frame = try readFrame()
+        printx("💜--> \(frame.code)")
+        return frame
     }
     
-    private var _stepper = false
-    private var _f : Frame?
-    private var _fin = false
+    private var stateStepper = false
+    private var stateFrame : Frame?
+    private var stateFin = false
     private var savedFrame : Frame?
     private func readFrame() throws -> Frame {
+        
         var (f, fin): (Frame, Bool) = (Frame(), false)
-        if !_stepper {
+        if !stateStepper {
             if savedFrame != nil {
                 (f, fin) = (savedFrame!, false)
                 savedFrame = nil
@@ -570,14 +575,14 @@ public class WebSocket {
                 throw WebSocketError.ProtocolError("leader frame cannot be a continue frame")
             }
             if !fin {
-                _stepper = true
-                _f = f
-                _fin = fin
+                stateStepper = true
+                stateFrame = f
+                stateFin = fin
                 throw WebSocketError.FrameNotReady
             }
         } else {
-            f = _f!
-            fin = _fin
+            f = stateFrame!
+            fin = stateFin
             if !fin {
                 let cf = try readFrameFragment(f)
                 fin = cf.finished
@@ -589,9 +594,9 @@ public class WebSocket {
                     return cf
                 }
                 if !fin {
-                    _stepper = true
-                    _f = f
-                    _fin = fin
+                    stateStepper = true
+                    stateFrame = f
+                    stateFin = fin
                     throw WebSocketError.FrameNotReady
                 }
             }
@@ -599,9 +604,9 @@ public class WebSocket {
         if !f.utf8.completed {
             throw WebSocketError.PayloadError("incomplete utf8")
         }
-        _stepper = false
-        _f = nil
-        _fin = false
+        stateStepper = false
+        stateFrame = nil
+        stateFin = false
         return f
     }
     
@@ -667,7 +672,7 @@ public class WebSocket {
                 path += "?" + q
             }
         }
-        print("🔵\(self.num) open \(path)")
+        printx("🔵\(self.num) open \(path)")
         var reqs = "GET \(path) HTTP/1.1\r\n"
         for key in req.allHTTPHeaderFields!.keys.array {
             if let val = req.valueForHTTPHeaderField(key) {
@@ -764,7 +769,7 @@ public class WebSocket {
         let eqval : (String,String)->(String) = { (line, del) in return trim(line.componentsSeparatedByString(del)[1]) }
         let lines = header.componentsSeparatedByString("\r\n")
         for var i = 0; i < lines.count; i++ {
-            let line = trim(lines[0])
+            let line = trim(lines[i])
             if i == 0  {
                 if !line.hasPrefix("HTTP/1.1 101"){
                     throw WebSocketError.InvalidResponse(line)
@@ -830,147 +835,214 @@ public class WebSocket {
    
     
     private class ByteReader {
-        var orgBytes : UnsafePointer<UInt8>
+        var start : UnsafePointer<UInt8>
+        var end : UnsafePointer<UInt8>
         var bytes : UnsafePointer<UInt8>
-        var length : Int
         init(bytes: UnsafePointer<UInt8>, length: Int){
-            self.orgBytes = bytes
             self.bytes = bytes
-            self.length = length
+            start = bytes
+            end = bytes+length
         }
         func readByte() throws -> UInt8 {
-            if length == 0 {
+            if bytes >= end {
                 throw WebSocketError.FrameNotReady
             }
-            let b = bytes[0]
-            length--
+            let b = bytes.memory
             bytes++
             return b
         }
-        var totalRead : Int {
-            return bytes-orgBytes
+        var length : Int {
+            return end - bytes
+        }
+        var position : Int {
+            get {
+                return bytes - start
+            }
+            set {
+                bytes = start + newValue
+            }
         }
     }
+    
+    private var fragStateSaved = false
+    private var fragStatePosition = 0
+    private var fragStateInflate = false
+    private var fragStateLen = 0
+    private var fragStateFin = false
+    private var fragStateCode = OpCode.Continue
+    private var fragStateLeaderCode = OpCode.Continue
+    private var fragStateUTF8 = UTF8()
+    private var fragStatePayload = BoxedBytes()
+    private var fragStateStatusCode = UInt16(0)
+    private var fragStateHeaderLen = 0
     
     private var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
     private var reusedBoxedBytes = BoxedBytes()
     private func readFrameFragment(var leader : Frame?) throws -> Frame {
-        let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
-        var b = try reader.readByte()
-        var inflate = false
-        let fin = b >> 7 & 0x1 == 0x1
-        let rsv1 = b >> 6 & 0x1 == 0x1
-        let rsv2 = b >> 5 & 0x1 == 0x1
-        let rsv3 = b >> 4 & 0x1 == 0x1
-        if inflater != nil && (rsv1 || (leader != nil && leader!.inflate)) {
-            inflate = true
-        } else if rsv1 || rsv2 || rsv3 {
-            throw WebSocketError.ProtocolError("invalid extension")
-        }
-        var code = OpCode.Binary
-        if let c = OpCode(rawValue: (b & 0xF)){
-            code = c
-        } else {
-            throw WebSocketError.ProtocolError("invalid opcode")
-        }
-        if !fin && code.isControl {
-            throw WebSocketError.ProtocolError("unfinished control frame")
-        }
-        b = try reader.readByte()
-        if b >> 7 & 0x1 == 0x1 {
-            throw WebSocketError.ProtocolError("server sent masked frame")
-        }
-        var len64 = Int64(b & 0x7F)
-        var bcount = 0
-        if b & 0x7F == 126 {
-            bcount = 2
-        } else if len64 == 127 {
-            bcount = 8
-        }
-        if bcount != 0 {
-            if code.isControl {
-                throw WebSocketError.ProtocolError("invalid payload size for control frame")
-            }
-            len64 = 0
-            for var i = bcount-1; i >= 0; i-- {
-                b = try reader.readByte()
-                len64 += Int64(b) << Int64(i*8)
-            }
-        }
-        var len = Int(len64)
-        if code == .Continue {
-            if code.isControl {
-                throw WebSocketError.ProtocolError("control frame cannot have the 'continue' opcode")
-            }
-            if leader == nil {
-                throw WebSocketError.ProtocolError("continue frame is missing it's leader")
-            }
-        }
-        if code.isControl {
-            if leader != nil {
-                leader = nil
-            }
-            if inflate {
-                throw WebSocketError.ProtocolError("control frame cannot be compressed")
-            }
-        }
+        var inflate : Bool
+        var len : Int
+        var fin = false
+        var code : OpCode
+        var leaderCode : OpCode
         var utf8 : UTF8
         var payload : BoxedBytes
-        var statusCode = UInt16(0)
-        var leaderCode : OpCode
-        if leader != nil {
-            leaderCode = leader!.code
-            utf8 = leader!.utf8
-            payload = leader!.payload
+        var statusCode : UInt16
+        var headerLen : Int
+        
+        let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
+        if fragStateSaved {
+            // load state
+            reader.position += fragStatePosition
+            inflate = fragStateInflate
+            len = fragStateLen
+            fin = fragStateFin
+            code = fragStateCode
+            leaderCode = fragStateLeaderCode
+            utf8 = fragStateUTF8
+            payload = fragStatePayload
+            statusCode = fragStateStatusCode
+            headerLen = fragStateHeaderLen
+            fragStateSaved = false
         } else {
-            leaderCode = code
-            utf8 = UTF8()
-            payload = reusedBoxedBytes
-            payload.count = 0
-        }
-        if leaderCode == .Close {
-            if len == 1 {
-                throw WebSocketError.ProtocolError("invalid payload size for close frame")
+            var b = try reader.readByte()
+            fin = b >> 7 & 0x1 == 0x1
+            let rsv1 = b >> 6 & 0x1 == 0x1
+            let rsv2 = b >> 5 & 0x1 == 0x1
+            let rsv3 = b >> 4 & 0x1 == 0x1
+            if inflater != nil && (rsv1 || (leader != nil && leader!.inflate)) {
+                inflate = true
+            } else if rsv1 || rsv2 || rsv3 {
+                throw WebSocketError.ProtocolError("invalid extension")
+            } else {
+                inflate = false
             }
-            if len >= 2 {
-                let b1 = try reader.readByte()
-                let b2 = try reader.readByte()
-                statusCode = (UInt16(b1) << 8) + UInt16(b2)
-                len -= 2
-                if statusCode < 1000 || statusCode > 4999  || (statusCode >= 1004 && statusCode <= 1006) || (statusCode >= 1012 && statusCode <= 2999) {
-                    throw WebSocketError.ProtocolError("invalid status code for close frame")
+            code = OpCode.Binary
+            if let c = OpCode(rawValue: (b & 0xF)){
+                code = c
+            } else {
+                throw WebSocketError.ProtocolError("invalid opcode")
+            }
+            if !fin && code.isControl {
+                throw WebSocketError.ProtocolError("unfinished control frame")
+            }
+            b = try reader.readByte()
+            if b >> 7 & 0x1 == 0x1 {
+                throw WebSocketError.ProtocolError("server sent masked frame")
+            }
+            var len64 = Int64(b & 0x7F)
+            var bcount = 0
+            if b & 0x7F == 126 {
+                bcount = 2
+            } else if len64 == 127 {
+                bcount = 8
+            }
+            if bcount != 0 {
+                if code.isControl {
+                    throw WebSocketError.ProtocolError("invalid payload size for control frame")
+                }
+                len64 = 0
+                for var i = bcount-1; i >= 0; i-- {
+                    b = try reader.readByte()
+                    len64 += Int64(b) << Int64(i*8)
                 }
             }
+            len = Int(len64)
+            if code == .Continue {
+                if code.isControl {
+                    throw WebSocketError.ProtocolError("control frame cannot have the 'continue' opcode")
+                }
+                if leader == nil {
+                    throw WebSocketError.ProtocolError("continue frame is missing it's leader")
+                }
+            }
+            if code.isControl {
+                if leader != nil {
+                    leader = nil
+                }
+                if inflate {
+                    throw WebSocketError.ProtocolError("control frame cannot be compressed")
+                }
+            }
+            statusCode = 0
+            if leader != nil {
+                leaderCode = leader!.code
+                utf8 = leader!.utf8
+                payload = leader!.payload
+            } else {
+                leaderCode = code
+                utf8 = UTF8()
+                payload = reusedBoxedBytes
+                payload.count = 0
+            }
+            if leaderCode == .Close {
+                if len == 1 {
+                    throw WebSocketError.ProtocolError("invalid payload size for close frame")
+                }
+                if len >= 2 {
+                    let b1 = try reader.readByte()
+                    let b2 = try reader.readByte()
+                    statusCode = (UInt16(b1) << 8) + UInt16(b2)
+                    len -= 2
+                    if statusCode < 1000 || statusCode > 4999  || (statusCode >= 1004 && statusCode <= 1006) || (statusCode >= 1012 && statusCode <= 2999) {
+                        throw WebSocketError.ProtocolError("invalid status code for close frame")
+                    }
+                }
+            }
+            headerLen = reader.position
         }
-        if reader.length < len {
+
+        let rlen : Int
+        let rfin : Bool
+        let chopped : Bool
+        if reader.length+reader.position-headerLen < len {
+            rlen = reader.length
+            rfin = false
+            chopped = true
+        } else {
+            rlen = len-reader.position+headerLen
+            rfin = fin
+            chopped = false
+        }
+        let bytes : UnsafeMutablePointer<UInt8>
+        let bytesLen : Int
+        if inflate {
+            (bytes, bytesLen) = try inflater!.inflate(reader.bytes, length: rlen, final: rfin)
+        } else {
+            (bytes, bytesLen) = (UnsafeMutablePointer<UInt8>(reader.bytes), rlen)
+        }
+        reader.bytes += rlen
+
+        if leaderCode == .Text || leaderCode == .Close {
+            try utf8.append(bytes, length: bytesLen)
+        } else {
+            payload.append(bytes, length: bytesLen)
+        }
+
+        if chopped {
+            // save state
+            fragStateHeaderLen = headerLen
+            fragStateStatusCode = statusCode
+            fragStatePayload = payload
+            fragStateUTF8 = utf8
+            fragStateLeaderCode = leaderCode
+            fragStateCode = code
+            fragStateFin = fin
+            fragStateLen = len
+            fragStateInflate = inflate
+            fragStatePosition = reader.position
+            fragStateSaved = true
             throw WebSocketError.FrameNotReady
         }
-        if leaderCode == .Text || leaderCode == .Close {
-            if inflate {
-                let (bytes, bytesLen) = try inflater!.inflate(reader.bytes, length: len, final: fin)
-                if bytesLen > 0 {
-                    try utf8.append(bytes, length: bytesLen)
-                }
-            } else {
-                try utf8.append(reader.bytes, length: len)
-            }
-        } else {
-            if inflate {
-                let (bytes, bytesLen) = try inflater!.inflate(reader.bytes, length: len, final: fin)
-                if bytesLen > 0 {
-                    payload.append(bytes, length: bytesLen)
-                }
-            } else {
-                payload.append(reader.bytes, length: len)
-            }
-        }
-        reader.length -= len
-        reader.bytes += len
-        inputBytesLength -= reader.totalRead
+        
+        
+        
+        
+        
+        inputBytesLength -= reader.position
         if inputBytesLength == 0 {
             inputBytesStart = 0
         } else {
-            inputBytesStart += reader.totalRead
+            inputBytesStart += reader.position
         }
         
         let f = Frame()
@@ -1083,7 +1155,7 @@ public class WebSocket {
         sendFrame(f)
     }
     private func sendFrame(f : Frame) {
-        print("[message]")
+        printx("[message]")
         frames += [f]
         dispatch_async(queue) { self.step(.None) }
     }
@@ -1214,7 +1286,7 @@ private class Frame {
         return f
     }
     func copy() -> Frame {
-        var f = Frame()
+        let f = Frame()
         f.code = code
         f.utf8.text = utf8.text
         f.payload.buffer = payload.buffer
