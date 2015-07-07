@@ -134,23 +134,23 @@ func updateReports(echo: Bool = false, block : ()->()){
 }
 
 func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
-//    var start = NSDate().timeIntervalSince1970
-//    var evstart = NSTimeInterval(0)
+    //    var start = NSDate().timeIntervalSince1970
+    //    var evstart = NSTimeInterval(0)
     getCaseInfo(caseIdx, block: { (id, description, error) in
         if error != nil{
             print("[ERR] getCaseInfo failed: \(error!)\n")
             exit(1)
         }
-
+        
         var next = { ()->() in }
-
-
+        
+        
         print("[CASE] #\(caseIdx+1)/\(caseCount): \(id): \(description)")
         let failed : (message : String)->() = { (message) in
             let error = makeError(message)
             printFailure(error)
             if stopOnFailure {
-                block(error: error)    
+                block(error: error)
             } else {
                 next()
             }
@@ -159,13 +159,13 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
             printFailure(makeError(message))
         }
         next = { ()->() in
-//            if showDuration {
-//                let now = NSDate().timeIntervalSince1970
-//                let recv = evstart == 0 ? 0 : (evstart - start) * 1000
-//                let total = (now - start) * 1000
-//                let send = total - recv
-//                println("[DONE] %.0f ms (recv: %.0f ms, send: %.0f ms)", total, recv, send)
-//            }
+            //            if showDuration {
+            //                let now = NSDate().timeIntervalSince1970
+            //                let recv = evstart == 0 ? 0 : (evstart - start) * 1000
+            //                let total = (now - start) * 1000
+            //                let send = total - recv
+            //                println("[DONE] %.0f ms (recv: %.0f ms, send: %.0f ms)", total, recv, send)
+            //            }
             getCaseStatus(caseIdx){ error in
                 let f : ()->() = {
                     if let error = error as? NSError {
@@ -196,9 +196,9 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
         var responseError : ErrorType?
         //print(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
         let ws = WebSocket(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
-        ws.binaryType = .UInt8UnsafeBufferPointer
-//        ws.flag = true
-
+        //ws.binaryType = .UInt8UnsafeBufferPointer
+        //        ws.flag = true
+        
         if id.hasPrefix("13.") || id.hasPrefix("12.") {
             ws.compression.on = true
             if id.hasPrefix("13.1"){
@@ -246,7 +246,7 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
             }
         }
         ws.event.message = { (msg) in
-//            evstart = NSDate().timeIntervalSince1970
+            //            evstart = NSDate().timeIntervalSince1970
             ws.send(msg)
         }
     })
@@ -265,22 +265,57 @@ func printFailure(error : ErrorType?){
     }
 }
 
-getCaseCount { (count, error) in
-    if error != nil{
-        print("[ERR] getCaseCount failed: \(error!)")
-        exit(1)
-    }
-    runCase(startCase-1, caseCount: count){ (error) in
-        if error == nil{
-            updateReports(true){
-               exit(0)
-            }
-        } else {
-            updateReports(true){
-               exit(1)
-            }
-        }
+
+//let ws = WebSocket("ws://localhost:9001/getCaseInfo?case=1")
+//ws.event.message = { (msg) in
+//    if let text = msg as? String {
+//        ws.close()
+//        print(text)
+//    }
+//}
+//ws.event.error = { error in
+//    print(error)
+//}
+
+//
+//getCaseCount { count, error in
+//    if error != nil{
+//        print("[ERR] getCaseCount failed: \(error!)")
+//        exit(1)
+//    }
+//    print("\(count) Cases")
+//    runCase(startCase-1, caseCount: count){ (error) in
+//        if error == nil{
+//            updateReports(true){
+//                exit(0)
+//            }
+//        } else {
+//            updateReports(true){
+//                exit(1)
+//            }
+//        }
+//    }
+//}
+
+
+
+let ws = WebSocket(baseURL + "/runCase?case=76&agent=SwiftWebSocket")
+ws.event.open = {
+    print(("open"))
+}
+
+ws.event.end = { (code, reason, clean, error) in
+    print(("end",code,reason,clean,error))
+    updateReports(true){
+        exit(0)
     }
 }
+ws.event.message = { (msg) in
+    print(msg)
+    ws.send(msg)
+}
+
+
+
 
 NSRunLoop.mainRunLoop().run()

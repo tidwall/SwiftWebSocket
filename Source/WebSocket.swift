@@ -11,41 +11,6 @@
 
 import Foundation
 
-private enum ErrCode : Int, CustomStringConvertible {
-    case Protocol = 1002, Payload = 1007, Undefined = -100, Codepoint = -101, Library = -102, Socket = -103
-    var description : String {
-        switch self {
-        case Protocol: return "Protocol error"
-        case Payload: return "Invalid payload data"
-        case Codepoint: return "Invalid codepoint"
-        case Library: return "Library error"
-        case Undefined: return "Undefined error"
-        case Socket: return "Broken socket"
-        }
-    }
-}
-
-private func makeError(error : String, _ code: ErrCode) -> ErrorType {
-    return NSError(domain: "com.github.tidwall.WebSocketConn", code: code.rawValue, userInfo: [NSLocalizedDescriptionKey:"\(error)"])
-}
-private func makeError(error : ErrorType, _ code: ErrCode) -> ErrorType {
-    let err = error as NSError
-    return NSError(domain: err.domain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey:"\(err.localizedDescription)"])
-}
-private func makeError(error : String) -> ErrorType {
-    return makeError(error, ErrCode.Library)
-}
-
-private let oneHundredYears : NSTimeInterval = 60*60*24*365*100
-
-private let errUTF8 = makeError("utf8")
-private let errTimeout = makeError("timeout")
-private let errClosed = makeError("closed")
-private let errStream = makeError("stream error")
-private let errEOF = makeError("eof")
-private let errAddress = makeError("invalid address")
-private let errNegative = makeError("length cannot be negative")
-
 private class BoxedBytes {
     var ptr : UnsafeMutablePointer<UInt8>
     var cap : Int
@@ -130,7 +95,6 @@ private enum OpCode : UInt8, CustomStringConvertible {
     }
 }
 
-
 /// The WebSocketEvents struct is used by the events property and manages the events for the WebSocket connection.
 public struct WebSocketEvents {
     /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
@@ -204,7 +168,6 @@ public struct WebSocketCompression {
     public var maxWindowBits = defaultMaxWindowBits
 }
 
-
 /// The WebSocketService options are used by the services property and manages the underlying socket services.
 public struct WebSocketService :  OptionSetType {
     public typealias RawValue = UInt
@@ -215,18 +178,19 @@ public struct WebSocketService :  OptionSetType {
     public static var allZeros: WebSocketService { return self.init(0) }
     static func fromMask(raw: UInt) -> WebSocketService { return self.init(raw) }
     public var rawValue: UInt { return self.value }
-    
     /// No services.
-    static var None: WebSocketService { return self.init(TCPConnService.None.rawValue) }
+    static var None: WebSocketService { return self.init(0) }
     /// Allow socket to handle VoIP.
-    static var VoIP: WebSocketService { return self.init(TCPConnService.VoIP.rawValue) }
+    static var VoIP: WebSocketService { return self.init(1 << 0) }
     /// Allow socket to handle video.
-    static var Video: WebSocketService { return self.init(TCPConnService.Video.rawValue) }
+    static var Video: WebSocketService { return self.init(1 << 1) }
     /// Allow socket to run in background.
-    static var Background: WebSocketService { return self.init(TCPConnService.Background.rawValue) }
+    static var Background: WebSocketService { return self.init(1 << 2) }
     /// Allow socket to handle voice.
-    static var Voice: WebSocketService { return self.init(TCPConnService.Voice.rawValue) }
+    static var Voice: WebSocketService { return self.init(1 << 3) }
 }
+
+private var queue = dispatch_queue_create("com.oncast.SwiftWebSocket", DISPATCH_QUEUE_SERIAL)
 
 public class WebSocket {
     private var mutex = pthread_mutex_t()
@@ -237,6 +201,23 @@ public class WebSocket {
     private var ccode : Int = 0
     private var creason : String = ""
     private var cclose : Bool = false
+    private var delegate : Delegate
+
+    private var inflater : Inflater!
+    private var deflater : Deflater!
+    
+    private var outputBytes : UnsafeMutablePointer<UInt8>
+    private var outputBytesSize : Int = 0
+    private var outputBytesStart : Int = 0
+    private var outputBytesLength : Int = 0
+    
+    
+    private var inputBytes : UnsafeMutablePointer<UInt8>
+    private var inputBytesSize : Int = 0
+    private var inputBytesStart : Int = 0
+    private var inputBytesLength : Int = 0
+
+    
     
     private var _subProtocol = ""
     private var _compression = WebSocketCompression()
@@ -286,7 +267,7 @@ public class WebSocket {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
-
+    
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
@@ -305,13 +286,23 @@ public class WebSocket {
         pthread_cond_init(&cond, nil)
         self.request = request
         self.subProtocols = subProtocols
+        self.outputBytes = UnsafeMutablePointer<UInt8>.alloc(1024)
+        self.outputBytesSize = 1024
+        self.inputBytes = UnsafeMutablePointer<UInt8>.alloc(1024)
+        self.inputBytesSize = 1024
+        self.delegate = Delegate()
+        self.delegate.ws = self
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
-            dispatch_async(dispatch_queue_create(nil, nil)) {
-                self.main()
-            }
+            dispatch_async(queue) { self.step(.None) }
         }
     }
     deinit{
+        if outputBytes != nil {
+            free(outputBytes)
+        }
+        if inputBytes != nil {
+            free(inputBytes)
+        }
         pthread_cond_init(&cond, nil)
         pthread_mutex_init(&mutex, nil)
     }
@@ -321,353 +312,382 @@ public class WebSocket {
     @inline(__always) private func unlock(){
         pthread_mutex_unlock(&mutex)
     }
-    @inline(__always) private func signal(){
-        pthread_cond_broadcast(&cond)
+    
+    
+    
+    private enum Stage : Int {
+        case OpenConn
+        case ReadResponse
+        case HandleFrames
+        case CloseConn
+        case Error
+        case End
+        case Exit
     }
-    private func wait(timeout : NSTimeInterval) -> WaitResult {
-        let timeInMs = Int(timeout * 1000)
-        var tv = timeval()
-        var ts = timespec()
-        gettimeofday(&tv, nil)
-        ts.tv_sec = time(nil) + timeInMs / 1000
-        ts.tv_nsec = Int(tv.tv_usec * 1000 + 1000 * 1000 * (timeInMs % 1000))
-        ts.tv_sec += ts.tv_nsec / (1000 * 1000 * 1000)
-        ts.tv_nsec %= (1000 * 1000 * 1000)
-        if (pthread_cond_timedwait(&cond, &mutex, &ts) == 0) {
-            return .Signaled
-        } else {
-            return .TimedOut
+    
+    private static var gnum = 0
+    private var stage = Stage.OpenConn
+    private var rd : NSInputStream!
+    private var wr : NSOutputStream!
+    private var closeCode = UInt16(0)
+    private var closeReason = ""
+    private var closeClean = false
+    private var closeFinal = false
+    private var acceptNoMoreOutput = false
+    private var acceptNoMoreInput = false
+    private var finalError : ErrorType?
+    private var num = 0
+    private var exit = false
+
+    private func step(event: NSStreamEvent){
+        if exit {
+            return
         }
-    }
-    private enum InternalEvent {
-        case Opened, Closed, Error, Text, Binary, End, Pong
-    }
-    private func fireEvent(event : InternalEvent, frame : Frame? = nil, error : ErrorType? = nil, code : Int = 0, reason : String = "", wasClean : Bool = false){
-        lock()
-        let binaryType = _binaryType
-        let events = _event
-        unlock()
-        dispatch_sync(dispatch_get_main_queue()) {
-            switch event {
-            case .Opened:
-                events.open()
-            case .Closed:
-                events.close(code: code, reason: reason, wasClean: wasClean)
-            case .End:
-                events.end(code: code, reason: reason, wasClean: wasClean, error: error)
-            case .Error:
-                events.error(error: error!)
-            case .Text:
-                events.message(data: frame!.utf8.text)
-            case .Binary, .Pong:
-                if event == .Binary {
-                    switch binaryType{
-                    case .UInt8Array: events.message(data: frame!.payload.array)
-                    case .NSData: events.message(data: frame!.payload.nsdata)
-                    case .UInt8UnsafeBufferPointer: events.message(data: frame!.payload.buffer)
-                    }
-                } else {
-                    switch binaryType{
-                    case .UInt8Array: events.pong(data: frame!.payload.array)
-                    case .NSData: events.pong(data: frame!.payload.nsdata)
-                    case .UInt8UnsafeBufferPointer: events.pong(data: frame!.payload.buffer)
-                    }
-                }
-            }
-        }
-    }
-    private func main(){
-        var finalError : ErrorType?
-        var finalErrorIsClosed = false
-        var (closeCode, closeReason, closeClean) = (0, "", false)
+        var nextStep = false
         defer {
-            if finalErrorIsClosed {
-                finalError = nil
-            }
-            lock()
-            let (_closeCode, _closeReason, _closeClean) = (closeCode, closeReason, closeClean)
-            unlock()
-            fireEvent(.End, error: finalError, code: _closeCode, reason: _closeReason, wasClean: _closeClean)
-            lock()
-            signal()
-            unlock()
-        }
-        var wso : WebSocketConn?
-        defer {
-            if let ws = wso {
-                lock()
-                let cclose = self.cclose
-                if !cclose {
-                    var err : NSError?
-                    if finalError != nil {
-                        err = finalError as? NSError
-                    }
-                    let pva : ErrCode = .Protocol
-                    if err != nil && err!.code == pva.rawValue  {
-                        (closeCode, closeReason) = (1002, "Protocol error")
-                    } else if err != nil && err!.code == ErrCode.Payload.rawValue {
-                        (closeCode, closeReason) = (1007, "Invalid frame payload data")
-                    } else {
-                        if closeClean == false {
-                            (closeCode, closeReason) = (1006, "Abnormal Closure")
-                        }
-                    }
-                }
-                let (_closeCode, _closeReason, _closeClean) = (closeCode, closeReason, closeClean)
-                unlock()
-                ws.close(_closeCode, reason: _closeReason)
-                privateReadyState = WebSocketReadyState.Closed
-                fireEvent(.Closed, code: _closeCode, reason: _closeReason, wasClean: _closeClean)
+            if nextStep {
+                dispatch_async(queue) { self.step(.None) }
             }
         }
         do {
-            let ws = try WebSocketConn(self.request, services: TCPConnService(self.services.rawValue), protocols: self.subProtocols, compression: self.compression)
-            wso = ws
-            privateSubProtocol = ws.subProtocol
-            privateReadyState = .Open
-            fireEvent(.Opened)
-            var pongFrames : [Frame] = []
-            dispatch_async(dispatch_queue_create(nil, nil)) {
-                var cclose = false
-                defer {
-                    if cclose {
-                        self.lock()
-                        (closeCode, closeReason, closeClean) = (self.ccode, self.creason, true)
-                        let (_closeCode, _closeReason) = (closeCode, closeReason)
-                        self.unlock()
-                        ws.close(_closeCode, reason: _closeReason)
-                    } else {
-                        ws.close()
-                    }
-                }
-                do {
-                    for ;; {
-                        var wsopened = true
-                        var frame : Frame?
-                        self.lock()
-                        for ;; {
-                            if !ws.opened {
-                                wsopened = false
-                                break
-                            }
-                            if self.cclose {
-                                cclose = true
-                                break
-                            }
-                            if pongFrames.count > 0 {
-                                frame = pongFrames.removeAtIndex(0)
-                                break
-                            }
-                            if self.frames.count > 0 {
-                                frame = self.frames.removeAtIndex(0)
-                                break
-                            }
-                            self.wait(0.25)
-                        }
-                        self.unlock()
-                        if cclose || !wsopened {
-                            break
-                        }
-                        if frame != nil{
-                            do {
-                                ws.writeDeadline = NSDate().dateByAddingTimeInterval(1)
-                                try ws.writeFrame(frame!)
-                            } catch {
-                                let error = error as NSError
-                                if error.code != -102 || error.localizedDescription != "timeout" {
-                                    throw error
-                                }
-                            }
-                            frame = nil
-                        }
-                    }
-                } catch {
-                    // error left behind ?
-                }
-            }
-            defer {
-                privateReadyState = .Closing
-            }
-            for ;; {
-                ws.readDeadline = NSDate().dateByAddingTimeInterval(oneHundredYears)
-                let f = try ws.readFrame()
-                switch f.code {
-                case .Close:
-                    lock()
-                    (closeCode, closeReason, closeClean) = (Int(f.statusCode), f.utf8.text, true)
-                    unlock()
+            try handleBuffers()
+            try handleEvent(event)
+            switch stage {
+            case .OpenConn:
+                num = WebSocket.gnum++
+                try openConn()
+                stage = .ReadResponse
+            case .ReadResponse:
+                try readResponse()
+                stage = .HandleFrames
+                privateReadyState = .Open
+                print("😄\(self.num) open")
+                dispatch_async(queue) { self.event.open() }
+                nextStep = true
+            case .HandleFrames:
+                try handleAllOutputFrames()
+                nextStep = true
+                if closeFinal {
+                    privateReadyState  == .Closing
+                    stage = .CloseConn
                     return
+                }
+                let frame = try handleNextInputFrame()
+                switch frame.code {
+                case .Text:
+                    print("😄\(self.num) message['text']")
+                    dispatch_async(queue) { self.event.message(data: frame.utf8.text) }
+                case .Binary:
+                    print("😄\(self.num) binary['text']")
+                    switch binaryType{
+                    case .UInt8Array: dispatch_async(queue) { self.event.message(data: frame.payload.array) }
+                    case .NSData: dispatch_async(queue) { self.event.message(data: frame.payload.nsdata) }
+                    case .UInt8UnsafeBufferPointer: dispatch_sync(queue) { self.event.message(data: frame.payload.buffer) }
+                    }
                 case .Ping:
-                    f.code = .Pong
+                    let nframe = frame.copy()
+                    nframe.code = .Pong
                     lock()
-                    pongFrames += [f]
-                    signal()
+                    frames += [nframe]
                     unlock()
                 case .Pong:
-                    fireEvent(.Pong, frame: f)
-                case .Text:
-                    fireEvent(.Text, frame: f)
-                case .Binary:
-                    fireEvent(.Binary, frame: f)
+                    print("😄\(self.num) message['pong']")
+                    switch binaryType{
+                    case .UInt8Array: dispatch_async(queue) { self.event.pong(data: frame.payload.array) }
+                    case .NSData: dispatch_async(queue) { self.event.pong(data: frame.payload.nsdata) }
+                    case .UInt8UnsafeBufferPointer: dispatch_sync(queue) { self.event.pong(data: frame.payload.buffer) }
+                    }
+                case .Close:
+                    print("😄\(self.num) message['close']")
+                    lock()
+                    frames += [frame]
+                    unlock()
                 default:
                     break
                 }
+            case .Error:
+                break
+            case .CloseConn:
+                if let error = finalError {
+                    print("😄\(self.num) error")
+                    dispatch_async(queue) { self.event.error(error: error) }
+                }
+                privateReadyState  == .Closed
+                if rd != nil {
+                    closeConn()
+                    print("😄\(self.num) close")
+                    dispatch_async(queue) { self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal) }
+                }
+                stage = .End
+                nextStep = true
+            case .End:
+                print("😄\(self.num) end")
+                dispatch_async(queue) { self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError) }
+                stage = .Exit
+                nextStep = false
+            case .Exit:
+                print("😄\(self.num) exit")
+                exit = true
+                break
             }
+        } catch WebSocketError.None  {
+        } catch WebSocketError.FrameNotReady {
         } catch {
-            let nserror = error as NSError
-            if nserror.code == 1002 {
-                NSThread.sleepForTimeInterval(0.05)
+            if finalError != nil{
+                return
             }
-            if nserror.localizedDescription != "eof" {
-                finalError = error
-                finalErrorIsClosed = nserror.localizedDescription == "closed"
-                if !finalErrorIsClosed {
-                    fireEvent(.Error, error: error)
+            finalError = error
+            if stage == .OpenConn || stage == .ReadResponse {
+                stage = .CloseConn
+            } else {
+                var frame : Frame?
+                if let error = error as? WebSocketError{
+                    switch error {
+                    case .ProtocolError:
+                        frame = Frame.makeClose(1002, reason: "Protocol error")
+                    case .PayloadError:
+                        frame = Frame.makeClose(1007, reason: "Payload error")
+                    default:
+                        break
+                    }
+                }
+                if frame == nil {
+                    frame = Frame.makeClose(1006, reason: "Abnormal Closure")
+                }
+                if let frame = frame {
+                    if frame.statusCode == 1007 {
+                        self.lock()
+                        print("[close] fail fast")
+                        self.frames = [frame]
+                        self.unlock()
+                        self.step(.None)
+                    } else {
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), queue){
+                            self.lock()
+                            print("[close] fail slow")
+                            self.frames += [frame]
+                            self.unlock()
+                        }
+                    }
+                }
+            }
+            nextStep = true
+        }
+    }
+    
+    private func handleBuffers() throws {
+        if rd != nil && rd.hasBytesAvailable {
+            while rd.hasBytesAvailable {
+                var size = inputBytesSize
+                while size-(inputBytesStart+inputBytesLength) < 1024 {
+                    size *= 2
+                }
+                if size > inputBytesSize {
+                    let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
+                    if ptr == nil {
+                        throw WebSocketError.Memory
+                    }
+                    inputBytes = ptr
+                    inputBytesSize = size
+                }
+                let n = rd.read(inputBytes+inputBytesStart+inputBytesLength, maxLength: inputBytesSize-inputBytesStart-inputBytesLength)
+                if n > 0 {
+                    inputBytesLength += n
+                }
+            }
+        }
+        if wr != nil && wr.hasSpaceAvailable {
+            if outputBytesLength > 0 {
+                let n = wr.write(outputBytes+outputBytesStart, maxLength: outputBytesLength)
+                if n > 0 {
+                    outputBytesLength -= n
+                    if outputBytesLength == 0 {
+                        outputBytesStart = 0
+                    } else {
+                        outputBytesStart += n
+                    }
                 }
             }
         }
     }
-    /**
-    Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
     
-    :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
-    :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
-    */
-    public func close(code : Int = 1000, reason : String = "Normal Closure") {
+    private func handleEvent(event: NSStreamEvent) throws {
+        switch event {
+        case NSStreamEvent.ErrorOccurred:
+            if let error = rd.streamError {
+                throw WebSocketError.Network((error as NSError).localizedDescription)
+            }
+            if let error = wr.streamError {
+                throw WebSocketError.Network((error as NSError).localizedDescription)
+            }
+            throw WebSocketError.Network("")
+        default:
+            break
+        }
+    }
+    
+    private func handleAllOutputFrames() throws {
+        lock()
+        defer {
+            frames = []
+            unlock()
+        }
+        if !closeFinal {
+            for frame in frames {
+                try writeFrame(frame)
+                print("--> \(frame.code)")
+                if frame.code == .Close {
+                    print("😎\(self.num)  -> close")
+                    closeCode = frame.statusCode
+                    closeReason = frame.utf8.text
+                    closeFinal = true
+                    return
+                }
+            }
+        }
+    }
+    private func handleNextInputFrame() throws -> Frame {
         lock()
         defer { unlock() }
-        if _readyState.isClosed {
-            return
-        }
-        _readyState = .Closing
-        (ccode, creason, cclose) = (code, reason, true)
-        signal()
+        return try readFrame()
     }
-    private func sendFrame(f : Frame) {
-        lock()
-        defer { unlock() }
-        if _readyState.isClosed {
-            return
-        }
-        frames += [f]
-        signal()
-    }
-    private func sendClose(statusCode : UInt16, reason : String) {
-        let f = Frame()
-        f.code = .Close
-        f.statusCode = statusCode
-        f.utf8.text = reason
-        sendFrame(f)
-    }
-    /**
-    Transmits message to the server over the WebSocket connection.
     
-    :param: message The data to be sent to the server.
-    */
-    public func send(message : Any) {
-        let f = Frame()
-        if let message = message as? String {
-            f.code = .Text
-            f.utf8.text = message
-        } else if let message = message as? [UInt8] {
-            f.code = .Binary
-            f.payload.array = message
-        } else if let message = message as? UnsafeBufferPointer<UInt8> {
-            f.code = .Binary
-            f.payload.append(message.baseAddress, length: message.count)
-        } else if let message = message as? NSData {
-            f.code = .Binary
-            f.payload.nsdata = message
+    private var _stepper = false
+    private var _f : Frame?
+    private var _fin = false
+    private var savedFrame : Frame?
+    private func readFrame() throws -> Frame {
+        var (f, fin): (Frame, Bool) = (Frame(), false)
+        if !_stepper {
+            if savedFrame != nil {
+                (f, fin) = (savedFrame!, false)
+                savedFrame = nil
+            } else {
+                f = try readFrameFragment(nil)
+                fin = f.finished
+            }
+            if f.code == .Continue{
+                throw WebSocketError.ProtocolError("leader frame cannot be a continue frame")
+            }
+            if !fin {
+                _stepper = true
+                _f = f
+                _fin = fin
+                throw WebSocketError.FrameNotReady
+            }
         } else {
-            f.code = .Text
-            f.utf8.text = "\(message)"
+            f = _f!
+            fin = _fin
+            if !fin {
+                let cf = try readFrameFragment(f)
+                fin = cf.finished
+                if cf.code != .Continue {
+                    if !cf.code.isControl {
+                        throw WebSocketError.ProtocolError("only ping frames can be interlaced with fragments")
+                    }
+                    savedFrame = f
+                    return cf
+                }
+                if !fin {
+                    _stepper = true
+                    _f = f
+                    _fin = fin
+                    throw WebSocketError.FrameNotReady
+                }
+            }
         }
-        sendFrame(f)
+        if !f.utf8.completed {
+            throw WebSocketError.PayloadError("incomplete utf8")
+        }
+        _stepper = false
+        _f = nil
+        _fin = false
+        return f
     }
-    /**
-    Transmits a ping to the server over the WebSocket connection.
-    */
-    public func ping() {
-        let f = Frame()
-        f.code = .Ping
-        sendFrame(f)
-    }
-    /**
-    Transmits a ping to the server over the WebSocket connection.
     
-    :param: optional message The data to be sent to the server.
-    */
-    public func ping(message : Any){
-        let f = Frame()
-        f.code = .Ping
-        if let message = message as? String {
-            f.payload.array = UTF8.bytes(message)
-        } else if let message = message as? [UInt8] {
-            f.payload.array = message
-        } else if let message = message as? UnsafeBufferPointer<UInt8> {
-            f.payload.append(message.baseAddress, length: message.count)
-        } else if let message = message as? NSData {
-            f.payload.nsdata = message
+    
+    
+    private func closeConn() {
+        delegate.ws = nil
+        rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        rd.delegate = nil
+        wr.delegate = nil
+        rd.close()
+        wr.close()
+    }
+    
+    
+    private func openConn() throws {
+        let req = request.mutableCopy() as! NSMutableURLRequest
+        req.setValue("websocket", forHTTPHeaderField: "Upgrade")
+        req.setValue("Upgrade", forHTTPHeaderField: "Connection")
+        req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
+        req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
+        if req.URL!.port == nil || req.URL!.port!.integerValue == 80 || req.URL!.port!.integerValue == 443  {
+            req.setValue(req.URL!.host!, forHTTPHeaderField: "Host")
         } else {
-            f.utf8.text = "\(message)"
+            req.setValue("\(req.URL!.host!):\(req.URL!.port!.integerValue)", forHTTPHeaderField: "Host")
         }
-        sendFrame(f)
-    }
-}
-
-private class Delegate : NSObject, NSStreamDelegate {
-    var c : TCPConn!
-    @objc func stream(aStream: NSStream, handleEvent eventCode: NSStreamEvent){
-        c.signal()
-    }
-}
-
-private enum TCPConnSecurity {
-    case None
-    case NegoticatedSSL
-}
-
-private struct TCPConnService : OptionSetType {
-    typealias RawValue = UInt
-    var value: UInt = 0
-    init(_ value: UInt) { self.value = value }
-    init(rawValue value: UInt) { self.value = value }
-    init(nilLiteral: ()) { self.value = 0 }
-    static var allZeros: TCPConnService { return self.init(0) }
-    static func fromMask(raw: UInt) -> TCPConnService { return self.init(raw) }
-    var rawValue: UInt { return self.value }
-    static var None: TCPConnService { return self.init(0) }
-    static var VoIP: TCPConnService { return self.init(1 << 0) }
-    static var Video: TCPConnService { return self.init(1 << 1) }
-    static var Background: TCPConnService { return self.init (1 << 2) }
-    static var Voice: TCPConnService { return self.init(1 << 3) }
-}
-
-private enum WaitResult {
-    case Signaled
-    case TimedOut
-}
-
-
-private class TCPConn {
-    var mutex = pthread_mutex_t()
-    var cond = pthread_cond_t()
-    var rd : NSInputStream!
-    var wr : NSOutputStream!
-    var closed = false
-    var delegate : Delegate
-    deinit {
-        pthread_cond_destroy(&cond)
-        pthread_mutex_destroy(&mutex)
-    }
-    init(_ address : String, security : TCPConnSecurity = .None, services : TCPConnService = .None) throws {
-        pthread_mutex_init(&mutex, nil)
-        pthread_cond_init(&cond, nil)
-        delegate = Delegate()
-        delegate.c = self
-        let addr = address.componentsSeparatedByString(":")
+        req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
+        if subProtocols.count > 0 {
+            req.setValue(";".join(subProtocols), forHTTPHeaderField: "Sec-WebSocket-Protocol")
+        }
+        if req.URL!.scheme != "wss" && req.URL!.scheme != "ws" {
+            throw WebSocketError.InvalidAddress
+        }
+        if compression.on {
+            var val = "permessage-deflate"
+            if compression.noContextTakeover {
+                val += "; client_no_context_takeover; server_no_context_takeover"
+            }
+            val += "; client_max_window_bits"
+            if compression.maxWindowBits != 0 {
+                val += "; server_max_window_bits=\(compression.maxWindowBits)"
+            }
+            req.setValue(val, forHTTPHeaderField: "Sec-WebSocket-Extensions")
+        }
+        var security = TCPConnSecurity.None
+        let port : Int
+        if req.URL!.port != nil {
+            port = req.URL!.port!.integerValue
+        } else if req.URL!.scheme == "wss" {
+            port = 443
+            security = .NegoticatedSSL
+        } else {
+            port = 80
+            security = .None
+        }
+        var path = CFURLCopyPath(req.URL!) as String
+        if path == "" {
+            path = "/"
+        }
+        if let q = req.URL!.query {
+            if q != "" {
+                path += "?" + q
+            }
+        }
+        print("🔵\(self.num) open \(path)")
+        var reqs = "GET \(path) HTTP/1.1\r\n"
+        for key in req.allHTTPHeaderFields!.keys.array {
+            if let val = req.valueForHTTPHeaderField(key) {
+                reqs += "\(key): \(val)\r\n"
+            }
+        }
+        var keyb = [UInt32](count: 4, repeatedValue: 0)
+        for var i = 0; i < 4; i++ {
+            keyb[i] = arc4random()
+        }
+        let rkey = NSData(bytes: keyb, length: 16).base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0))
+        reqs += "Sec-WebSocket-Key: \(rkey)\r\n"
+        reqs += "\r\n"
+        var header = [UInt8]()
+        for b in reqs.utf8 {
+            header += [b]
+        }
+        let addr = ["\(req.URL!.host!)", "\(port)"]
         if addr.count != 2 || Int(addr[1]) == nil {
-            throw errAddress
+            throw WebSocketError.InvalidAddress
         }
         var (rdo, wro) : (NSInputStream?, NSOutputStream?)
         NSStream.getStreamsToHostWithName(addr[0], port: Int(addr[1])!, inputStream: &rdo, outputStream: &wro)
@@ -703,532 +723,51 @@ private class TCPConn {
         wr.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         rd.open()
         wr.open()
-        var rwerror : NSError?
-        pthread_mutex_lock(&mutex)
-        for ;; {
-            rwerror = rd.streamError
-            if rwerror == nil {
-                rwerror = wr.streamError
-            }
-            if rd.streamStatus == .Open && wr.streamStatus == .Open || rwerror != nil {
-                break
-            }
-            wait(0.25)
-        }
-        pthread_mutex_unlock(&mutex)
-        if rwerror != nil {
-            throw rwerror!
-        }
+        try write(header, length: header.count)
     }
-    var _writeDeadline : NSDate = NSDate().dateByAddingTimeInterval(oneHundredYears)
-    var writeDeadline : NSDate {
-        get {
-            pthread_mutex_lock(&mutex)
-            let deadline = _writeDeadline
-            pthread_mutex_unlock(&mutex)
-            return deadline
-        }
-        set {
-            pthread_mutex_lock(&mutex)
-            _writeDeadline = newValue
-            pthread_mutex_unlock(&mutex)
-        }
-    }
-    var _readDeadline : NSDate = NSDate().dateByAddingTimeInterval(oneHundredYears)
-    var readDeadline : NSDate {
-        get {
-            pthread_mutex_lock(&mutex)
-            let deadline = _readDeadline
-            pthread_mutex_unlock(&mutex)
-            return deadline
-        }
-        set {
-            pthread_mutex_lock(&mutex)
-            _readDeadline = newValue
-            pthread_mutex_unlock(&mutex)
-        }
-    }
-    func wait(timeout : NSTimeInterval) -> WaitResult {
-        let timeInMs = Int(timeout * 1000)
-        var tv = timeval()
-        var ts = timespec()
-        gettimeofday(&tv, nil)
-        ts.tv_sec = time(nil) + timeInMs / 1000
-        ts.tv_nsec = Int(tv.tv_usec * 1000 + 1000 * 1000 * (timeInMs % 1000))
-        ts.tv_sec += ts.tv_nsec / (1000 * 1000 * 1000)
-        ts.tv_nsec %= (1000 * 1000 * 1000)
-        if (pthread_cond_timedwait(&cond, &mutex, &ts) == 0) {
-            return .Signaled
-        } else {
-            return .TimedOut
-        }
-    }
-    func lock() {
-        pthread_mutex_lock(&mutex)
-    }
-    func unlock() {
-        pthread_mutex_unlock(&mutex)
-    }
-    func write(buffer : UnsafePointer<UInt8>, length : Int) throws -> Int {
-        if length < 0 {
-            throw errNegative
-        }
-        var total = 0
-        for ;; {
-            lock()
-            for ;; {
-                if closed {
-                    unlock()
-                    throw errClosed
-                }
-                if NSDate().compare(_writeDeadline) != .OrderedAscending {
-                    unlock()
-                    throw errTimeout
-                }
-                if let serror = errorForStatus(wr) {
-                    unlock()
-                    throw serror
-                }
-                if wr.hasSpaceAvailable {
-                    break
-                }
-                wait(0.25)
-            }
-            let n = wr.write(buffer+total, maxLength: length-total)
-            unlock()
-            if n < 0 {
-                throw errStream
-            }
-            total += n
-            if total > length {
-                throw errStream
-            } else if total == length {
-                break
-            }
-        }
-        return total
-    }
-    func errorForStatus(stream : NSStream) -> ErrorType? {
-        switch stream.streamStatus {
-        case .NotOpen, .Closed:
-            return errClosed
-        case .Error:
-            if let error = stream.streamError {
-                return error
-            }
-            return errStream
-        case .AtEnd:
-            return errEOF
-        default:
-            return nil
-        }
-    }
-    func read(buffer : UnsafeMutablePointer<UInt8>, length : Int) throws -> Int {
-        if length < 0 {
-            throw errNegative
-        }
-        for var i = 0; i < 2; i++ {
-            lock()
-            for ;; {
-                if closed {
-                    unlock()
-                    throw errClosed
-                }
-                if NSDate().compare(_readDeadline) != .OrderedAscending {
-                    unlock()
-                    throw errTimeout
-                }
-                if let serror = errorForStatus(rd) {
-                    unlock()
-                    throw serror
-                }
-                if rd.hasBytesAvailable {
-                    break
-                }
-                wait(0.25)
-            }
-            if i == 1 {
-                unlock()
-                return 0
-            }
-            let n = rd.read(buffer, maxLength: length)
-            unlock()
-            if n < 0 {
-                throw errStream
-            } else if n > 0 {
-                return n
-            }
-        }
-        return 0
-    }
-    func signal(){
-        pthread_mutex_lock(&mutex)
-        pthread_cond_broadcast(&cond)
-        pthread_mutex_unlock(&mutex)
-    }
-    func close() {
-        lock()
-        defer {
-            unlock()
-        }
-        if closed {
-            return
-        }
-        closed = true
-        rd.delegate = nil
-        wr.delegate = nil
-        rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
-        wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
-        rd.close()
-        wr.close()
-        delegate.c = nil
-        pthread_cond_broadcast(&cond)
-    }
-    var opened : Bool {
-        lock()
-        defer { unlock() }
-        return !closed
-    }
-}
 
-
-
-private class Frame {
-    var inflate = false
-    var code = OpCode.Continue
-    var utf8 = UTF8()
-    var payload = BoxedBytes()
-    var statusCode = UInt16(0)
-    var finished = true
-}
-
-private struct z_stream {
-    var next_in : UnsafePointer<UInt8> = nil
-    var avail_in : CUnsignedInt = 0
-    var total_in : CUnsignedLong = 0
+    private func write(bytes: UnsafePointer<UInt8>, length: Int) throws {
+        if outputBytesStart+outputBytesLength+length > outputBytesSize {
+            var size = outputBytesSize
+            while outputBytesStart+outputBytesLength+length > size {
+                size *= 2
+            }
+            let ptr = UnsafeMutablePointer<UInt8>(realloc(outputBytes, size))
+            if ptr == nil {
+                throw WebSocketError.Memory
+            }
+            outputBytes = ptr
+            outputBytesSize = size
+        }
+        memcpy(outputBytes+outputBytesStart+outputBytesLength, bytes, length)
+        outputBytesLength += length
+    }
     
-    var next_out : UnsafeMutablePointer<UInt8> = nil
-    var avail_out : CUnsignedInt = 0
-    var total_out : CUnsignedLong = 0
-    
-    var msg : UnsafePointer<CChar> = nil
-    var state : COpaquePointer = nil
-    
-    var zalloc : COpaquePointer = nil
-    var zfree : COpaquePointer = nil
-    var opaque : COpaquePointer = nil
-    
-    var data_type : CInt = 0
-    var adler : CUnsignedLong = 0
-    var reserved : CUnsignedLong = 0
-}
-
-@asmname("zlibVersion") private func zlibVersion() -> COpaquePointer
-@asmname("deflateInit2_") private func deflateInit2(strm : UnsafeMutablePointer<Void>, level : CInt, method : CInt, windowBits : CInt, memLevel : CInt, strategy : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("deflateInit_") private func deflateInit(strm : UnsafeMutablePointer<Void>, level : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("deflateEnd") private func deflateEnd(strm : UnsafeMutablePointer<Void>) -> CInt
-@asmname("deflate") private func deflate(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
-@asmname("inflateInit2_") private func inflateInit2(strm : UnsafeMutablePointer<Void>, windowBits : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("inflateInit_") private func inflateInit(strm : UnsafeMutablePointer<Void>, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("inflate") private func inflateG(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
-@asmname("inflateEnd") private func inflateEndG(strm : UnsafeMutablePointer<Void>) -> CInt
-
-private func zerror(res : CInt) -> ErrorType? {
-    var err = ""
-    switch res {
-    case 0: return nil
-    case 1: err = "stream end"
-    case 2: err = "need dict"
-    case -1: err = "errno"
-    case -2: err = "stream error"
-    case -3: err = "data error"
-    case -4: err = "mem error"
-    case -5: err = "buf error"
-    case -6: err = "version error"
-    default: err = "undefined error"
-    }
-    return makeError("\(err): \(res)")
-}
-
-private class Inflater {
-    var windowBits = 0
-    var strm = z_stream()
-    var tInput = [[UInt8]]()
-    var inflateEnd : [UInt8] = [0x00, 0x00, 0xFF, 0xFF]
-    var bufferSize = 1024
-    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
-    init?(windowBits : Int){
-        if buffer == nil {
-            return nil
+    private func readResponse() throws {
+        let end : [UInt8] = [ 0x0D, 0x0A, 0x0D, 0x0A ]
+        let ptr = UnsafeMutablePointer<UInt8>(memmem(inputBytes+inputBytesStart, inputBytesLength, end, 4))
+        if ptr == nil {
+            throw WebSocketError.None
         }
-        self.windowBits = windowBits
-        let ret = inflateInit2(&strm, windowBits: -CInt(windowBits), version: zlibVersion(), stream_size: CInt(sizeof(z_stream)))
-        if ret != 0 {
-            return nil
+        let buffer = inputBytes+inputBytesStart
+        let bufferCount = ptr-(inputBytes+inputBytesStart)
+        let string = NSString(bytesNoCopy: buffer, length: bufferCount, encoding: NSUTF8StringEncoding, freeWhenDone: false) as? String
+        if string == nil {
+            throw WebSocketError.InvalidHeader
         }
-    }
-    deinit{
-        inflateEndG(&strm)
-        free(buffer)
-    }
-    func inflate(bufin : UnsafePointer<UInt8>, length : Int, final : Bool) throws -> (p : UnsafeMutablePointer<UInt8>, n : Int){
-        var buf = buffer
-        var bufsiz = bufferSize
-        var buflen = 0
-        for var i = 0; i < 2; i++ {
-            if i == 0 {
-                strm.avail_in = CUnsignedInt(length)
-                strm.next_in = UnsafePointer<UInt8>(bufin)
-            } else {
-                if !final {
-                    break
-                }
-                strm.avail_in = CUnsignedInt(inflateEnd.count)
-                strm.next_in = UnsafePointer<UInt8>(inflateEnd)
-            }
-            for ;; {
-                strm.avail_out = CUnsignedInt(bufsiz)
-                strm.next_out = buf
-                inflateG(&strm, flush: 0)
-                let have = bufsiz - Int(strm.avail_out)
-                bufsiz -= have
-                buflen += have
-                if strm.avail_out != 0{
-                    break
-                }
-                if bufsiz == 0 {
-                    bufferSize *= 2
-                    let nbuf = UnsafeMutablePointer<UInt8>(realloc(buffer, bufferSize))
-                    if nbuf == nil {
-                        throw makeError("out of memory")
-                    }
-                    buffer = nbuf
-                    buf = buffer+Int(buflen)
-                    bufsiz = bufferSize - buflen
-                }
-            }
-        }
-        return (buffer, buflen)
-    }
-}
-
-private class Deflater {
-    var windowBits = 0
-    var memLevel = 0
-    var strm = z_stream()
-    var bufferSize = 1024
-    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
-    init?(windowBits : Int, memLevel : Int){
-        if buffer == nil {
-            return nil
-        }
-        self.windowBits = windowBits
-        self.memLevel = memLevel
-        let ret = deflateInit2(&strm, level: 6, method: 8, windowBits: -CInt(windowBits), memLevel: CInt(memLevel), strategy: 0, version: zlibVersion(), stream_size: CInt(sizeof(z_stream)))
-        if ret != 0 {
-            return nil
-        }
-    }
-    deinit{
-        deflateEnd(&strm)
-        free(buffer)
-    }
-    func deflate(bufin : UnsafePointer<UInt8>, length : Int, final : Bool) -> (p : UnsafeMutablePointer<UInt8>, n : Int, err : NSError?){
-        return (nil, 0, nil)
-    }
-}
-
-private class UTF8 {
-    var text : String = ""
-    var count : UInt32 = 0          // number of bytes
-    var procd : UInt32 = 0          // number of bytes processed
-    var codepoint : UInt32 = 0      // the actual codepoint
-    var bcount = 0
-    init() { text = "" }
-    func append(byte : UInt8) throws {
-        if count == 0 {
-            if byte <= 0x7F {
-                text.append(UnicodeScalar(byte))
-                return
-            }
-            if byte == 0xC0 || byte == 0xC1 {
-                throw makeError("invalid codepoint: invalid byte")
-            }
-            if byte >> 5 & 0x7 == 0x6 {
-                count = 2
-            } else if byte >> 4 & 0xF == 0xE {
-                count = 3
-            } else if byte >> 3 & 0x1F == 0x1E {
-                count = 4
-            } else {
-                throw makeError("invalid codepoint: frames")
-            }
-            procd = 1
-            codepoint = (UInt32(byte) & (0xFF >> count)) << ((count-1) * 6)
-            return
-        }
-        if byte >> 6 & 0x3 != 0x2 {
-            throw makeError("invalid codepoint: signature")
-        }
-        codepoint += UInt32(byte & 0x3F) << ((count-procd-1) * 6)
-        if codepoint > 0x10FFFF || (codepoint >= 0xD800 && codepoint <= 0xDFFF) {
-            throw makeError("invalid codepoint: out of bounds")
-        }
-        procd++
-        if procd == count {
-            if codepoint <= 0x7FF && count > 2 {
-                throw makeError("invalid codepoint: overlong")
-            }
-            if codepoint <= 0xFFFF && count > 3 {
-                throw makeError("invalid codepoint: overlong")
-            }
-            procd = 0
-            count = 0
-            text.append(UnicodeScalar(codepoint))
-        }
-        return
-    }
-    func append(bytes : UnsafePointer<UInt8>, length : Int) throws {
-        if length == 0 {
-            return
-        }
-        if count == 0 {
-            var ascii = true
-            for var i = 0; i < length; i++ {
-                if bytes[i] > 0x7F {
-                    ascii = false
-                    break
-                }
-            }
-            if ascii {
-                text += NSString(bytes: bytes, length: length, encoding: NSASCIIStringEncoding) as! String
-                bcount += length
-                return
-            }
-        }
-        for var i = 0; i < length; i++ {
-            try append(bytes[i])
-        }
-        bcount += length
-    }
-    var completed : Bool {
-        return count == 0
-    }
-    static func bytes(string : String) -> [UInt8]{
-        let data = string.dataUsingEncoding(NSUTF8StringEncoding)!
-        return [UInt8](UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(data.bytes), count: data.length))
-    }
-    static func string(bytes : [UInt8]) -> String{
-        if let str = NSString(bytes: bytes, length: bytes.count, encoding: NSUTF8StringEncoding) {
-            return str as String
-        }
-        return ""
-    }
-}
-
-private class WebSocketConn {
-    var c : TCPConn?
-    var inflater : Inflater?
-    var deflater : Deflater?
-    var subProtocol = ""
-    var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
-    init(_ request : NSURLRequest, protocols : [String] = [], services : TCPConnService = TCPConnService(0), compression : WebSocketCompression = WebSocketCompression()) throws {
-        if request.URL == nil {
-            let _ = try TCPConn("")
-        }
-        let req = request.mutableCopy() as! NSMutableURLRequest
-        req.setValue("websocket", forHTTPHeaderField: "Upgrade")
-        req.setValue("Upgrade", forHTTPHeaderField: "Connection")
-        req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
-        req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
-        if req.URL!.port == nil || req.URL!.port!.integerValue == 80 || req.URL!.port!.integerValue == 443  {
-            req.setValue(req.URL!.host!, forHTTPHeaderField: "Host")
-        } else {
-            req.setValue("\(req.URL!.host!):\(req.URL!.port!.integerValue)", forHTTPHeaderField: "Host")
-        }
-        req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
-        if protocols.count > 0 {
-            req.setValue(";".join(protocols), forHTTPHeaderField: "Sec-WebSocket-Protocol")
-        }
-        if req.URL!.scheme != "wss" && req.URL!.scheme != "ws" {
-            let _ = try TCPConn("")
-        }
-        if compression.on {
-            var val = "permessage-deflate"
-            if compression.noContextTakeover {
-                val += "; client_no_context_takeover; server_no_context_takeover"
-            }
-            val += "; client_max_window_bits"
-            if compression.maxWindowBits != 0 {
-                val += "; server_max_window_bits=\(compression.maxWindowBits)"
-            }
-            req.setValue(val, forHTTPHeaderField: "Sec-WebSocket-Extensions")
-        }
-        
-        var security = TCPConnSecurity.None
-        let port : Int
-        if req.URL!.port != nil {
-            port = req.URL!.port!.integerValue
-        } else if req.URL!.scheme == "wss" {
-            port = 443
-            security = .NegoticatedSSL
-        } else {
-            port = 80
-            security = .None
-        }
-        var path = CFURLCopyPath(req.URL!) as String
-        if path == "" {
-            path = "/"
-        }
-        if let q = req.URL!.query {
-            if q != "" {
-                path += "?" + q
-            }
-        }
-        var reqs = "GET \(path) HTTP/1.1\r\n"
-        for key in req.allHTTPHeaderFields!.keys.array {
-            if let val = req.valueForHTTPHeaderField(key) {
-                reqs += "\(key): \(val)\r\n"
-            }
-        }
-        var keyb = [UInt32](count: 4, repeatedValue: 0)
-        for var i = 0; i < 4; i++ {
-            keyb[i] = arc4random()
-        }
-        let rkey = NSData(bytes: keyb, length: 16).base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0))
-        reqs += "Sec-WebSocket-Key: \(rkey)\r\n"
-        reqs += "\r\n"
-        var header = [UInt8]()
-        for b in reqs.utf8 {
-            header += [b]
-        }
-        
-        c = try TCPConn("\(req.URL!.host!):\(port)", security: security, services: services)
-        try c!.write(header, length: header.count)
+        let header = string!
         var needsCompression = false
         var serverMaxWindowBits = 15
         let clientMaxWindowBits = 15
         var key = ""
-        var b = UInt8(0)
-        for var i = 0;; i++ {
-            var lineb : [UInt8] = []
-            for ;; {
-                try readByte(&b)
-                if b == 0xA {
-                    break
-                }
-                lineb += [b]
-            }
-            let lineo = String(bytes: lineb, encoding: NSUTF8StringEncoding)
-            if lineo == nil {
-                throw errUTF8
-            }
-            let trim : (String)->(String) = { (text) in return text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())}
-            let eqval : (String,String)->(String) = { (line, del) in return trim(line.componentsSeparatedByString(del)[1]) }
-            let line = trim(lineo!)
+        let trim : (String)->(String) = { (text) in return text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())}
+        let eqval : (String,String)->(String) = { (line, del) in return trim(line.componentsSeparatedByString(del)[1]) }
+        let lines = header.componentsSeparatedByString("\r\n")
+        for var i = 0; i < lines.count; i++ {
+            let line = trim(lines[0])
             if i == 0  {
                 if !line.hasPrefix("HTTP/1.1 101"){
-                    throw makeError("invalid response (\(line))")
+                    throw WebSocketError.InvalidResponse(line)
                 }
             } else if line != "" {
                 var value = ""
@@ -1243,7 +782,7 @@ private class WebSocketConn {
                 }
                 switch key {
                 case "Sec-WebSocket-SubProtocol":
-                    subProtocol = value
+                    privateSubProtocol = value
                 case "Sec-WebSocket-Extensions":
                     let parts = value.componentsSeparatedByString(";")
                     for p in parts {
@@ -1260,103 +799,64 @@ private class WebSocketConn {
                     break
                 }
             }
-            if line == "" {
-                break
-            }
         }
         if needsCompression {
             if serverMaxWindowBits < 8 || serverMaxWindowBits > 15 {
-                throw makeError("invalid server_max_window_bits")
+                throw WebSocketError.InvalidCompressionOptions("server_max_window_bits")
             }
             if serverMaxWindowBits < 8 || serverMaxWindowBits > 15 {
-                throw makeError("invalid client_max_window_bits")
+                throw WebSocketError.InvalidCompressionOptions("client_max_window_bits")
             }
             inflater = Inflater(windowBits: serverMaxWindowBits)
             if inflater == nil {
-                throw makeError("inflater init")
+                throw WebSocketError.InvalidCompressionOptions("inflater init")
             }
             deflater = Deflater(windowBits: clientMaxWindowBits, memLevel: 8)
             if deflater == nil {
-                throw makeError("deflater init")
+                throw WebSocketError.InvalidCompressionOptions("deflater init")
             }
         }
-    }
-    convenience init(_ url : String) throws {
-        let nsurl = NSURL(string: url)
-        if nsurl == nil {
-            try self.init(NSURLRequest())
+        
+        
+        
+        inputBytesLength -= bufferCount+4
+        if inputBytesLength == 0 {
+            inputBytesStart = 0
         } else {
-            try self.init(NSURLRequest(URL: nsurl!))
+            inputBytesStart += bufferCount+4
         }
     }
     
-    func close(code : Int, reason : String) {
-        let f = Frame()
-        (f.code, f.statusCode, f.utf8.text) = (.Close, UInt16(code), reason)
-        do {
-            try writeFrame(f)
-        } catch {
-            
+   
+    
+    private class ByteReader {
+        var orgBytes : UnsafePointer<UInt8>
+        var bytes : UnsafePointer<UInt8>
+        var length : Int
+        init(bytes: UnsafePointer<UInt8>, length: Int){
+            self.orgBytes = bytes
+            self.bytes = bytes
+            self.length = length
         }
-        close()
-    }
-    
-    func close() {
-        c!.close()
-    }
-    
-    var opened : Bool {
-        return c!.opened
-    }
-    
-    @inline(__always) func readByte(inout b : UInt8) throws {
-        for ;; {
-            let n = try c!.read(&b, length: 1)
-            if n == 1  {
-                break
+        func readByte() throws -> UInt8 {
+            if length == 0 {
+                throw WebSocketError.FrameNotReady
             }
+            let b = bytes[0]
+            length--
+            bytes++
+            return b
+        }
+        var totalRead : Int {
+            return bytes-orgBytes
         }
     }
-
-    var savedFrame : Frame?
-    func readFrame() throws -> Frame {
-
-        var (f, fin): (Frame, Bool) = (Frame(), false)
-        if savedFrame != nil {
-            (f, fin) = (savedFrame!, false)
-            savedFrame = nil
-        } else {
-            f = try readFrameFragment(nil)
-            fin = f.finished
-        }
-        if f.code == .Continue{
-            throw makeError("leader frame cannot be a continue frame", .Protocol)
-        }
-        while !fin {
-            let cf = try readFrameFragment(f)
-            fin = cf.finished
-            if cf.code != .Continue {
-                if !cf.code.isControl {
-                    throw makeError("only ping frames can be interlaced with fragments", .Protocol)
-                }
-                savedFrame = f
-                return cf
-            }
-        }
-        if !f.utf8.completed {
-            throw makeError("incomplete utf8", .Payload)
-        }
-        return f
-    }
-
-    var reusedBoxedBytes = BoxedBytes()
-    func readFrameFragment(var leader : Frame?) throws -> Frame {
-        var b = UInt8(0)
-        do {
-            try readByte(&b)
-        } catch {
-            throw makeError(error, .Protocol)
-        }
+    
+    private var buffer = [UInt8](count: 1024*16, repeatedValue: 0)
+    private var reusedBoxedBytes = BoxedBytes()
+    private func readFrameFragment(var leader : Frame?) throws -> Frame {
+        let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
+        var b = try reader.readByte()
         var inflate = false
         let fin = b >> 7 & 0x1 == 0x1
         let rsv1 = b >> 6 & 0x1 == 0x1
@@ -1365,24 +865,20 @@ private class WebSocketConn {
         if inflater != nil && (rsv1 || (leader != nil && leader!.inflate)) {
             inflate = true
         } else if rsv1 || rsv2 || rsv3 {
-            throw makeError("invalid extension", .Protocol)
+            throw WebSocketError.ProtocolError("invalid extension")
         }
         var code = OpCode.Binary
         if let c = OpCode(rawValue: (b & 0xF)){
             code = c
         } else {
-            throw makeError("invalid opcode", .Protocol)
+            throw WebSocketError.ProtocolError("invalid opcode")
         }
         if !fin && code.isControl {
-            throw makeError("unfinished control frame", .Protocol)
+            throw WebSocketError.ProtocolError("unfinished control frame")
         }
-        do {
-            try readByte(&b)
-        } catch {
-            throw makeError(error, .Protocol)
-        }
+        b = try reader.readByte()
         if b >> 7 & 0x1 == 0x1 {
-            throw makeError("server sent masked frame", .Protocol)
+            throw WebSocketError.ProtocolError("server sent masked frame")
         }
         var len64 = Int64(b & 0x7F)
         var bcount = 0
@@ -1393,25 +889,21 @@ private class WebSocketConn {
         }
         if bcount != 0 {
             if code.isControl {
-                throw makeError("invalid payload size for control frame", .Protocol)
+                throw WebSocketError.ProtocolError("invalid payload size for control frame")
             }
             len64 = 0
             for var i = bcount-1; i >= 0; i-- {
-                do {
-                    try readByte(&b)
-                } catch {
-                    throw makeError(error, .Protocol)
-                }
+                b = try reader.readByte()
                 len64 += Int64(b) << Int64(i*8)
             }
         }
         var len = Int(len64)
         if code == .Continue {
             if code.isControl {
-                throw makeError("control frame cannot have the 'continue' opcode", .Protocol)
+                throw WebSocketError.ProtocolError("control frame cannot have the 'continue' opcode")
             }
             if leader == nil {
-                throw makeError("continue frame is missing it's leader", .Protocol)
+                throw WebSocketError.ProtocolError("continue frame is missing it's leader")
             }
         }
         if code.isControl {
@@ -1419,7 +911,7 @@ private class WebSocketConn {
                 leader = nil
             }
             if inflate {
-                throw makeError("control frame cannot be compressed", .Protocol)
+                throw WebSocketError.ProtocolError("control frame cannot be compressed")
             }
         }
         var utf8 : UTF8
@@ -1438,106 +930,72 @@ private class WebSocketConn {
         }
         if leaderCode == .Close {
             if len == 1 {
-                throw makeError("invalid payload size for close frame", .Protocol)
+                throw WebSocketError.ProtocolError("invalid payload size for close frame")
             }
             if len >= 2 {
-                var (b1, b2) = (UInt8(0), UInt8(0))
-                do {
-                    try readByte(&b1)
-                    try readByte(&b2)
-                } catch {
-                    throw makeError(error, .Payload)
-                }
+                let b1 = try reader.readByte()
+                let b2 = try reader.readByte()
                 statusCode = (UInt16(b1) << 8) + UInt16(b2)
                 len -= 2
                 if statusCode < 1000 || statusCode > 4999  || (statusCode >= 1004 && statusCode <= 1006) || (statusCode >= 1012 && statusCode <= 2999) {
-                    throw makeError("invalid status code for close frame", .Protocol)
+                    throw WebSocketError.ProtocolError("invalid status code for close frame")
                 }
             }
+        }
+        if reader.length < len {
+            throw WebSocketError.FrameNotReady
+        }
+        if leaderCode == .Text || leaderCode == .Close {
+            if inflate {
+                let (bytes, bytesLen) = try inflater!.inflate(reader.bytes, length: len, final: fin)
+                if bytesLen > 0 {
+                    try utf8.append(bytes, length: bytesLen)
+                }
+            } else {
+                try utf8.append(reader.bytes, length: len)
+            }
+        } else {
+            if inflate {
+                let (bytes, bytesLen) = try inflater!.inflate(reader.bytes, length: len, final: fin)
+                if bytesLen > 0 {
+                    payload.append(bytes, length: bytesLen)
+                }
+            } else {
+                payload.append(reader.bytes, length: len)
+            }
+        }
+        reader.length -= len
+        reader.bytes += len
+        inputBytesLength -= reader.totalRead
+        if inputBytesLength == 0 {
+            inputBytesStart = 0
+        } else {
+            inputBytesStart += reader.totalRead
         }
         
-        if leaderCode == .Text || leaderCode == .Close {
-            var take = Int(len)
-            repeat {
-                var n : Int = 0
-                if take > 0 {
-                    var c = take
-                    if c > buffer.count {
-                        c = buffer.count
-                    }
-                    do {
-                        n = try self.c!.read(&buffer, length: c)
-                    } catch {
-                        throw makeError(error, .Payload)
-                    }
-                }
-                do {
-                    if inflate {
-                        let (bytes, bytesLen) : (UnsafeMutablePointer<UInt8>, Int)
-                        do {
-                            (bytes, bytesLen) = try inflater!.inflate(&buffer, length: n, final: (take - n == 0) && fin)
-                        } catch {
-                            throw makeError(error, .Payload)
-                        }
-                        if bytesLen > 0 {
-                            try utf8.append(bytes, length: bytesLen)
-                        }
-                    } else {
-                        try utf8.append(&buffer, length: n)
-                    }
-                } catch {
-                    throw makeError(error, .Payload)
-                }
-                take -= n
-            } while take > 0
-        } else {
-            var start = payload.count
-            if !inflate {
-                payload.count += len
-            }
-            var take = Int(len)
-            repeat {
-                var n : Int = 0
-                if inflate {
-                    if take > 0 {
-                        var c = take
-                        if c > buffer.count {
-                            c = buffer.count
-                        }
-                        do {
-                            n = try self.c!.read(&buffer, length: c)
-                        } catch {
-                            throw makeError(error, .Payload)
-                        }
-                    }
-                    let (bytes, bytesLen) : (UnsafeMutablePointer<UInt8>, Int)
-                    do {
-                        (bytes, bytesLen) = try inflater!.inflate(&buffer, length: n, final: (take - n == 0) && fin)
-                    } catch {
-                        throw makeError(error, .Payload)
-                    }
-                    if bytesLen > 0 {
-                        payload.append(bytes, length: bytesLen)
-                    }
-                } else if take > 0 {
-                    do {
-                        n = try self.c!.read(payload.ptr+start, length: take)
-                    } catch {
-                        throw makeError(error, .Payload)
-                    }
-                    start += n
-                }
-                take -= n
-            } while take > 0
-        }
         let f = Frame()
         (f.code, f.payload, f.utf8, f.statusCode, f.inflate, f.finished) = (code, payload, utf8, statusCode, inflate, fin)
         return f
     }
-    var head = [UInt8](count: 0xFF, repeatedValue: 0)
-    func writeFrame(f : Frame) throws {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private var head = [UInt8](count: 0xFF, repeatedValue: 0)
+    private func writeFrame(f : Frame) throws {
         if !f.finished{
-            throw makeError("cannot send unfinished frames", .Library)
+            throw WebSocketError.LibraryError("cannot send unfinished frames")
         }
         var hlen = 0
         let b : UInt8 = 0x80
@@ -1600,37 +1058,394 @@ private class WebSocketConn {
                 }
             }
         }
-        var written = 0
-        while written < hlen {
-            let n = try self.c!.write((&head)+written, length: hlen-written)
-            if n == -1 {
-                break
-            }
-            written += n
+        try write(head, length: hlen)
+        try write(payloadBytes, length: payloadBytes.count)
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+    Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
+    
+    :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
+    :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
+    */
+    public func close(code : Int = 1000, reason : String = "Normal Closure") {
+        let f = Frame()
+        f.code = .Close
+        f.statusCode = UInt16(truncatingBitPattern: code)
+        f.utf8.text = reason
+        sendFrame(f)
+    }
+    private func sendFrame(f : Frame) {
+        print("[message]")
+        frames += [f]
+        dispatch_async(queue) { self.step(.None) }
+    }
+    /**
+    Transmits message to the server over the WebSocket connection.
+    
+    :param: message The data to be sent to the server.
+    */
+    public func send(message : Any) {
+        let f = Frame()
+        if let message = message as? String {
+            f.code = .Text
+            f.utf8.text = message
+        } else if let message = message as? [UInt8] {
+            f.code = .Binary
+            f.payload.array = message
+        } else if let message = message as? UnsafeBufferPointer<UInt8> {
+            f.code = .Binary
+            f.payload.append(message.baseAddress, length: message.count)
+        } else if let message = message as? NSData {
+            f.code = .Binary
+            f.payload.nsdata = message
+        } else {
+            f.code = .Text
+            f.utf8.text = "\(message)"
         }
-        written = 0
-        while written < payloadBytes.count {
-            let n = try self.c!.write((&payloadBytes)+written, length: payloadBytes.count-written)
-            if n == -1 {
-                break
-            }
-            written += n
+        sendFrame(f)
+    }
+    /**
+    Transmits a ping to the server over the WebSocket connection.
+    */
+    public func ping() {
+        let f = Frame()
+        f.code = .Ping
+        sendFrame(f)
+    }
+    /**
+    Transmits a ping to the server over the WebSocket connection.
+    
+    :param: optional message The data to be sent to the server.
+    */
+    public func ping(message : Any){
+        let f = Frame()
+        f.code = .Ping
+        if let message = message as? String {
+            f.payload.array = UTF8.bytes(message)
+        } else if let message = message as? [UInt8] {
+            f.payload.array = message
+        } else if let message = message as? UnsafeBufferPointer<UInt8> {
+            f.payload.append(message.baseAddress, length: message.count)
+        } else if let message = message as? NSData {
+            f.payload.nsdata = message
+        } else {
+            f.utf8.text = "\(message)"
+        }
+        sendFrame(f)
+    }
+}
+
+
+public enum WebSocketError : ErrorType, CustomStringConvertible {
+    case None
+    case Memory
+    case FrameNotReady
+    case InvalidHeader
+    case InvalidAddress
+    case Network(String)
+    case LibraryError(String)
+    case PayloadError(String)
+    case ProtocolError(String)
+    case InvalidResponse(String)
+    case InvalidCompressionOptions(String)
+    public var description : String {
+        switch self {
+        case .None: return "WebSocketError.None"
+        case .Memory: return "WebSocketError.Memory"
+        case .FrameNotReady: return "WebSocketError.FrameNotReady"
+        case .InvalidAddress: return "WebSocketError.InvalidAddress"
+        case .InvalidHeader: return "WebSocketError.InvalidHeader"
+        case let .InvalidResponse(details): return "WebSocketError.InvalidResponse(\(details))"
+        case let .InvalidCompressionOptions(details): return "WebSocketError.InvalidCompressionOptions(\(details))"
+        case let .LibraryError(details): return "WebSocketError.LibraryError(\(details))"
+        case let .ProtocolError(details): return "WebSocketError.ProtocolError(\(details))"
+        case let .PayloadError(details): return "WebSocketError.PayloadError(\(details))"
+        case let .Network(details): return "WebSocketError.Network(\(details))"
         }
     }
-    var readDeadline : NSDate {
-        get {
-            return c!.readDeadline
-        }
-        set {
-            c!.readDeadline = newValue
+    public var details : String {
+        switch self {
+        case .InvalidResponse(let details): return details
+        case .InvalidCompressionOptions(let details): return details
+        case .LibraryError(let details): return details
+        case .ProtocolError(let details): return details
+        case .PayloadError(let details): return details
+        case .Network(let details): return details
+        default: return ""
         }
     }
-    var writeDeadline : NSDate {
-        get {
-            return c!.writeDeadline
+    
+}
+
+private class Delegate : NSObject, NSStreamDelegate {
+    var ws : WebSocket!
+    @objc func stream(aStream: NSStream, handleEvent eventCode: NSStreamEvent){
+        if let ws = ws {
+            dispatch_async(queue) { ws.step(eventCode) }
         }
-        set {
-            c!.writeDeadline = newValue
+    }
+}
+
+private enum TCPConnSecurity {
+    case None
+    case NegoticatedSSL
+}
+
+private class Frame {
+    var inflate = false
+    var code = OpCode.Continue
+    var utf8 = UTF8()
+    var payload = BoxedBytes()
+    var statusCode = UInt16(0)
+    var finished = true
+    static func makeClose(statusCode: UInt16, reason: String) -> Frame {
+        let f = Frame()
+        f.code = .Close
+        f.statusCode = statusCode
+        f.utf8.text = reason
+        return f
+    }
+    func copy() -> Frame {
+        var f = Frame()
+        f.code = code
+        f.utf8.text = utf8.text
+        f.payload.buffer = payload.buffer
+        f.statusCode = statusCode
+        f.finished = finished
+        f.inflate = inflate
+        return f
+    }
+}
+
+private struct z_stream {
+    var next_in : UnsafePointer<UInt8> = nil
+    var avail_in : CUnsignedInt = 0
+    var total_in : CUnsignedLong = 0
+    
+    var next_out : UnsafeMutablePointer<UInt8> = nil
+    var avail_out : CUnsignedInt = 0
+    var total_out : CUnsignedLong = 0
+    
+    var msg : UnsafePointer<CChar> = nil
+    var state : COpaquePointer = nil
+    
+    var zalloc : COpaquePointer = nil
+    var zfree : COpaquePointer = nil
+    var opaque : COpaquePointer = nil
+    
+    var data_type : CInt = 0
+    var adler : CUnsignedLong = 0
+    var reserved : CUnsignedLong = 0
+}
+
+@asmname("zlibVersion") private func zlibVersion() -> COpaquePointer
+@asmname("deflateInit2_") private func deflateInit2(strm : UnsafeMutablePointer<Void>, level : CInt, method : CInt, windowBits : CInt, memLevel : CInt, strategy : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@asmname("deflateInit_") private func deflateInit(strm : UnsafeMutablePointer<Void>, level : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@asmname("deflateEnd") private func deflateEnd(strm : UnsafeMutablePointer<Void>) -> CInt
+@asmname("deflate") private func deflate(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
+@asmname("inflateInit2_") private func inflateInit2(strm : UnsafeMutablePointer<Void>, windowBits : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@asmname("inflateInit_") private func inflateInit(strm : UnsafeMutablePointer<Void>, version : COpaquePointer, stream_size : CInt) -> CInt
+@asmname("inflate") private func inflateG(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
+@asmname("inflateEnd") private func inflateEndG(strm : UnsafeMutablePointer<Void>) -> CInt
+
+private func zerror(res : CInt) -> ErrorType? {
+    var err = ""
+    switch res {
+    case 0: return nil
+    case 1: err = "stream end"
+    case 2: err = "need dict"
+    case -1: err = "errno"
+    case -2: err = "stream error"
+    case -3: err = "data error"
+    case -4: err = "mem error"
+    case -5: err = "buf error"
+    case -6: err = "version error"
+    default: err = "undefined error"
+    }
+    return WebSocketError.PayloadError("zlib: \(err): \(res)")
+}
+
+private class Inflater {
+    var windowBits = 0
+    var strm = z_stream()
+    var tInput = [[UInt8]]()
+    var inflateEnd : [UInt8] = [0x00, 0x00, 0xFF, 0xFF]
+    var bufferSize = 1024
+    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
+    init?(windowBits : Int){
+        if buffer == nil {
+            return nil
         }
+        self.windowBits = windowBits
+        let ret = inflateInit2(&strm, windowBits: -CInt(windowBits), version: zlibVersion(), stream_size: CInt(sizeof(z_stream)))
+        if ret != 0 {
+            return nil
+        }
+    }
+    deinit{
+        inflateEndG(&strm)
+        free(buffer)
+    }
+    func inflate(bufin : UnsafePointer<UInt8>, length : Int, final : Bool) throws -> (p : UnsafeMutablePointer<UInt8>, n : Int){
+        var buf = buffer
+        var bufsiz = bufferSize
+        var buflen = 0
+        for var i = 0; i < 2; i++ {
+            if i == 0 {
+                strm.avail_in = CUnsignedInt(length)
+                strm.next_in = UnsafePointer<UInt8>(bufin)
+            } else {
+                if !final {
+                    break
+                }
+                strm.avail_in = CUnsignedInt(inflateEnd.count)
+                strm.next_in = UnsafePointer<UInt8>(inflateEnd)
+            }
+            for ;; {
+                strm.avail_out = CUnsignedInt(bufsiz)
+                strm.next_out = buf
+                inflateG(&strm, flush: 0)
+                let have = bufsiz - Int(strm.avail_out)
+                bufsiz -= have
+                buflen += have
+                if strm.avail_out != 0{
+                    break
+                }
+                if bufsiz == 0 {
+                    bufferSize *= 2
+                    let nbuf = UnsafeMutablePointer<UInt8>(realloc(buffer, bufferSize))
+                    if nbuf == nil {
+                        throw WebSocketError.PayloadError("memory")
+                    }
+                    buffer = nbuf
+                    buf = buffer+Int(buflen)
+                    bufsiz = bufferSize - buflen
+                }
+            }
+        }
+        return (buffer, buflen)
+    }
+}
+
+private class Deflater {
+    var windowBits = 0
+    var memLevel = 0
+    var strm = z_stream()
+    var bufferSize = 1024
+    var buffer = UnsafeMutablePointer<UInt8>(malloc(1024))
+    init?(windowBits : Int, memLevel : Int){
+        if buffer == nil {
+            return nil
+        }
+        self.windowBits = windowBits
+        self.memLevel = memLevel
+        let ret = deflateInit2(&strm, level: 6, method: 8, windowBits: -CInt(windowBits), memLevel: CInt(memLevel), strategy: 0, version: zlibVersion(), stream_size: CInt(sizeof(z_stream)))
+        if ret != 0 {
+            return nil
+        }
+    }
+    deinit{
+        deflateEnd(&strm)
+        free(buffer)
+    }
+    func deflate(bufin : UnsafePointer<UInt8>, length : Int, final : Bool) -> (p : UnsafeMutablePointer<UInt8>, n : Int, err : NSError?){
+        return (nil, 0, nil)
+    }
+}
+
+
+private class UTF8 {
+    var text : String = ""
+    var count : UInt32 = 0          // number of bytes
+    var procd : UInt32 = 0          // number of bytes processed
+    var codepoint : UInt32 = 0      // the actual codepoint
+    var bcount = 0
+    init() { text = "" }
+    func append(byte : UInt8) throws {
+        if count == 0 {
+            if byte <= 0x7F {
+                text.append(UnicodeScalar(byte))
+                return
+            }
+            if byte == 0xC0 || byte == 0xC1 {
+                throw WebSocketError.PayloadError("invalid codepoint: invalid byte")
+            }
+            if byte >> 5 & 0x7 == 0x6 {
+                count = 2
+            } else if byte >> 4 & 0xF == 0xE {
+                count = 3
+            } else if byte >> 3 & 0x1F == 0x1E {
+                count = 4
+            } else {
+                throw WebSocketError.PayloadError("invalid codepoint: frames")
+            }
+            procd = 1
+            codepoint = (UInt32(byte) & (0xFF >> count)) << ((count-1) * 6)
+            return
+        }
+        if byte >> 6 & 0x3 != 0x2 {
+            throw WebSocketError.PayloadError("invalid codepoint: signature")
+        }
+        codepoint += UInt32(byte & 0x3F) << ((count-procd-1) * 6)
+        if codepoint > 0x10FFFF || (codepoint >= 0xD800 && codepoint <= 0xDFFF) {
+            throw WebSocketError.PayloadError("invalid codepoint: out of bounds")
+        }
+        procd++
+        if procd == count {
+            if codepoint <= 0x7FF && count > 2 {
+                throw WebSocketError.PayloadError("invalid codepoint: overlong")
+            }
+            if codepoint <= 0xFFFF && count > 3 {
+                throw WebSocketError.PayloadError("invalid codepoint: overlong")
+            }
+            procd = 0
+            count = 0
+            text.append(UnicodeScalar(codepoint))
+        }
+        return
+    }
+    func append(bytes : UnsafePointer<UInt8>, length : Int) throws {
+        if length == 0 {
+            return
+        }
+        if count == 0 {
+            var ascii = true
+            for var i = 0; i < length; i++ {
+                if bytes[i] > 0x7F {
+                    ascii = false
+                    break
+                }
+            }
+            if ascii {
+                text += NSString(bytes: bytes, length: length, encoding: NSASCIIStringEncoding) as! String
+                bcount += length
+                return
+            }
+        }
+        for var i = 0; i < length; i++ {
+            try append(bytes[i])
+        }
+        bcount += length
+    }
+    var completed : Bool {
+        return count == 0
+    }
+    static func bytes(string : String) -> [UInt8]{
+        let data = string.dataUsingEncoding(NSUTF8StringEncoding)!
+        return [UInt8](UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(data.bytes), count: data.length))
+    }
+    static func string(bytes : [UInt8]) -> String{
+        if let str = NSString(bytes: bytes, length: bytes.count, encoding: NSUTF8StringEncoding) {
+            return str as String
+        }
+        return ""
     }
 }

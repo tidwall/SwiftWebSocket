@@ -7,19 +7,36 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03285D2B1B4A9F1A0078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
+		03285D331B4B3A720078A1AA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D321B4B3A720078A1AA /* main.swift */; };
+		03285D381B4B3A9E0078A1AA /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
+		03285D3C1B4B9A920078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
 		03D1E7221B208A5C00AC49AC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 03D1E7211B208A5C00AC49AC /* libz.dylib */; };
 		D71948F51B35E5670015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D71948F61B35E5670015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
 		D719491A1B35E6640015C529 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D71948FA1B35E59D0015C529 /* libz.dylib */; };
 		D719491B1B35E7510015C529 /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D719491E1B35EF910015C529 /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71948F21B35E5670015C529 /* WebSocket.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		03285D2E1B4B3A720078A1AA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		03285D301B4B3A720078A1AA /* Autobahn */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Autobahn; sourceTree = BUILT_PRODUCTS_DIR; };
+		03285D321B4B3A720078A1AA /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		03D1E7031B20897100AC49AC /* SwiftWebSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftWebSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		03D1E7211B208A5C00AC49AC /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		D71948F11B35E5670015C529 /* SwiftWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftWebSocket.h; sourceTree = "<group>"; };
-		D71948F21B35E5670015C529 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		D71948F21B35E5670015C529 /* WebSocketOld.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocketOld.swift; sourceTree = "<group>"; };
 		D71948F41B35E5670015C529 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D71948FA1B35E59D0015C529 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		D71949011B35E6130015C529 /* SwiftWebSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftWebSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -27,6 +44,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		03285D2D1B4B3A720078A1AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03285D381B4B3A9E0078A1AA /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		03D1E6FF1B20897100AC49AC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -46,6 +71,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		03285D311B4B3A720078A1AA /* Autobahn */ = {
+			isa = PBXGroup;
+			children = (
+				03285D321B4B3A720078A1AA /* main.swift */,
+			);
+			path = Autobahn;
+			sourceTree = "<group>";
+		};
 		03D1E6F91B20897100AC49AC = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +87,7 @@
 				D71948F01B35E5670015C529 /* Source */,
 				D71948F31B35E5670015C529 /* SwiftWebSocket-iOS */,
 				D71949021B35E6140015C529 /* SwiftWebSocket-OSX */,
+				03285D311B4B3A720078A1AA /* Autobahn */,
 				03D1E7041B20897100AC49AC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -63,6 +97,7 @@
 			children = (
 				03D1E7031B20897100AC49AC /* SwiftWebSocket.framework */,
 				D71949011B35E6130015C529 /* SwiftWebSocket.framework */,
+				03285D301B4B3A720078A1AA /* Autobahn */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -71,7 +106,8 @@
 			isa = PBXGroup;
 			children = (
 				D71948F11B35E5670015C529 /* SwiftWebSocket.h */,
-				D71948F21B35E5670015C529 /* WebSocket.swift */,
+				D71948F21B35E5670015C529 /* WebSocketOld.swift */,
+				03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -114,6 +150,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		03285D2F1B4B3A720078A1AA /* Autobahn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03285D341B4B3A720078A1AA /* Build configuration list for PBXNativeTarget "Autobahn" */;
+			buildPhases = (
+				03285D2C1B4B3A720078A1AA /* Sources */,
+				03285D2D1B4B3A720078A1AA /* Frameworks */,
+				03285D2E1B4B3A720078A1AA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Autobahn;
+			productName = Autobahn;
+			productReference = 03285D301B4B3A720078A1AA /* Autobahn */;
+			productType = "com.apple.product-type.tool";
+		};
 		03D1E7021B20897100AC49AC /* SwiftWebSocket-iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 03D1E7191B20897100AC49AC /* Build configuration list for PBXNativeTarget "SwiftWebSocket-iOS" */;
@@ -160,6 +213,9 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "ONcast, LLC";
 				TargetAttributes = {
+					03285D2F1B4B3A720078A1AA = {
+						CreatedOnToolsVersion = 7.0;
+					};
 					03D1E7021B20897100AC49AC = {
 						CreatedOnToolsVersion = 6.3.2;
 					};
@@ -182,6 +238,7 @@
 			targets = (
 				03D1E7021B20897100AC49AC /* SwiftWebSocket-iOS */,
 				D71949001B35E6130015C529 /* SwiftWebSocket-OSX */,
+				03285D2F1B4B3A720078A1AA /* Autobahn */,
 			);
 		};
 /* End PBXProject section */
@@ -204,11 +261,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		03285D2C1B4B3A720078A1AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03285D331B4B3A720078A1AA /* main.swift in Sources */,
+				03285D3C1B4B9A920078A1AA /* WebSocket.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		03D1E6FE1B20897100AC49AC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D71948F61B35E5670015C529 /* WebSocket.swift in Sources */,
+				03285D2B1B4A9F1A0078A1AA /* WebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,13 +282,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D719491E1B35EF910015C529 /* WebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		03285D351B4B3A720078A1AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		03285D361B4B3A720078A1AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		03D1E7171B20897100AC49AC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -401,6 +485,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		03285D341B4B3A720078A1AA /* Build configuration list for PBXNativeTarget "Autobahn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03285D351B4B3A720078A1AA /* Debug */,
+				03285D361B4B3A720078A1AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		03D1E6FD1B20897100AC49AC /* Build configuration list for PBXProject "SwiftWebSocket" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
