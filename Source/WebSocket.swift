@@ -13,7 +13,7 @@ import Foundation
 
 private let windowBufferSize = 0x2000
 
-private class BoxedBytes {
+private class Payload {
     var ptr : UnsafeMutablePointer<UInt8>
     var cap : Int
     var len : Int
@@ -119,10 +119,13 @@ public enum WebSocketBinaryType : CustomStringConvertible {
     case UInt8Array
     /// The WebSocket should transmit NSData objects.
     case NSData
+    /// The WebSocket should transmit UnsafeBufferPointer<UInt8> objects. This buffer is only valid during the scope of the message event. Use at your own risk.
+    case UInt8UnsafeBufferPointer
     public var description : String {
         switch self {
         case UInt8Array: return "UInt8Array"
         case NSData: return "NSData"
+        case UInt8UnsafeBufferPointer: return "UInt8UnsafeBufferPointer"
         }
     }
 }
@@ -189,6 +192,7 @@ public struct WebSocketService :  OptionSetType {
     static var Voice: WebSocketService { return self.init(1 << 3) }
 }
 
+/// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
 public class WebSocket: Hashable {
     private var id : Int
     private var mutex = pthread_mutex_t()
@@ -329,8 +333,6 @@ public class WebSocket: Hashable {
         }
         return false
     }
-    
-    
     private enum Stage : Int {
         case OpenConn
         case ReadResponse
@@ -338,7 +340,6 @@ public class WebSocket: Hashable {
         case CloseConn
         case End
     }
-    
     private var stage = Stage.OpenConn
     private var rd : NSInputStream!
     private var wr : NSOutputStream!
@@ -353,8 +354,8 @@ public class WebSocket: Hashable {
             return
         }
         do {
-            try handleBuffers()
-            try handleStreamErrors()
+            try stepBuffers()
+            try stepStreamErrors()
             switch stage {
             case .OpenConn:
                 try openConn()
@@ -367,7 +368,7 @@ public class WebSocket: Hashable {
                 }
                 stage = .HandleFrames
             case .HandleFrames:
-                try handleAllOutputFrames()
+                try stepOutputFrames()
                 if closeFinal {
                     privateReadyState  == .Closing
                     stage = .CloseConn
@@ -381,9 +382,10 @@ public class WebSocket: Hashable {
                     }
                 case .Binary:
                     fire {
-                        switch self.binaryType{
+                        switch self.binaryType {
                         case .UInt8Array: self.event.message(data: frame.payload.array)
                         case .NSData: self.event.message(data: frame.payload.nsdata)
+                        case .UInt8UnsafeBufferPointer: self.event.message(data: frame.payload.buffer)
                         }
                     }
                 case .Ping:
@@ -394,9 +396,10 @@ public class WebSocket: Hashable {
                     unlock()
                 case .Pong:
                     fire {
-                        switch self.binaryType{
+                        switch self.binaryType {
                         case .UInt8Array: self.event.pong(data: frame.payload.array)
                         case .NSData: self.event.pong(data: frame.payload.nsdata)
+                        case .UInt8UnsafeBufferPointer: self.event.pong(data: frame.payload.buffer)
                         }
                     }
                 case .Close:
@@ -468,18 +471,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    
-    @inline(__always) private func fire(block: ()->()){
-        if let queue = eventQueue {
-            dispatch_sync(queue){
-                block()
-            }
-        } else {
-            block()
-        }
-    }
-    
-    private func handleBuffers() throws {
+    private func stepBuffers() throws {
         if rd != nil {
             while rd.hasBytesAvailable {
                 var size = inputBytesSize
@@ -512,8 +504,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-
-    private func handleStreamErrors() throws {
+    private func stepStreamErrors() throws {
         if finalError == nil {
             if let error = rd?.streamError {
                 throw WebSocketError.Network(error.localizedDescription)
@@ -523,8 +514,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    
-    private func handleAllOutputFrames() throws {
+    private func stepOutputFrames() throws {
         lock()
         defer {
             frames = []
@@ -533,7 +523,6 @@ public class WebSocket: Hashable {
         if !closeFinal {
             for frame in frames {
                 try writeFrame(frame)
-                //printx("💜--> \(frame.code)")
                 if frame.code == .Close {
                     closeCode = frame.statusCode
                     closeReason = frame.utf8.text
@@ -543,59 +532,69 @@ public class WebSocket: Hashable {
             }
         }
     }
-    
-    private var stateStepper = false
-    private var stateFrame : Frame?
-    private var stateFin = false
-    private var savedFrame : Frame?
-    private func readFrame() throws -> Frame {
-        
-        var (f, fin): (Frame, Bool) = (Frame(), false)
-        if !stateStepper {
-            if savedFrame != nil {
-                (f, fin) = (savedFrame!, false)
-                savedFrame = nil
-            } else {
-                f = try readFrameFragment(nil)
-                fin = f.finished
+    @inline(__always) private func fire(block: ()->()){
+        if let queue = eventQueue {
+            dispatch_sync(queue){
+                block()
             }
-            if f.code == .Continue{
+        } else {
+            block()
+        }
+    }
+    
+    private var readStateSaved = false
+    private var readStateFrame : Frame?
+    private var readStateFinished = false
+    private var leaderFrame : Frame?
+    private func readFrame() throws -> Frame {
+        var frame : Frame
+        var finished : Bool
+        if !readStateSaved {
+            if leaderFrame != nil {
+                frame = leaderFrame!
+                finished = false
+                leaderFrame = nil
+            } else {
+                frame = try readFrameFragment(nil)
+                finished = frame.finished
+            }
+            if frame.code == .Continue{
                 throw WebSocketError.ProtocolError("leader frame cannot be a continue frame")
             }
-            if !fin {
-                stateStepper = true
-                stateFrame = f
-                stateFin = fin
+            if !finished {
+                readStateSaved = true
+                readStateFrame = frame
+                readStateFinished = finished
                 throw WebSocketError.NeedMoreInput
             }
         } else {
-            f = stateFrame!
-            fin = stateFin
-            if !fin {
-                let cf = try readFrameFragment(f)
-                fin = cf.finished
+            frame = readStateFrame!
+            finished = readStateFinished
+            if !finished {
+                let cf = try readFrameFragment(frame)
+                finished = cf.finished
                 if cf.code != .Continue {
                     if !cf.code.isControl {
                         throw WebSocketError.ProtocolError("only ping frames can be interlaced with fragments")
                     }
-                    savedFrame = f
+                    leaderFrame = frame
                     return cf
                 }
-                if !fin {
-                    stateStepper = true
-                    stateFrame = f
-                    stateFin = fin
+                if !finished {
+                    readStateSaved = true
+                    readStateFrame = frame
+                    readStateFinished = finished
                     throw WebSocketError.NeedMoreInput
                 }
             }
         }
-        if !f.utf8.completed {
+        if !frame.utf8.completed {
             throw WebSocketError.PayloadError("incomplete utf8")
         }
-        stateStepper = false
-        stateFrame = nil
-        stateFin = false
-        return f
+        readStateSaved = false
+        readStateFrame = nil
+        readStateFinished = false
+        return frame
     }
 
     private func closeConn() {
@@ -606,7 +605,6 @@ public class WebSocket: Hashable {
         rd.close()
         wr.close()
     }
-    
     
     private func openConn() throws {
         let req = request.mutableCopy() as! NSMutableURLRequest
@@ -851,11 +849,11 @@ public class WebSocket: Hashable {
     private var fragStateCode = OpCode.Continue
     private var fragStateLeaderCode = OpCode.Continue
     private var fragStateUTF8 = UTF8()
-    private var fragStatePayload = BoxedBytes()
+    private var fragStatePayload = Payload()
     private var fragStateStatusCode = UInt16(0)
     private var fragStateHeaderLen = 0
     private var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
-    private var reusedBoxedBytes = BoxedBytes()
+    private var reusedPayload = Payload()
     private func readFrameFragment(var leader : Frame?) throws -> Frame {
         var inflate : Bool
         var len : Int
@@ -863,7 +861,7 @@ public class WebSocket: Hashable {
         var code : OpCode
         var leaderCode : OpCode
         var utf8 : UTF8
-        var payload : BoxedBytes
+        var payload : Payload
         var statusCode : UInt16
         var headerLen : Int
         
@@ -949,7 +947,7 @@ public class WebSocket: Hashable {
             } else {
                 leaderCode = code
                 utf8 = UTF8()
-                payload = reusedBoxedBytes
+                payload = reusedPayload
                 payload.count = 0
             }
             if leaderCode == .Close {
@@ -1186,16 +1184,16 @@ public enum WebSocketError : ErrorType, CustomStringConvertible {
     case InvalidCompressionOptions(String)
     public var description : String {
         switch self {
-        case .Memory: return "WebSocketError.Memory"
-        case .NeedMoreInput: return "WebSocketError.NeedMoreInput"
-        case .InvalidAddress: return "WebSocketError.InvalidAddress"
-        case .InvalidHeader: return "WebSocketError.InvalidHeader"
-        case let .InvalidResponse(details): return "WebSocketError.InvalidResponse(\(details))"
-        case let .InvalidCompressionOptions(details): return "WebSocketError.InvalidCompressionOptions(\(details))"
-        case let .LibraryError(details): return "WebSocketError.LibraryError(\(details))"
-        case let .ProtocolError(details): return "WebSocketError.ProtocolError(\(details))"
-        case let .PayloadError(details): return "WebSocketError.PayloadError(\(details))"
-        case let .Network(details): return "WebSocketError.Network(\(details))"
+        case .Memory: return "Memory"
+        case .NeedMoreInput: return "NeedMoreInput"
+        case .InvalidAddress: return "InvalidAddress"
+        case .InvalidHeader: return "InvalidHeader"
+        case let .InvalidResponse(details): return "InvalidResponse(\(details))"
+        case let .InvalidCompressionOptions(details): return "InvalidCompressionOptions(\(details))"
+        case let .LibraryError(details): return "LibraryError(\(details))"
+        case let .ProtocolError(details): return "ProtocolError(\(details))"
+        case let .PayloadError(details): return "PayloadError(\(details))"
+        case let .Network(details): return "Network(\(details))"
         }
     }
     public var details : String {
@@ -1226,7 +1224,7 @@ private class Frame {
     var inflate = false
     var code = OpCode.Continue
     var utf8 = UTF8()
-    var payload = BoxedBytes()
+    var payload = Payload()
     var statusCode = UInt16(0)
     var finished = true
     static func makeClose(statusCode: UInt16, reason: String) -> Frame {

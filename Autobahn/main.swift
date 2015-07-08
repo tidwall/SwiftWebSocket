@@ -296,13 +296,14 @@ if true {
         }
     }
 } else {
-    let ws = WebSocket(baseURL + "/runCase?case=306&agent=SwiftWebSocket")
+    let ws = WebSocket(baseURL + "/runCase?case=47&agent=SwiftWebSocket")
     ws.event.open = {
         print(("open"))
     }
     ws.event.end = { (code, reason, clean, error) in
         print(("end",code,reason,clean,error))
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1e9/8)), dispatch_get_main_queue()){
+            print("-------------------")
             updateReports(true){
                 exit(0)
             }
