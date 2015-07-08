@@ -9,7 +9,7 @@ let stopOnInfo = false
 let stopAfterOne = false
 let showDuration = false
 
-let startCase = 306
+let startCase = 1 //306
 let stopAtCase = 999
 
 private enum ErrCode : Int, CustomStringConvertible {
@@ -265,7 +265,6 @@ func printFailure(error : ErrorType?){
     }
 }
 
-
 //let ws = WebSocket("ws://localhost:9001/getCaseInfo?case=1")
 //ws.event.message = { (msg) in
 //    if let text = msg as? String {
@@ -277,7 +276,7 @@ func printFailure(error : ErrorType?){
 //    print(error)
 //}
 
-if false {
+if true {
     getCaseCount { count, error in
         if error != nil{
             print("[ERR] getCaseCount failed: \(error!)")
@@ -297,16 +296,13 @@ if false {
         }
     }
 } else {
-    WebSocketDebug = false
     let ws = WebSocket(baseURL + "/runCase?case=306&agent=SwiftWebSocket")
-    ws.compression.on = true
     ws.event.open = {
         print(("open"))
     }
     ws.event.end = { (code, reason, clean, error) in
         print(("end",code,reason,clean,error))
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1e9/8)), dispatch_get_main_queue()){
-            WebSocketDebug = false
             updateReports(true){
                 exit(0)
             }

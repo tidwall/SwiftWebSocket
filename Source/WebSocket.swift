@@ -13,14 +13,6 @@ import Foundation
 
 private let windowBufferSize = 0x2000
 
-public var WebSocketDebug = false
-public func printx<T>(value: T){
-    if WebSocketDebug {
-        NSLog("%@", "\(value)")
-    }
-}
-
-
 private class BoxedBytes {
     var ptr : UnsafeMutablePointer<UInt8>
     var cap : Int
@@ -197,35 +189,25 @@ public struct WebSocketService :  OptionSetType {
     static var Voice: WebSocketService { return self.init(1 << 3) }
 }
 
-private var queue = dispatch_queue_create("SwiftWebSocket", DISPATCH_QUEUE_SERIAL)
-
-public class WebSocket {
+public class WebSocket: Hashable {
+    private var id : Int
     private var mutex = pthread_mutex_t()
     private var cond = pthread_cond_t()
     private let request : NSURLRequest!
     private let subProtocols : [String]!
     private var frames : [Frame] = []
-    private var ccode : Int = 0
-    private var creason : String = ""
-    private var cclose : Bool = false
     private var delegate : Delegate
-
     private var inflater : Inflater!
     private var deflater : Deflater!
-    
     private var outputBytes : UnsafeMutablePointer<UInt8>
     private var outputBytesSize : Int = 0
     private var outputBytesStart : Int = 0
     private var outputBytesLength : Int = 0
-    
-    
     private var inputBytes : UnsafeMutablePointer<UInt8>
     private var inputBytesSize : Int = 0
     private var inputBytesStart : Int = 0
     private var inputBytesLength : Int = 0
-
-    
-    
+    private var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
     private var _subProtocol = ""
     private var _compression = WebSocketCompression()
     private var _services = WebSocketService.None
@@ -261,6 +243,11 @@ public class WebSocket {
         get { lock(); defer { unlock() }; return _event }
         set { lock(); defer { unlock() }; _event = newValue }
     }
+    /// The queue for firing off events. default is main_queue
+    public var eventQueue : dispatch_queue_t? {
+        get { lock(); defer { unlock() }; return _eventQueue; }
+        set { lock(); defer { unlock() }; _eventQueue = newValue }
+    }
     /// A WebSocketBinaryType value indicating the type of binary data being transmitted by the connection. Default is .UInt8Array.
     public var binaryType : WebSocketBinaryType {
         get { lock(); defer { unlock() }; return _binaryType }
@@ -275,6 +262,8 @@ public class WebSocket {
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
     
+    public var hashValue: Int { return id }
+
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
@@ -291,6 +280,7 @@ public class WebSocket {
     public init(request: NSURLRequest, subProtocols : [String] = []){
         pthread_mutex_init(&mutex, nil)
         pthread_cond_init(&cond, nil)
+        self.id = manager.nextId()
         self.request = request
         self.subProtocols = subProtocols
         self.outputBytes = UnsafeMutablePointer<UInt8>.alloc(windowBufferSize)
@@ -298,9 +288,8 @@ public class WebSocket {
         self.inputBytes = UnsafeMutablePointer<UInt8>.alloc(windowBufferSize)
         self.inputBytesSize = windowBufferSize
         self.delegate = Delegate()
-        self.delegate.ws = self
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
-            dispatch_async(queue) { self.step(.None) }
+            manager.add(self)
         }
     }
     deinit{
@@ -319,7 +308,27 @@ public class WebSocket {
     @inline(__always) private func unlock(){
         pthread_mutex_unlock(&mutex)
     }
-    
+
+    private var dirty : Bool {
+        lock()
+        defer { unlock() }
+        if exit {
+            return false
+        }
+        if stage != .ReadResponse && stage != .HandleFrames {
+            return true
+        }
+        if rd.streamStatus != .Open || wr.streamStatus != .Open {
+            return true
+        }
+        if rd.streamError != nil || wr.streamError != nil {
+            return true
+        }
+        if rd.hasBytesAvailable || frames.count > 0 || inputBytesLength > 0 || outputBytesLength > 0 {
+            return true
+        }
+        return false
+    }
     
     
     private enum Stage : Int {
@@ -327,9 +336,7 @@ public class WebSocket {
         case ReadResponse
         case HandleFrames
         case CloseConn
-        case Error
         case End
-        case Exit
     }
     
     private var stage = Stage.OpenConn
@@ -339,53 +346,45 @@ public class WebSocket {
     private var closeReason = ""
     private var closeClean = false
     private var closeFinal = false
-    private var acceptNoMoreOutput = false
-    private var acceptNoMoreInput = false
     private var finalError : ErrorType?
     private var exit = false
-
-    private func step(event: NSStreamEvent){
+    private func step(){
         if exit {
             return
         }
-        var nextStep = false
-        defer {
-            if nextStep {
-                dispatch_async(queue) { self.step(.None) }
-            }
-        }
         do {
             try handleBuffers()
-            try handleEvent(event)
+            try handleStreamErrors()
             switch stage {
             case .OpenConn:
                 try openConn()
                 stage = .ReadResponse
             case .ReadResponse:
                 try readResponse()
-                stage = .HandleFrames
                 privateReadyState = .Open
-                printx("😄open")
-                self.event.open()
-                nextStep = true
+                fire {
+                    self.event.open()
+                }
+                stage = .HandleFrames
             case .HandleFrames:
                 try handleAllOutputFrames()
-                nextStep = true
                 if closeFinal {
                     privateReadyState  == .Closing
                     stage = .CloseConn
                     return
                 }
-                let frame = try handleNextInputFrame()
+                let frame = try readFrame()
                 switch frame.code {
                 case .Text:
-                    printx("😄message['text']")
-                    self.event.message(data: frame.utf8.text)
+                    fire {
+                        self.event.message(data: frame.utf8.text)
+                    }
                 case .Binary:
-                    printx("😄binary['binary']")
-                    switch binaryType{
-                    case .UInt8Array: self.event.message(data: frame.payload.array)
-                    case .NSData: self.event.message(data: frame.payload.nsdata)
+                    fire {
+                        switch self.binaryType{
+                        case .UInt8Array: self.event.message(data: frame.payload.array)
+                        case .NSData: self.event.message(data: frame.payload.nsdata)
+                        }
                     }
                 case .Ping:
                     let nframe = frame.copy()
@@ -394,53 +393,48 @@ public class WebSocket {
                     frames += [nframe]
                     unlock()
                 case .Pong:
-                    printx("😄message['pong']")
-                    switch binaryType{
-                    case .UInt8Array: self.event.pong(data: frame.payload.array)
-                    case .NSData: self.event.pong(data: frame.payload.nsdata)
+                    fire {
+                        switch self.binaryType{
+                        case .UInt8Array: self.event.pong(data: frame.payload.array)
+                        case .NSData: self.event.pong(data: frame.payload.nsdata)
+                        }
                     }
                 case .Close:
-                    printx("😄message['close']")
                     lock()
                     frames += [frame]
                     unlock()
                 default:
                     break
                 }
-            case .Error:
-                break
             case .CloseConn:
                 if let error = finalError {
-                    printx("😄error")
                     self.event.error(error: error)
                 }
                 privateReadyState  == .Closed
                 if rd != nil {
                     closeConn()
-                    printx("😄close")
-                    self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
+                    fire {
+                        self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
+                    }
                 }
                 stage = .End
-                nextStep = true
             case .End:
-                printx("😄end")
-                self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError)
-                stage = .Exit
-                nextStep = false
-            case .Exit:
-                printx("😄exit")
+                fire {
+                    self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError)
+                }
                 exit = true
-                break
+                manager.remove(self)
             }
-        } catch WebSocketError.None  {
-        } catch WebSocketError.FrameNotReady {
+        } catch WebSocketError.NeedMoreInput {
+            
         } catch {
-            if finalError != nil{
+            if finalError != nil {
                 return
             }
             finalError = error
             if stage == .OpenConn || stage == .ReadResponse {
                 stage = .CloseConn
+
             } else {
                 var frame : Frame?
                 if let error = error as? WebSocketError{
@@ -459,21 +453,29 @@ public class WebSocket {
                 if let frame = frame {
                     if frame.statusCode == 1007 {
                         self.lock()
-                        printx("[close] fail fast")
                         self.frames = [frame]
                         self.unlock()
-                        self.step(.None)
+                        manager.signal()
                     } else {
-                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), queue){
+                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
                             self.lock()
-                            printx("[close] fail slow")
                             self.frames += [frame]
                             self.unlock()
+                            manager.signal()
                         }
                     }
                 }
             }
-            nextStep = true
+        }
+    }
+    
+    @inline(__always) private func fire(block: ()->()){
+        if let queue = eventQueue {
+            dispatch_sync(queue){
+                block()
+            }
+        } else {
+            block()
         }
     }
     
@@ -511,18 +513,14 @@ public class WebSocket {
         }
     }
 
-    private func handleEvent(event: NSStreamEvent) throws {
-        switch event {
-        case NSStreamEvent.ErrorOccurred:
-            if let error = rd.streamError {
-                throw WebSocketError.Network((error as NSError).localizedDescription)
+    private func handleStreamErrors() throws {
+        if finalError == nil {
+            if let error = rd?.streamError {
+                throw WebSocketError.Network(error.localizedDescription)
             }
-            if let error = wr.streamError {
-                throw WebSocketError.Network((error as NSError).localizedDescription)
+            if let error = wr?.streamError {
+                throw WebSocketError.Network(error.localizedDescription)
             }
-            throw WebSocketError.Network("")
-        default:
-            break
         }
     }
     
@@ -544,13 +542,6 @@ public class WebSocket {
                 }
             }
         }
-    }
-    private func handleNextInputFrame() throws -> Frame {
-        lock()
-        defer { unlock() }
-        let frame = try readFrame()
-        //printx("💜--> \(frame.code)")
-        return frame
     }
     
     private var stateStepper = false
@@ -575,7 +566,7 @@ public class WebSocket {
                 stateStepper = true
                 stateFrame = f
                 stateFin = fin
-                throw WebSocketError.FrameNotReady
+                throw WebSocketError.NeedMoreInput
             }
         } else {
             f = stateFrame!
@@ -594,7 +585,7 @@ public class WebSocket {
                     stateStepper = true
                     stateFrame = f
                     stateFin = fin
-                    throw WebSocketError.FrameNotReady
+                    throw WebSocketError.NeedMoreInput
                 }
             }
         }
@@ -606,11 +597,8 @@ public class WebSocket {
         stateFin = false
         return f
     }
-    
-    
-    
+
     private func closeConn() {
-        delegate.ws = nil
         rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         rd.delegate = nil
@@ -669,7 +657,6 @@ public class WebSocket {
                 path += "?" + q
             }
         }
-        printx("🔵open \(path)")
         var reqs = "GET \(path) HTTP/1.1\r\n"
         for key in req.allHTTPHeaderFields!.keys.array {
             if let val = req.valueForHTTPHeaderField(key) {
@@ -749,7 +736,7 @@ public class WebSocket {
         let end : [UInt8] = [ 0x0D, 0x0A, 0x0D, 0x0A ]
         let ptr = UnsafeMutablePointer<UInt8>(memmem(inputBytes+inputBytesStart, inputBytesLength, end, 4))
         if ptr == nil {
-            throw WebSocketError.None
+            throw WebSocketError.NeedMoreInput
         }
         let buffer = inputBytes+inputBytesStart
         let bufferCount = ptr-(inputBytes+inputBytesStart)
@@ -837,7 +824,7 @@ public class WebSocket {
         }
         func readByte() throws -> UInt8 {
             if bytes >= end {
-                throw WebSocketError.FrameNotReady
+                throw WebSocketError.NeedMoreInput
             }
             let b = bytes.memory
             bytes++
@@ -1022,7 +1009,7 @@ public class WebSocket {
             fragStateInflate = inflate
             fragStatePosition = reader.position
             fragStateSaved = true
-            throw WebSocketError.FrameNotReady
+            throw WebSocketError.NeedMoreInput
         }
 
         inputBytesLength -= reader.position
@@ -1121,9 +1108,10 @@ public class WebSocket {
         sendFrame(f)
     }
     private func sendFrame(f : Frame) {
-        printx("[message]")
+        lock()
         frames += [f]
-        dispatch_async(queue) { self.step(.None) }
+        unlock()
+        manager.signal()
     }
     /**
     Transmits message to the server over the WebSocket connection.
@@ -1180,11 +1168,14 @@ public class WebSocket {
         sendFrame(f)
     }
 }
+public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
+    return lhs.id == rhs.id
+}
+
 
 public enum WebSocketError : ErrorType, CustomStringConvertible {
-    case None
     case Memory
-    case FrameNotReady
+    case NeedMoreInput
     case InvalidHeader
     case InvalidAddress
     case Network(String)
@@ -1195,9 +1186,8 @@ public enum WebSocketError : ErrorType, CustomStringConvertible {
     case InvalidCompressionOptions(String)
     public var description : String {
         switch self {
-        case .None: return "WebSocketError.None"
         case .Memory: return "WebSocketError.Memory"
-        case .FrameNotReady: return "WebSocketError.FrameNotReady"
+        case .NeedMoreInput: return "WebSocketError.NeedMoreInput"
         case .InvalidAddress: return "WebSocketError.InvalidAddress"
         case .InvalidHeader: return "WebSocketError.InvalidHeader"
         case let .InvalidResponse(details): return "WebSocketError.InvalidResponse(\(details))"
@@ -1222,11 +1212,8 @@ public enum WebSocketError : ErrorType, CustomStringConvertible {
 }
 
 private class Delegate : NSObject, NSStreamDelegate {
-    var ws : WebSocket!
     @objc func stream(aStream: NSStream, handleEvent eventCode: NSStreamEvent){
-        if let ws = ws {
-            dispatch_async(queue) { ws.step(eventCode) }
-        }
+        manager.signal()
     }
 }
 
@@ -1484,3 +1471,57 @@ private class UTF8 {
         return ""
     }
 }
+
+private class Manager {
+    var once = dispatch_once_t()
+    var mutex = pthread_mutex_t()
+    var cond = pthread_cond_t()
+    var websockets = Set<WebSocket>()
+    var _nextId = 0
+    init(){
+        pthread_mutex_init(&mutex, nil)
+        pthread_cond_init(&cond, nil)
+        dispatch_async(dispatch_queue_create("SwiftWebSocket", nil)) {
+            for ;; {
+                var wait = true
+                pthread_mutex_lock(&self.mutex)
+                for ws in self.websockets {
+                    if ws.dirty {
+                        pthread_mutex_unlock(&self.mutex)
+                        ws.step()
+                        pthread_mutex_lock(&self.mutex)
+                        wait = false
+                    }
+                }
+                if wait {
+                    pthread_cond_wait(&self.cond, &self.mutex)
+                }
+                pthread_mutex_unlock(&self.mutex)
+            }
+        }
+    }
+    func signal(){
+        pthread_mutex_lock(&mutex)
+        pthread_cond_signal(&cond)
+        pthread_mutex_unlock(&mutex)
+    }
+    func add(websocket: WebSocket) {
+        pthread_mutex_lock(&mutex)
+        websockets.insert(websocket)
+        pthread_cond_signal(&cond)
+        pthread_mutex_unlock(&mutex)
+    }
+    func remove(websocket: WebSocket) {
+        pthread_mutex_lock(&mutex)
+        websockets.remove(websocket)
+        pthread_cond_signal(&cond)
+        pthread_mutex_unlock(&mutex)
+    }
+    func nextId() -> Int {
+        pthread_mutex_lock(&mutex)
+        defer { pthread_mutex_unlock(&mutex) }
+        return ++_nextId
+    }
+}
+
+private let manager = Manager()
