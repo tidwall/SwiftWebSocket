@@ -196,8 +196,8 @@ func runCase(caseIdx : Int, caseCount : Int, block : (error : ErrorType?)->()) {
         var responseError : ErrorType?
         //print(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
         let ws = WebSocket(baseURL + "/runCase?case=\(caseIdx+1)&agent=\(agent)")
-        //ws.binaryType = .UInt8UnsafeBufferPointer
-//        ws.flag = true
+        ws.eventQueue = nil
+        ws.binaryType = .UInt8UnsafeBufferPointer
 
         if id.hasPrefix("13.") || id.hasPrefix("12.") {
             ws.compression.on = true

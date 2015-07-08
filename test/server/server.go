@@ -8,6 +8,7 @@ import (
 
 func main() {
 	http.HandleFunc("/", handler)
+	log.Print("Running server on port 6789")
 	http.ListenAndServe(":6789", nil)
 }
 
