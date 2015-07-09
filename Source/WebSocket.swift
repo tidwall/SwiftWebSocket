@@ -329,6 +329,7 @@ public class WebSocket: Hashable {
             return true
         }
         if rd.hasBytesAvailable || frames.count > 0 || inputBytesLength > 0 || outputBytesLength > 0 {
+            print("in: \(inputBytesLength): out: \(outputBytesLength)")
             return true
         }
         return false
@@ -534,7 +535,7 @@ public class WebSocket: Hashable {
     }
     @inline(__always) private func fire(block: ()->()){
         if let queue = eventQueue {
-            dispatch_sync(queue){
+            dispatch_sync(queue) {
                 block()
             }
         } else {
@@ -1480,10 +1481,15 @@ private class Manager {
         pthread_mutex_init(&mutex, nil)
         pthread_cond_init(&cond, nil)
         dispatch_async(dispatch_queue_create("SwiftWebSocket", nil)) {
+            var wss : [WebSocket] = []
             for ;; {
                 var wait = true
+                wss.removeAll()
                 pthread_mutex_lock(&self.mutex)
                 for ws in self.websockets {
+                    wss.append(ws)
+                }
+                for ws in wss {
                     if ws.dirty {
                         pthread_mutex_unlock(&self.mutex)
                         ws.step()
