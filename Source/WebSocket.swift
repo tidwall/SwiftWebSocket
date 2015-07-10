@@ -329,7 +329,6 @@ public class WebSocket: Hashable {
             return true
         }
         if rd.hasBytesAvailable || frames.count > 0 || inputBytesLength > 0 || outputBytesLength > 0 {
-            print("in: \(inputBytesLength): out: \(outputBytesLength)")
             return true
         }
         return false
