@@ -1470,6 +1470,9 @@ private class UTF8 {
     }
 }
 
+// Manager class is used to minimize the number of dispatches and cycle through network events
+// using fewers threads. Helps tremendously with lowing system resources when many conncurrent 
+// sockets are opened.
 private class Manager {
     var once = dispatch_once_t()
     var mutex = pthread_mutex_t()
