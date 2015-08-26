@@ -219,7 +219,7 @@ public class WebSocket: Hashable {
     private var _binaryType = WebSocketBinaryType.UInt8Array
     private var _readyState = WebSocketReadyState.Connecting
     private var _networkTimeout = NSTimeInterval(-1)
-    
+
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String {
         return request.URL!.description
@@ -265,7 +265,7 @@ public class WebSocket: Hashable {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
-    
+
     public var hashValue: Int { return id }
 
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
@@ -429,7 +429,7 @@ public class WebSocket: Hashable {
                 manager.remove(self)
             }
         } catch WebSocketError.NeedMoreInput {
-            
+
         } catch {
             if finalError != nil {
                 return
@@ -541,7 +541,7 @@ public class WebSocket: Hashable {
             block()
         }
     }
-    
+
     private var readStateSaved = false
     private var readStateFrame : Frame?
     private var readStateFinished = false
@@ -605,7 +605,7 @@ public class WebSocket: Hashable {
         rd.close()
         wr.close()
     }
-    
+
     private func openConn() throws {
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
@@ -619,7 +619,7 @@ public class WebSocket: Hashable {
         }
         req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
         if subProtocols.count > 0 {
-            req.setValue(";".join(subProtocols), forHTTPHeaderField: "Sec-WebSocket-Protocol")
+            req.setValue(subProtocols.joinWithSeparator(";"), forHTTPHeaderField: "Sec-WebSocket-Protocol")
         }
         if req.URL!.scheme != "wss" && req.URL!.scheme != "ws" {
             throw WebSocketError.InvalidAddress
@@ -656,7 +656,7 @@ public class WebSocket: Hashable {
             }
         }
         var reqs = "GET \(path) HTTP/1.1\r\n"
-        for key in req.allHTTPHeaderFields!.keys.array {
+        for key in req.allHTTPHeaderFields!.keys {
             if let val = req.valueForHTTPHeaderField(key) {
                 reqs += "\(key): \(val)\r\n"
             }
@@ -729,7 +729,7 @@ public class WebSocket: Hashable {
         memcpy(outputBytes+outputBytesStart+outputBytesLength, bytes, length)
         outputBytesLength += length
     }
-    
+
     private func readResponse() throws {
         let end : [UInt8] = [ 0x0D, 0x0A, 0x0D, 0x0A ]
         let ptr = UnsafeMutablePointer<UInt8>(memmem(inputBytes+inputBytesStart, inputBytesLength, end, 4))
@@ -864,7 +864,7 @@ public class WebSocket: Hashable {
         var payload : Payload
         var statusCode : UInt16
         var headerLen : Int
-        
+
         let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
         if fragStateSaved {
             // load state
@@ -1046,7 +1046,7 @@ public class WebSocket: Hashable {
         }
         payloadLen += payloadBytes.count
         if deflate {
-            
+
         }
         var usingStatusCode = false
         if f.statusCode != 0 && payloadLen != 0 {
@@ -1094,7 +1094,7 @@ public class WebSocket: Hashable {
 
     /**
     Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
-    
+
     :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
     :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
     */
@@ -1113,7 +1113,7 @@ public class WebSocket: Hashable {
     }
     /**
     Transmits message to the server over the WebSocket connection.
-    
+
     :param: message The data to be sent to the server.
     */
     public func send(message : Any) {
@@ -1146,7 +1146,7 @@ public class WebSocket: Hashable {
     }
     /**
     Transmits a ping to the server over the WebSocket connection.
-    
+
     :param: optional message The data to be sent to the server.
     */
     public func ping(message : Any){
@@ -1250,18 +1250,18 @@ private struct z_stream {
     var next_in : UnsafePointer<UInt8> = nil
     var avail_in : CUnsignedInt = 0
     var total_in : CUnsignedLong = 0
-    
+
     var next_out : UnsafeMutablePointer<UInt8> = nil
     var avail_out : CUnsignedInt = 0
     var total_out : CUnsignedLong = 0
-    
+
     var msg : UnsafePointer<CChar> = nil
     var state : COpaquePointer = nil
-    
+
     var zalloc : COpaquePointer = nil
     var zfree : COpaquePointer = nil
     var opaque : COpaquePointer = nil
-    
+
     var data_type : CInt = 0
     var adler : CUnsignedLong = 0
     var reserved : CUnsignedLong = 0
@@ -1471,7 +1471,7 @@ private class UTF8 {
 }
 
 // Manager class is used to minimize the number of dispatches and cycle through network events
-// using fewers threads. Helps tremendously with lowing system resources when many conncurrent 
+// using fewers threads. Helps tremendously with lowing system resources when many conncurrent
 // sockets are opened.
 private class Manager {
     var once = dispatch_once_t()
