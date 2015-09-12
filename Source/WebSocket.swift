@@ -612,6 +612,10 @@ public class WebSocket: Hashable {
         req.setValue("Upgrade", forHTTPHeaderField: "Connection")
         req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
         req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
+        
+        if req.URL == nil || req.URL!.host == nil{
+            throw WebSocketError.InvalidAddress
+        }
         if req.URL!.port == nil || req.URL!.port!.integerValue == 80 || req.URL!.port!.integerValue == 443  {
             req.setValue(req.URL!.host!, forHTTPHeaderField: "Host")
         } else {
