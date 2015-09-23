@@ -343,6 +343,7 @@ public class WebSocket: Hashable {
     private var stage = Stage.OpenConn
     private var rd : NSInputStream!
     private var wr : NSOutputStream!
+    private var atEnd = false
     private var closeCode = UInt16(0)
     private var closeReason = ""
     private var closeClean = false
@@ -442,6 +443,13 @@ public class WebSocket: Hashable {
                 var frame : Frame?
                 if let error = error as? WebSocketError{
                     switch error {
+                    case .Network(let details):
+                        if details == atEndDetails{
+                            stage = .CloseConn
+                            frame = Frame.makeClose(1006, reason: "Abnormal Closure")
+                            atEnd = true
+                            finalError = nil
+                        }
                     case .ProtocolError:
                         frame = Frame.makeClose(1002, reason: "Protocol error")
                     case .PayloadError:
@@ -472,7 +480,13 @@ public class WebSocket: Hashable {
         }
     }
     private func stepBuffers() throws {
+        if atEnd {
+            return;
+        }
         if rd != nil {
+            if rd.streamStatus == NSStreamStatus.AtEnd || rd.streamStatus == NSStreamStatus.Closed {
+                throw WebSocketError.Network(atEndDetails)
+            }
             while rd.hasBytesAvailable {
                 var size = inputBytesSize
                 while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
@@ -1174,6 +1188,7 @@ public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
     return lhs.id == rhs.id
 }
 
+private let atEndDetails = "streamStatus.atEnd"
 
 public enum WebSocketError : ErrorType, CustomStringConvertible {
     case Memory
