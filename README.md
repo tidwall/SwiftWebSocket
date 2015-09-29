@@ -14,15 +14,14 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 
 ## Features
 
-- Swift 2.0. No need for Objective-C Bridging.
-- Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
-- Strict UTF-8 processing. 
-- The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
+- High performance.
 - TLS / WSS support.
+- The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
+- Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
+- Send pings and receive pong events.
+- Strict UTF-8 processing. 
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
 - Zero asserts. All networking, stream, and protocol errors are routed through the `error` event.
-- Send pings and receive pong events.
-- High performance. 
 
 ##Example
 
