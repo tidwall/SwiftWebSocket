@@ -511,6 +511,7 @@ public class WebSocket: Hashable {
     private var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
     private var _subProtocol = ""
     private var _compression = WebSocketCompression()
+    private var _allowSelfSignedSSL = false
     private var _services = WebSocketService.None
     private var _event = WebSocketEvents()
     private var _binaryType = WebSocketBinaryType.UInt8Array
@@ -533,6 +534,11 @@ public class WebSocket: Hashable {
     public var compression : WebSocketCompression {
         get { lock(); defer { unlock() }; return _compression }
         set { lock(); defer { unlock() }; _compression = newValue }
+    }
+    /// The compression options of the WebSocket.
+    public var allowSelfSignedSSL : Bool {
+        get { lock(); defer { unlock() }; return _allowSelfSignedSSL }
+        set { lock(); defer { unlock() }; _allowSelfSignedSSL = newValue }
     }
     /// The services of the WebSocket.
     public var services : WebSocketService {
@@ -1018,6 +1024,15 @@ public class WebSocket: Hashable {
         if services.contains(.Voice) {
             rd.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
+        }
+        if services.contains(.Voice) {
+            rd.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
+            wr.setProperty(NSStreamNetworkServiceTypeVoice, forKey: NSStreamNetworkServiceType)
+        }
+        if allowSelfSignedSSL {
+            let prop: Dictionary<NSObject,NSObject> = [kCFStreamSSLPeerName: kCFNull, kCFStreamSSLValidatesCertificateChain: NSNumber(bool: false)]
+            rd.setProperty(prop, forKey: kCFStreamPropertySSLSettings as String)
+            wr.setProperty(prop, forKey: kCFStreamPropertySSLSettings as String)
         }
         rd.delegate = delegate
         wr.delegate = delegate
