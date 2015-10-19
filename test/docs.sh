@@ -22,3 +22,4 @@ rm -rf docs
 mv docsb docs
 git add docs/
 git commit -m "updated docs"
+echo "Make sure to push the gh-pages branch"
