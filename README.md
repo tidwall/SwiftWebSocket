@@ -2,7 +2,7 @@
 
 <a href="https://tidwall.github.io/SwiftWebSocket/results/"><img src="https://tidwall.github.io/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
 <a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
-<a href="https://tidwall.github.io/SwiftWebSocket/docs/"><img src="https://raw.githubusercontent.com/tidwall/SwiftWebSocket/gh-pages/docs.png" alt="" width="65" height="20" border="0" /></a>
+<a href="https://tidwall.github.io/SwiftWebSocket/docs/"><img src="https://tidwall.github.io/SwiftWebSocket/docs.png" alt="" width="65" height="20" border="0" /></a>
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
 
@@ -13,7 +13,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 ## Features
 
 - High performance.
-- TLS / WSS support.
+- TLS / WSS support. Self-signed certificate option.
 - The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
 - Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
 - Send pings and receive pong events.
