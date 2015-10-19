@@ -535,7 +535,7 @@ public class WebSocket: Hashable {
         get { lock(); defer { unlock() }; return _compression }
         set { lock(); defer { unlock() }; _compression = newValue }
     }
-    /// The compression options of the WebSocket.
+    /// Allow for Self-Signed SSL Certificates. Default is false.
     public var allowSelfSignedSSL : Bool {
         get { lock(); defer { unlock() }; return _allowSelfSignedSSL }
         set { lock(); defer { unlock() }; _allowSelfSignedSSL = newValue }
