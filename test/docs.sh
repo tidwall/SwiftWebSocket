@@ -12,13 +12,13 @@ printf "%s(\".nav-group-name a[href='../Extensions.html']\").parent().hide()\n" 
 printf "%s(\"header .content-wrapper a[href='index.html']\").parent().html(\"<a href='index.html'>SwiftWebSocket Docs</a>\")\n" "$" >> docsb/js/jazzy.js
 printf "%s(\"header .content-wrapper a[href='../index.html']\").parent().html(\"<a href='../index.html'>SwiftWebSocket Docs</a>\")\n" "$" >> docsb/js/jazzy.js
 
-# git checkout gh-pages
-# function cleanup {
-# 	git reset
-# 	git checkout master
-# }
-# trap cleanup EXIT
-# rm -rf docs
-# mv docsb docs
-# git add docs/
-# git commit -m "updated docs"
+git checkout gh-pages
+function cleanup {
+	git reset
+	git checkout master
+}
+trap cleanup EXIT
+rm -rf docs
+mv docsb docs
+git add docs/
+git commit -m "updated docs"
