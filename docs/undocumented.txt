@@ -1,0 +1,9 @@
+WebSocket.swift
+	public var description : String
+	public init(rawValue value: UInt) { self.value = value }
+	public init(nilLiteral: ()) { self.value = 0 }
+	public static var allZeros: WebSocketService { return self.init(0) }
+	public var rawValue: UInt { return self.value }
+	public enum WebSocketError : ErrorType, CustomStringConvertible
+	public var hashValue: Int { return id }
+	public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool

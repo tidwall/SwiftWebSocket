@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WebSocketEvents Struct Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/WebSocketEvents" class="dashAnchor"></a>
+    <a title="WebSocketEvents Struct Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">SwiftWebSocket Docs</a> (83% documented)</p>
+        <p class="header-right"><a href="https://github.com/tidwall/SwiftWebSocket"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">SwiftWebSocket Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        WebSocketEvents Struct Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+          <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/WebSocket.html">WebSocket</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/WebSocketBinaryType.html">WebSocketBinaryType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/WebSocketReadyState.html">WebSocketReadyState</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Structs.html">Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/WebSocketCompression.html">WebSocketCompression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/WebSocketEvents.html">WebSocketEvents</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs.html#/s:V14SwiftWebSocket16WebSocketService">WebSocketService</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>WebSocketEvents</h1>
+              <div class="declaration">
+                <div class="Swift">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">WebSocketEvents</span></code></pre>
+
+                </div>
+              </div>
+            <p>The WebSocketEvents struct is used by the events property and manages the events for the WebSocket connection.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents4openFT_T_"></a>
+                    <a name="//apple_ref/swift/Property/open" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents4openFT_T_">open</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when the WebSocket connection&rsquo;s readyState changes to .Open; this indicates that the connection is ready to send and receive data.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">open</span> <span class="p">:</span> <span class="p">()</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents5closeFT4codeSi6reasonSS8wasCleanSb_T_"></a>
+                    <a name="//apple_ref/swift/Property/close" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents5closeFT4codeSi6reasonSS8wasCleanSb_T_">close</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when the WebSocket connection&rsquo;s readyState changes to .Closed.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">close</span> <span class="p">:</span> <span class="p">(</span><span class="nv">code</span> <span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">reason</span> <span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">wasClean</span> <span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{(</span><span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">wasClean</span><span class="p">)</span> <span class="k">in</span><span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents5errorFT5errorPSs9ErrorType__T_"></a>
+                    <a name="//apple_ref/swift/Property/error" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents5errorFT5errorPSs9ErrorType__T_">error</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when an error occurs.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">error</span> <span class="p">:</span> <span class="p">(</span><span class="nv">error</span> <span class="p">:</span> <span class="kt">ErrorType</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{(</span><span class="n">error</span><span class="p">)</span> <span class="k">in</span><span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents7messageFT4dataP__T_"></a>
+                    <a name="//apple_ref/swift/Property/message" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents7messageFT4dataP__T_">message</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when a message is received from the server.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">message</span> <span class="p">:</span> <span class="p">(</span><span class="nv">data</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{(</span><span class="n">data</span><span class="p">)</span> <span class="k">in</span><span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents4pongFT4dataP__T_"></a>
+                    <a name="//apple_ref/swift/Property/pong" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents4pongFT4dataP__T_">pong</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when a pong is received from the server.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">pong</span> <span class="p">:</span> <span class="p">(</span><span class="nv">data</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{(</span><span class="n">data</span><span class="p">)</span> <span class="k">in</span><span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vV14SwiftWebSocket15WebSocketEvents3endFT4codeSi6reasonSS8wasCleanSb5errorGSqPSs9ErrorType___T_"></a>
+                    <a name="//apple_ref/swift/Property/end" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vV14SwiftWebSocket15WebSocketEvents3endFT4codeSi6reasonSS8wasCleanSb5errorGSqPSs9ErrorType___T_">end</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An event to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the <q>close</q> or <q>error</q> events.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">end</span> <span class="p">:</span> <span class="p">(</span><span class="nv">code</span> <span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">reason</span> <span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">wasClean</span> <span class="p">:</span> <span class="kt">Bool</span><span class="p">,</span> <span class="nv">error</span> <span class="p">:</span> <span class="kt">ErrorType</span><span class="p">?)</span><span class="o">-&gt;</span><span class="p">()</span> <span class="o">=</span> <span class="p">{(</span><span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">wasClean</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="k">in</span><span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2015 <a class="link" href="http://github.com/tidwall" target="_blank" rel="external">Josh Baker</a>. All rights reserved. (Last updated: 2015-10-19)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.3.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

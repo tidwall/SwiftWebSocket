@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WebSocketBinaryType Enum Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Enum/WebSocketBinaryType" class="dashAnchor"></a>
+    <a title="WebSocketBinaryType Enum Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">SwiftWebSocket Docs</a> (83% documented)</p>
+        <p class="header-right"><a href="https://github.com/tidwall/SwiftWebSocket"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">SwiftWebSocket Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        WebSocketBinaryType Enum Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+          <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/WebSocket.html">WebSocket</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/WebSocketBinaryType.html">WebSocketBinaryType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/WebSocketReadyState.html">WebSocketReadyState</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Structs.html">Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/WebSocketCompression.html">WebSocketCompression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/WebSocketEvents.html">WebSocketEvents</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs.html#/s:V14SwiftWebSocket16WebSocketService">WebSocketService</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>WebSocketBinaryType</h1>
+              <div class="declaration">
+                <div class="Swift">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">WebSocketBinaryType</span> <span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                </div>
+              </div>
+            <p>The WebSocketBinaryType enum is used by the binaryType property and indicates the type of binary data being transmitted by the WebSocket connection.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FO14SwiftWebSocket19WebSocketBinaryType10UInt8ArrayFMS0_S0_"></a>
+                    <a name="//apple_ref/swift/Element/UInt8Array" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FO14SwiftWebSocket19WebSocketBinaryType10UInt8ArrayFMS0_S0_">UInt8Array</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The WebSocket should transmit [UInt8] objects.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="kt">UInt8Array</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FO14SwiftWebSocket19WebSocketBinaryType6NSDataFMS0_S0_"></a>
+                    <a name="//apple_ref/swift/Element/NSData" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FO14SwiftWebSocket19WebSocketBinaryType6NSDataFMS0_S0_">NSData</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The WebSocket should transmit NSData objects.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="kt">NSData</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FO14SwiftWebSocket19WebSocketBinaryType24UInt8UnsafeBufferPointerFMS0_S0_"></a>
+                    <a name="//apple_ref/swift/Element/UInt8UnsafeBufferPointer" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FO14SwiftWebSocket19WebSocketBinaryType24UInt8UnsafeBufferPointerFMS0_S0_">UInt8UnsafeBufferPointer</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The WebSocket should transmit UnsafeBufferPointer<UInt8> objects. This buffer is only valid during the scope of the message event. Use at your own risk.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="kt">UInt8UnsafeBufferPointer</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2015 <a class="link" href="http://github.com/tidwall" target="_blank" rel="external">Josh Baker</a>. All rights reserved. (Last updated: 2015-10-19)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.3.2</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
