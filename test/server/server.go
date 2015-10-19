@@ -1,18 +1,49 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 )
 
+var port int
+var crt, key string
+var host string
+var s string
+var ports string
+
 func main() {
+
+	flag.StringVar(&crt, "crt", "", "ssl cert file")
+	flag.StringVar(&key, "key", "", "ssl key file")
+	flag.StringVar(&host, "host", "localhost", "listening server host")
+	flag.IntVar(&port, "port", 6789, "listening server port")
+	flag.Parse()
+
+	if crt != "" || key != "" {
+		s = "s"
+		if port != 443 {
+			ports = fmt.Sprintf(":%d", port)
+		}
+	} else if port != 80 {
+		ports = fmt.Sprintf(":%d", port)
+	}
 	http.HandleFunc("/client", client)
 	http.HandleFunc("/echo", socket)
-	log.Print("Running server on port 6789")
-	log.Print("ws://localhost:6789/client  (javascript test client)")
-	log.Print("ws://localhost:6789/echo    (echo socket)")
-	http.ListenAndServe(":6789", nil)
+	log.Printf("Running server on %s:%d\n", host, port)
+	log.Printf("ws%s://%s%s/echo      (echo socket)\n", s, host, ports)
+	log.Printf("http%s://%s%s/client  (javascript test client)\n", s, host, ports)
+	var err error
+	if crt != "" || key != "" {
+		err = http.ListenAndServeTLS(fmt.Sprintf(":%d", port), crt, key, nil)
+	} else {
+		err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	}
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }
 
 func socket(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +57,6 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		ws.Close()
 		log.Print("connection closed")
 	}()
-
 	for {
 		msgt, msg, err := ws.ReadMessage()
 		if err != nil {
@@ -35,7 +65,6 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Print("rcvd: '" + string(msg) + "'")
 		ws.WriteMessage(msgt, msg)
-
 	}
 }
 
@@ -43,10 +72,11 @@ func client(w http.ResponseWriter, r *http.Request) {
 	log.Print("client request")
 	w.Header().Set("Content-Type", "text/html")
 	w.Write([]byte(`
-		Open the Javascript Console
+		<pre id="out"></pre>
 		<script>
+		var console={log:function(s){document.getElementById("out").innerHTML+=s+"\n";}};
 		var messageNum = 0;
-		var ws = new WebSocket("ws://localhost:6789/echo")
+		var ws = new WebSocket("` + fmt.Sprintf("ws%s://%s%s/echo", s, host, ports) + `")
 		function send(){
 			messageNum++;
             var msg = messageNum + ": " + new Date()
