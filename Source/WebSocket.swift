@@ -193,6 +193,8 @@ public struct WebSocketService :  OptionSetType {
 }
 
 private let atEndDetails = "streamStatus.atEnd"
+private let timeoutDetails = "The operation couldn’t be completed. Operation timed out"
+private let timeoutDuration : CFTimeInterval = 30
 
 public enum WebSocketError : ErrorType, CustomStringConvertible {
     case Memory
@@ -508,6 +510,8 @@ public class WebSocket: Hashable {
     private var inputBytesSize : Int = 0
     private var inputBytesStart : Int = 0
     private var inputBytesLength : Int = 0
+    private var createdAt = CFAbsoluteTimeGetCurrent()
+    private var connectionTimeout = false
     private var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
     private var _subProtocol = ""
     private var _compression = WebSocketCompression()
@@ -622,8 +626,14 @@ public class WebSocket: Hashable {
         if exit {
             return false
         }
+        if connectionTimeout {
+            return true
+        }
         if stage != .ReadResponse && stage != .HandleFrames {
             return true
+        }
+        if rd.streamStatus == .Opening && wr.streamStatus == .Opening {
+            return false;
         }
         if rd.streamStatus != .Open || wr.streamStatus != .Open {
             return true
@@ -823,6 +833,9 @@ public class WebSocket: Hashable {
     }
     private func stepStreamErrors() throws {
         if finalError == nil {
+            if connectionTimeout {
+                throw WebSocketError.Network(timeoutDetails)
+            }
             if let error = rd?.streamError {
                 throw WebSocketError.Network(error.localizedDescription)
             }
@@ -1523,6 +1536,7 @@ private class Manager {
                     wss.append(ws)
                 }
                 for ws in wss {
+                    self.checkForConnectionTimeout(ws)
                     if ws.dirty {
                         pthread_mutex_unlock(&self.mutex)
                         ws.step()
@@ -1531,11 +1545,31 @@ private class Manager {
                     }
                 }
                 if wait {
-                    pthread_cond_wait(&self.cond, &self.mutex)
+                    self.wait(250)
                 }
                 pthread_mutex_unlock(&self.mutex)
             }
         }
+    }
+    func checkForConnectionTimeout(ws : WebSocket) {
+        if ws.rd != nil && ws.wr != nil && (ws.rd.streamStatus == .Opening || ws.wr.streamStatus == .Opening) {
+            let age = CFAbsoluteTimeGetCurrent() - ws.createdAt
+            if age >= timeoutDuration {
+                ws.connectionTimeout = true
+            }
+        }
+    }
+    func wait(timeInMs : Int) -> Int32 {
+        var ts = timespec()
+        var tv = timeval()
+        gettimeofday(&tv, nil)
+        ts.tv_sec = time(nil) + timeInMs / 1000;
+        let v1 = Int(tv.tv_usec * 1000)
+        let v2 = Int(1000 * 1000 * Int(timeInMs % 1000))
+        ts.tv_nsec = v1 + v2;
+        ts.tv_sec += ts.tv_nsec / (1000 * 1000 * 1000);
+        ts.tv_nsec %= (1000 * 1000 * 1000);
+        return pthread_cond_timedwait(&self.cond, &self.mutex, &ts)
     }
     func signal(){
         pthread_mutex_lock(&mutex)

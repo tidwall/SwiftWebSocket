@@ -26,7 +26,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 ```swift
 func echoTest(){
     var messageNum = 0
-    let ws = WebSocket("wss://echo.websocket.org")
+    unowned let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
         let msg = "\(++messageNum): \(NSDate().description)"
         print("send: \(msg)")
