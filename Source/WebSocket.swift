@@ -563,18 +563,20 @@ private class InnerWebSocket: Hashable {
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
 
+    func copyOpen(request: NSURLRequest, subProtocols : [String] = []) -> InnerWebSocket{
+        let ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
+        ws.compression = compression
+        ws.allowSelfSignedSSL = allowSelfSignedSSL
+        ws.services = services
+        ws.event = event
+        ws.eventQueue = eventQueue
+        ws.binaryType = binaryType
+        return ws
+    }
+    
     var hashValue: Int { return id }
 
-    convenience init(_ url: String){
-        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
-    }
-    convenience init(_ url: String, subProtocols : [String]){
-        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
-    }
-    convenience init(_ url: String, subProtocol : String){
-        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
-    }
-    init(request: NSURLRequest, subProtocols : [String] = []){
+    init(request: NSURLRequest, subProtocols : [String] = [], stub : Bool = false){
         pthread_mutex_init(&mutex, nil)
         self.id = manager.nextId()
         self.request = request
@@ -584,8 +586,14 @@ private class InnerWebSocket: Hashable {
         self.inputBytes = UnsafeMutablePointer<UInt8>.alloc(windowBufferSize)
         self.inputBytesSize = windowBufferSize
         self.delegate = Delegate()
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
-            manager.add(self)
+        if stub{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
+                self
+            }
+        } else {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue()){
+                manager.add(self)
+            }
         }
     }
     deinit{
@@ -1560,3 +1568,105 @@ private class Manager {
 }
 
 private let manager = Manager()
+
+public class WebSocket: Hashable {
+    private var ws : InnerWebSocket
+    private var id = manager.nextId()
+    private var opened : Bool
+    public var hashValue: Int { return id }
+    public convenience init(_ url: String){
+        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
+    }
+    public convenience init(_ url: String, subProtocols : [String]){
+        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
+    }
+    public convenience init(_ url: String, subProtocol : String){
+        self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
+    }
+    public init(request: NSURLRequest, subProtocols : [String] = []){
+        opened = true
+        ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
+    }
+    public init(){
+        opened = false
+        ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
+    }
+    public var url : String{ return ws.url }
+    public var subProtocol : String{ return ws.subProtocol }
+    public var compression : WebSocketCompression{
+        get { return ws.compression }
+        set { ws.compression = newValue }
+    }
+    public var allowSelfSignedSSL : Bool{
+        get { return ws.allowSelfSignedSSL }
+        set { ws.allowSelfSignedSSL = newValue }
+    }
+    public var services : WebSocketService{
+        get { return ws.services }
+        set { ws.services = newValue }
+    }
+    public var event : WebSocketEvents{
+        get { return ws.event }
+        set { ws.event = newValue }
+    }
+    public var eventQueue : dispatch_queue_t?{
+        get { return ws.eventQueue }
+        set { ws.eventQueue = newValue }
+    }
+    public var binaryType : WebSocketBinaryType{
+        get { return ws.binaryType }
+        set { ws.binaryType = newValue }
+    }
+    public var readyState : WebSocketReadyState{
+        return ws.readyState
+    }
+    public func open(request: NSURLRequest, subProtocols : [String] = []){
+        if opened{
+            return
+        }
+        opened = true
+        ws = ws.copyOpen(request, subProtocols: subProtocols)
+    }
+    public func open(){
+        open(ws.request, subProtocols: ws.subProtocols)
+    }
+    public func open(url: String){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
+    }
+    public func open(url: String, subProtocols : [String]){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
+    }
+    public func open(url: String, subProtocol : String){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
+    }
+    public func close(code : Int = 1000, reason : String = "Normal Closure"){
+        if !opened{
+            return
+        }
+        opened = false
+        ws.close(code, reason: reason)
+    }
+    public func send(message : Any){
+        if !opened{
+            return
+        }
+        ws.send(message)
+    }
+    public func ping(message : Any){
+        if !opened{
+            return
+        }
+        ws.ping(message)
+    }
+    public func ping(){
+        if !opened{
+            return
+        }
+        ws.ping()
+    }
+}
+
+public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
+    return lhs.id == rhs.id
+}
+
