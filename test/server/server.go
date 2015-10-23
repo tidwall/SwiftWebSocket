@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"time"
 )
 
 var port int
@@ -13,12 +14,14 @@ var crt, key string
 var host string
 var s string
 var ports string
+var _case string
 
 func main() {
 
 	flag.StringVar(&crt, "crt", "", "ssl cert file")
 	flag.StringVar(&key, "key", "", "ssl key file")
 	flag.StringVar(&host, "host", "localhost", "listening server host")
+	flag.StringVar(&_case, "case", "", "choose a specialized case, (hang)")
 	flag.IntVar(&port, "port", 6789, "listening server port")
 	flag.Parse()
 
@@ -33,6 +36,10 @@ func main() {
 	http.HandleFunc("/client", client)
 	http.HandleFunc("/echo", socket)
 	log.Printf("Running server on %s:%d\n", host, port)
+	switch _case {
+	case "hang":
+		log.Printf("case: %s (long connection hanging)\n", _case)
+	}
 	log.Printf("ws%s://%s%s/echo      (echo socket)\n", s, host, ports)
 	log.Printf("http%s://%s%s/client  (javascript test client)\n", s, host, ports)
 	var err error
@@ -48,6 +55,11 @@ func main() {
 
 func socket(w http.ResponseWriter, r *http.Request) {
 	log.Print("connection established")
+	if _case == "hang" {
+		hang := time.Minute
+		log.Printf("hanging for %s\n", hang.String())
+		time.Sleep(hang)
+	}
 	ws, err := websocket.Upgrade(w, r, nil, 1024, 1024)
 	if err != nil {
 		log.Print(err)
