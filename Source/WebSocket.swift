@@ -181,15 +181,15 @@ public struct WebSocketService :  OptionSetType {
     static func fromMask(raw: UInt) -> WebSocketService { return self.init(raw) }
     public var rawValue: UInt { return self.value }
     /// No services.
-    static var None: WebSocketService { return self.init(0) }
+    public static var None: WebSocketService { return self.init(0) }
     /// Allow socket to handle VoIP.
-    static var VoIP: WebSocketService { return self.init(1 << 0) }
+    public static var VoIP: WebSocketService { return self.init(1 << 0) }
     /// Allow socket to handle video.
-    static var Video: WebSocketService { return self.init(1 << 1) }
+    public static var Video: WebSocketService { return self.init(1 << 1) }
     /// Allow socket to run in background.
-    static var Background: WebSocketService { return self.init(1 << 2) }
+    public static var Background: WebSocketService { return self.init(1 << 2) }
     /// Allow socket to handle voice.
-    static var Voice: WebSocketService { return self.init(1 << 3) }
+    public static var Voice: WebSocketService { return self.init(1 << 3) }
 }
 
 private let atEndDetails = "streamStatus.atEnd"
