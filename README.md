@@ -21,7 +21,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
 - Zero asserts. All networking, stream, and protocol errors are routed through the `error` event.
 
-##Example
+## Example
 
 ```swift
 func echoTest(){
@@ -53,6 +53,30 @@ func echoTest(){
         }
     }
 }
+```
+
+## Reuse and Delaying WebSocket Connections
+v2.3.0+ makes available an `open` method. This will allow for a `WebSocket` object to be instantiated without an immediate connection to the server. It can also be used to reconnect to a server following the `close` event.
+
+For example,
+
+```swift
+    let ws = WebSocket()
+    ws.event.close = { _ in
+        ws.open()                 // reopen the socket to the previous url
+        ws.open("ws://otherurl")  // or, reopen the socket to a new url
+    }
+    ws.open("ws://url") // call with url
+}
+```
+
+## Compression
+
+The `compression` flag may be used to request commpressed messages from the server. If the server does not support or accept the request, then connection will continue as normal, but with uncompressed messages.
+
+```swift
+let ws = WebSocket("ws://url")
+ws.compression.on = true
 ```
 
 ##Installation (iOS and OS X)
