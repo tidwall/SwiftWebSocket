@@ -94,13 +94,6 @@ let ws = WebSocket("ws://url")
 ws.allowSelfSignedSSL = true
 ```
 
-## Self-signed SSL Certificate
-
-```swift
-let ws = WebSocket("ws://url")
-ws.allowSelfSignedSSL = true
-```
-
 ## Network Services (VoIP, Video, Background, Voice)
 
 ```swift
