@@ -633,7 +633,10 @@ private class InnerWebSocket: Hashable {
         if rd.streamError != nil || wr.streamError != nil {
             return true
         }
-        if rd.hasBytesAvailable || frames.count > 0 || inputBytesLength > 0 || outputBytesLength > 0 {
+        if rd.hasBytesAvailable || frames.count > 0 || inputBytesLength > 0 {
+            return true
+        }
+        if outputBytesLength > 0 && wr.hasSpaceAvailable{
             return true
         }
         return false
@@ -1573,57 +1576,85 @@ private class Manager {
 
 private let manager = Manager()
 
+/// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
 public class WebSocket: Hashable {
     private var ws : InnerWebSocket
     private var id = manager.nextId()
     private var opened : Bool
     public var hashValue: Int { return id }
+    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
+    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
     public convenience init(_ url: String, subProtocols : [String]){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
     }
+    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
     public convenience init(_ url: String, subProtocol : String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
     }
+    /// Create a WebSocket connection from an NSURLRequest; Also include a list of protocols.
     public init(request: NSURLRequest, subProtocols : [String] = []){
         opened = true
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
     }
+    /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
     public init(){
         opened = false
         ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
     }
+    /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String{ return ws.url }
+    /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
     public var subProtocol : String{ return ws.subProtocol }
+    /// The compression options of the WebSocket.
     public var compression : WebSocketCompression{
         get { return ws.compression }
         set { ws.compression = newValue }
     }
+    /// Allow for Self-Signed SSL Certificates. Default is false.
     public var allowSelfSignedSSL : Bool{
         get { return ws.allowSelfSignedSSL }
         set { ws.allowSelfSignedSSL = newValue }
     }
+    /// The services of the WebSocket.
     public var services : WebSocketService{
         get { return ws.services }
         set { ws.services = newValue }
     }
+    /// The events of the WebSocket.
     public var event : WebSocketEvents{
         get { return ws.event }
         set { ws.event = newValue }
     }
+    /// The queue for firing off events. default is main_queue
     public var eventQueue : dispatch_queue_t?{
         get { return ws.eventQueue }
         set { ws.eventQueue = newValue }
     }
+    /// A WebSocketBinaryType value indicating the type of binary data being transmitted by the connection. Default is .UInt8Array.
     public var binaryType : WebSocketBinaryType{
         get { return ws.binaryType }
         set { ws.binaryType = newValue }
     }
+    /// The current state of the connection; this is one of the WebSocketReadyState constants. Read only.
     public var readyState : WebSocketReadyState{
         return ws.readyState
     }
+    /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
+    public func open(url: String){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
+    }
+    /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
+    public func open(url: String, subProtocols : [String]){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
+    }
+    /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
+    public func open(url: String, subProtocol : String){
+        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
+    }
+    /// Opens a deferred or closed WebSocket connection from an NSURLRequest; Also include a list of protocols.
     public func open(request: NSURLRequest, subProtocols : [String] = []){
         if opened{
             return
@@ -1631,18 +1662,16 @@ public class WebSocket: Hashable {
         opened = true
         ws = ws.copyOpen(request, subProtocols: subProtocols)
     }
+    /// Opens a closed WebSocket connection from an NSURLRequest; Uses the same request and protocols as previously closed WebSocket
     public func open(){
         open(ws.request, subProtocols: ws.subProtocols)
     }
-    public func open(url: String){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
-    }
-    public func open(url: String, subProtocols : [String]){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
-    }
-    public func open(url: String, subProtocol : String){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
-    }
+    /**
+    Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
+    
+    :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
+    :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
+    */
     public func close(code : Int = 1000, reason : String = "Normal Closure"){
         if !opened{
             return
@@ -1650,18 +1679,31 @@ public class WebSocket: Hashable {
         opened = false
         ws.close(code, reason: reason)
     }
+    /**
+    Transmits message to the server over the WebSocket connection.
+    
+    :param: message The data to be sent to the server.
+    */
     public func send(message : Any){
         if !opened{
             return
         }
         ws.send(message)
     }
+    /**
+    Transmits a ping to the server over the WebSocket connection.
+     
+    :param: optional message The data to be sent to the server.
+    */
     public func ping(message : Any){
         if !opened{
             return
         }
         ws.ping(message)
     }
+    /**
+    Transmits a ping to the server over the WebSocket connection.
+    */
     public func ping(){
         if !opened{
             return
