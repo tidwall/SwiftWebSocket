@@ -39,7 +39,7 @@ rm -fr reports
 mkdir -p reports
 mkdir -p /tmp/SwiftWebSocket/tests
 
-cat ../Source/WebSocket.swift > /tmp/SwiftWebSocket/tests/main.swift
+cat ../../Source/WebSocket.swift > /tmp/SwiftWebSocket/tests/main.swift
 echo "" >> /tmp/SwiftWebSocket/tests/main.swift
 cat autobahn.swift >> /tmp/SwiftWebSocket/tests/main.swift
 swift -Ounchecked /tmp/SwiftWebSocket/tests/main.swift

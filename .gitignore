@@ -29,10 +29,6 @@ xcuserdata
 *.hmap
 *.ipa
 
-test/fuzzingserver.json
-test/reports/
-
-
 docsb/
 
 
