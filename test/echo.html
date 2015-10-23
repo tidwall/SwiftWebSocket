@@ -1,0 +1,30 @@
+<pre id="out"></pre>
+<script>
+var console={log:function(s){document.getElementById("out").innerHTML+=s+"\n";}};
+var messageNum = 0;
+var ws = new WebSocket("wss://echo.websocket.org")
+function send(){
+	messageNum++;
+    var msg = messageNum + ": " + new Date()
+    console.log("send: " + msg)
+    ws.send(msg)
+}
+ws.onopen = function(){
+	console.log("opened")
+    send()
+}
+ws.onclose = function(){
+    console.log("close")
+}
+ws.onerror = function(ev){
+    console.log("error " + ev)
+}
+ws.onmessage = function(msg){
+    console.log("recv: " + msg.data)
+    if (messageNum == 10) {
+        ws.close()
+    } else {
+        send()
+    }
+}
+</script>
