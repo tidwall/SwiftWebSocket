@@ -72,7 +72,7 @@ For example,
 
 ## Compression
 
-The `compression` flag may be used to request commpressed messages from the server. If the server does not support or accept the request, then connection will continue as normal, but with uncompressed messages.
+The `compression` flag may be used to request compressed messages from the server. If the server does not support or accept the request, then connection will continue as normal, but with uncompressed messages.
 
 ```swift
 let ws = WebSocket("ws://url")
