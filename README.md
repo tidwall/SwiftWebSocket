@@ -55,6 +55,14 @@ func echoTest(){
 }
 ```
 
+## Custom Headers
+```swift
+let request = NSMutableURLRequest(URL: NSURL(string:"ws://url")!)
+request.addValue("AUTH_TOKEN", forHTTPHeaderField: "Authorization")
+request.addValue("Value", forHTTPHeaderField: "X-Another-Header")
+let ws = WebSocket(request: request)
+```
+
 ## Reuse and Delaying WebSocket Connections
 v2.3.0+ makes available an optional `open` method. This will allow for a `WebSocket` object to be instantiated without an immediate connection to the server. It can also be used to reconnect to a server following the `close` event.
 
@@ -77,6 +85,27 @@ The `compression` flag may be used to request compressed messages from the serve
 ```swift
 let ws = WebSocket("ws://url")
 ws.compression.on = true
+```
+
+## Self-signed SSL Certificate
+
+```swift
+let ws = WebSocket("ws://url")
+ws.allowSelfSignedSSL = true
+```
+
+## Self-signed SSL Certificate
+
+```swift
+let ws = WebSocket("ws://url")
+ws.allowSelfSignedSSL = true
+```
+
+## Network Services (VoIP, Video, Background, Voice)
+
+```swift
+// Allow socket to handle VoIP in the background.
+ws.services = [.VoIP, Background] 
 ```
 
 ##Installation (iOS and OS X)
