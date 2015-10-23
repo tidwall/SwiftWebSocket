@@ -1003,7 +1003,11 @@ private class InnerWebSocket: Hashable {
             throw WebSocketError.InvalidAddress
         }
         var (rdo, wro) : (NSInputStream?, NSOutputStream?)
-        NSStream.getStreamsToHostWithName(addr[0], port: Int(addr[1])!, inputStream: &rdo, outputStream: &wro)
+        var readStream:  Unmanaged<CFReadStream>?
+        var writeStream: Unmanaged<CFWriteStream>?
+        CFStreamCreatePairWithSocketToHost(nil, addr[0], UInt32(Int(addr[1])!), &readStream, &writeStream);
+        rdo = readStream!.takeRetainedValue()
+        wro = writeStream!.takeRetainedValue()
         (rd, wr) = (rdo!, wro!)
         let securityLevel : String
         switch security {
