@@ -87,6 +87,27 @@ let ws = WebSocket("ws://url")
 ws.compression.on = true
 ```
 
+## Self-signed SSL Certificate
+
+```swift
+let ws = WebSocket("ws://url")
+ws.allowSelfSignedSSL = true
+```
+
+## Self-signed SSL Certificate
+
+```swift
+let ws = WebSocket("ws://url")
+ws.allowSelfSignedSSL = true
+```
+
+## Network Services (VoIP, Video, Background, Voice)
+
+```swift
+// Allow socket to handle VoIP in the background.
+ws.services = [.VoIP, Background] 
+```
+
 ##Installation (iOS and OS X)
 
 ### [Carthage]
