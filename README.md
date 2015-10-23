@@ -56,7 +56,7 @@ func echoTest(){
 ```
 
 ## Reuse and Delaying WebSocket Connections
-v2.3.0+ makes available an `open` method. This will allow for a `WebSocket` object to be instantiated without an immediate connection to the server. It can also be used to reconnect to a server following the `close` event.
+v2.3.0+ makes available an optional `open` method. This will allow for a `WebSocket` object to be instantiated without an immediate connection to the server. It can also be used to reconnect to a server following the `close` event.
 
 For example,
 
