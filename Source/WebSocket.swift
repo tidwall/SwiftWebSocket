@@ -492,105 +492,90 @@ private class Deflater {
 }
 
 /// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
-public class WebSocket: Hashable {
-    private var id : Int
-    private var mutex = pthread_mutex_t()
-    private var cond = pthread_cond_t()
-    private let request : NSURLRequest!
-    private let subProtocols : [String]!
-    private var frames : [Frame] = []
-    private var delegate : Delegate
-    private var inflater : Inflater!
-    private var deflater : Deflater!
-    private var outputBytes : UnsafeMutablePointer<UInt8>
-    private var outputBytesSize : Int = 0
-    private var outputBytesStart : Int = 0
-    private var outputBytesLength : Int = 0
-    private var inputBytes : UnsafeMutablePointer<UInt8>
-    private var inputBytesSize : Int = 0
-    private var inputBytesStart : Int = 0
-    private var inputBytesLength : Int = 0
-    private var createdAt = CFAbsoluteTimeGetCurrent()
-    private var connectionTimeout = false
-    private var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
-    private var _subProtocol = ""
-    private var _compression = WebSocketCompression()
-    private var _allowSelfSignedSSL = false
-    private var _services = WebSocketService.None
-    private var _event = WebSocketEvents()
-    private var _binaryType = WebSocketBinaryType.UInt8Array
-    private var _readyState = WebSocketReadyState.Connecting
-    private var _networkTimeout = NSTimeInterval(-1)
+private class InnerWebSocket: Hashable {
+    var id : Int
+    var mutex = pthread_mutex_t()
+    let request : NSURLRequest!
+    let subProtocols : [String]!
+    var frames : [Frame] = []
+    var delegate : Delegate
+    var inflater : Inflater!
+    var deflater : Deflater!
+    var outputBytes : UnsafeMutablePointer<UInt8>
+    var outputBytesSize : Int = 0
+    var outputBytesStart : Int = 0
+    var outputBytesLength : Int = 0
+    var inputBytes : UnsafeMutablePointer<UInt8>
+    var inputBytesSize : Int = 0
+    var inputBytesStart : Int = 0
+    var inputBytesLength : Int = 0
+    var createdAt = CFAbsoluteTimeGetCurrent()
+    var connectionTimeout = false
+    var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
+    var _subProtocol = ""
+    var _compression = WebSocketCompression()
+    var _allowSelfSignedSSL = false
+    var _services = WebSocketService.None
+    var _event = WebSocketEvents()
+    var _binaryType = WebSocketBinaryType.UInt8Array
+    var _readyState = WebSocketReadyState.Connecting
+    var _networkTimeout = NSTimeInterval(-1)
 
-    /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
-    public var url : String {
+    var url : String {
         return request.URL!.description
     }
-    /// A string indicating the name of the sub-protocol the server selected; this will be one of the strings specified in the protocols parameter when creating the WebSocket object.
-    public var subProtocol : String {
+    var subProtocol : String {
         get { return privateSubProtocol }
     }
-    private var privateSubProtocol : String {
+    var privateSubProtocol : String {
         get { lock(); defer { unlock() }; return _subProtocol }
         set { lock(); defer { unlock() }; _subProtocol = newValue }
     }
-    /// The compression options of the WebSocket.
-    public var compression : WebSocketCompression {
+    var compression : WebSocketCompression {
         get { lock(); defer { unlock() }; return _compression }
         set { lock(); defer { unlock() }; _compression = newValue }
     }
-    /// Allow for Self-Signed SSL Certificates. Default is false.
-    public var allowSelfSignedSSL : Bool {
+    var allowSelfSignedSSL : Bool {
         get { lock(); defer { unlock() }; return _allowSelfSignedSSL }
         set { lock(); defer { unlock() }; _allowSelfSignedSSL = newValue }
     }
-    /// The services of the WebSocket.
-    public var services : WebSocketService {
+    var services : WebSocketService {
         get { lock(); defer { unlock() }; return _services }
         set { lock(); defer { unlock() }; _services = newValue }
     }
-    /// The events of the WebSocket.
-    public var event : WebSocketEvents {
+    var event : WebSocketEvents {
         get { lock(); defer { unlock() }; return _event }
         set { lock(); defer { unlock() }; _event = newValue }
     }
-    /// The queue for firing off events. default is main_queue
-    public var eventQueue : dispatch_queue_t? {
+    var eventQueue : dispatch_queue_t? {
         get { lock(); defer { unlock() }; return _eventQueue; }
         set { lock(); defer { unlock() }; _eventQueue = newValue }
     }
-    /// A WebSocketBinaryType value indicating the type of binary data being transmitted by the connection. Default is .UInt8Array.
-    public var binaryType : WebSocketBinaryType {
+    var binaryType : WebSocketBinaryType {
         get { lock(); defer { unlock() }; return _binaryType }
         set { lock(); defer { unlock() }; _binaryType = newValue }
     }
-    /// The current state of the connection; this is one of the WebSocketReadyState constants. Read only.
-    public var readyState : WebSocketReadyState {
+    var readyState : WebSocketReadyState {
         get { return privateReadyState }
     }
-    private var privateReadyState : WebSocketReadyState {
+    var privateReadyState : WebSocketReadyState {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
 
-    public var hashValue: Int { return id }
+    var hashValue: Int { return id }
 
-    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
-    public convenience init(_ url: String){
+    convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
-    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
-    public convenience init(_ url: String, subProtocols : [String]){
+    convenience init(_ url: String, subProtocols : [String]){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
     }
-    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
-    public convenience init(_ url: String, subProtocol : String){
+    convenience init(_ url: String, subProtocol : String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
     }
-    /// Create a WebSocket connection from an NSURLRequest; Also include a list of protocols.
-    public init(request: NSURLRequest, subProtocols : [String] = []){
+    init(request: NSURLRequest, subProtocols : [String] = []){
         pthread_mutex_init(&mutex, nil)
-        pthread_cond_init(&cond, nil)
         self.id = manager.nextId()
         self.request = request
         self.subProtocols = subProtocols
@@ -610,7 +595,6 @@ public class WebSocket: Hashable {
         if inputBytes != nil {
             free(inputBytes)
         }
-        pthread_cond_init(&cond, nil)
         pthread_mutex_init(&mutex, nil)
     }
     @inline(__always) private func lock(){
@@ -646,24 +630,24 @@ public class WebSocket: Hashable {
         }
         return false
     }
-    private enum Stage : Int {
+    enum Stage : Int {
         case OpenConn
         case ReadResponse
         case HandleFrames
         case CloseConn
         case End
     }
-    private var stage = Stage.OpenConn
-    private var rd : NSInputStream!
-    private var wr : NSOutputStream!
-    private var atEnd = false
-    private var closeCode = UInt16(0)
-    private var closeReason = ""
-    private var closeClean = false
-    private var closeFinal = false
-    private var finalError : ErrorType?
-    private var exit = false
-    private func step(){
+    var stage = Stage.OpenConn
+    var rd : NSInputStream!
+    var wr : NSOutputStream!
+    var atEnd = false
+    var closeCode = UInt16(0)
+    var closeReason = ""
+    var closeClean = false
+    var closeFinal = false
+    var finalError : ErrorType?
+    var exit = false
+    func step(){
         if exit {
             return
         }
@@ -684,7 +668,7 @@ public class WebSocket: Hashable {
             case .HandleFrames:
                 try stepOutputFrames()
                 if closeFinal {
-                    privateReadyState  == .Closing
+                    privateReadyState = .Closing
                     stage = .CloseConn
                     return
                 }
@@ -727,7 +711,7 @@ public class WebSocket: Hashable {
                 if let error = finalError {
                     self.event.error(error: error)
                 }
-                privateReadyState  == .Closed
+                privateReadyState = .Closed
                 if rd != nil {
                     closeConn()
                     fire {
@@ -792,7 +776,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    private func stepBuffers() throws {
+    func stepBuffers() throws {
         if rd != nil {
             if rd.streamStatus == NSStreamStatus.AtEnd  {
                 if atEnd {
@@ -831,7 +815,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    private func stepStreamErrors() throws {
+    func stepStreamErrors() throws {
         if finalError == nil {
             if connectionTimeout {
                 throw WebSocketError.Network(timeoutDetails)
@@ -844,7 +828,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    private func stepOutputFrames() throws {
+    func stepOutputFrames() throws {
         lock()
         defer {
             frames = []
@@ -862,7 +846,7 @@ public class WebSocket: Hashable {
             }
         }
     }
-    @inline(__always) private func fire(block: ()->()){
+    @inline(__always) func fire(block: ()->()){
         if let queue = eventQueue {
             dispatch_sync(queue) {
                 block()
@@ -872,11 +856,11 @@ public class WebSocket: Hashable {
         }
     }
 
-    private var readStateSaved = false
-    private var readStateFrame : Frame?
-    private var readStateFinished = false
-    private var leaderFrame : Frame?
-    private func readFrame() throws -> Frame {
+    var readStateSaved = false
+    var readStateFrame : Frame?
+    var readStateFinished = false
+    var leaderFrame : Frame?
+    func readFrame() throws -> Frame {
         var frame : Frame
         var finished : Bool
         if !readStateSaved {
@@ -927,7 +911,7 @@ public class WebSocket: Hashable {
         return frame
     }
 
-    private func closeConn() {
+    func closeConn() {
         rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         rd.delegate = nil
@@ -936,7 +920,7 @@ public class WebSocket: Hashable {
         wr.close()
     }
 
-    private func openConn() throws {
+    func openConn() throws {
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
         req.setValue("Upgrade", forHTTPHeaderField: "Connection")
@@ -1052,7 +1036,7 @@ public class WebSocket: Hashable {
         try write(header, length: header.count)
     }
 
-    private func write(bytes: UnsafePointer<UInt8>, length: Int) throws {
+    func write(bytes: UnsafePointer<UInt8>, length: Int) throws {
         if outputBytesStart+outputBytesLength+length > outputBytesSize {
             var size = outputBytesSize
             while outputBytesStart+outputBytesLength+length > size {
@@ -1069,7 +1053,7 @@ public class WebSocket: Hashable {
         outputBytesLength += length
     }
 
-    private func readResponse() throws {
+    func readResponse() throws {
         let end : [UInt8] = [ 0x0D, 0x0A, 0x0D, 0x0A ]
         let ptr = UnsafeMutablePointer<UInt8>(memmem(inputBytes+inputBytesStart, inputBytesLength, end, 4))
         if ptr == nil {
@@ -1150,7 +1134,7 @@ public class WebSocket: Hashable {
         }
     }
 
-    private class ByteReader {
+    class ByteReader {
         var start : UnsafePointer<UInt8>
         var end : UnsafePointer<UInt8>
         var bytes : UnsafePointer<UInt8>
@@ -1180,20 +1164,20 @@ public class WebSocket: Hashable {
         }
     }
 
-    private var fragStateSaved = false
-    private var fragStatePosition = 0
-    private var fragStateInflate = false
-    private var fragStateLen = 0
-    private var fragStateFin = false
-    private var fragStateCode = OpCode.Continue
-    private var fragStateLeaderCode = OpCode.Continue
-    private var fragStateUTF8 = UTF8()
-    private var fragStatePayload = Payload()
-    private var fragStateStatusCode = UInt16(0)
-    private var fragStateHeaderLen = 0
-    private var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
-    private var reusedPayload = Payload()
-    private func readFrameFragment(var leader : Frame?) throws -> Frame {
+    var fragStateSaved = false
+    var fragStatePosition = 0
+    var fragStateInflate = false
+    var fragStateLen = 0
+    var fragStateFin = false
+    var fragStateCode = OpCode.Continue
+    var fragStateLeaderCode = OpCode.Continue
+    var fragStateUTF8 = UTF8()
+    var fragStatePayload = Payload()
+    var fragStateStatusCode = UInt16(0)
+    var fragStateHeaderLen = 0
+    var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
+    var reusedPayload = Payload()
+    func readFrameFragment(var leader : Frame?) throws -> Frame {
         var inflate : Bool
         var len : Int
         var fin = false
@@ -1361,8 +1345,8 @@ public class WebSocket: Hashable {
         return f
     }
 
-    private var head = [UInt8](count: 0xFF, repeatedValue: 0)
-    private func writeFrame(f : Frame) throws {
+    var head = [UInt8](count: 0xFF, repeatedValue: 0)
+    func writeFrame(f : Frame) throws {
         if !f.finished{
             throw WebSocketError.LibraryError("cannot send unfinished frames")
         }
@@ -1430,32 +1414,20 @@ public class WebSocket: Hashable {
         try write(head, length: hlen)
         try write(payloadBytes, length: payloadBytes.count)
     }
-
-    /**
-    Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
-
-    :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
-    :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
-    */
-    public func close(code : Int = 1000, reason : String = "Normal Closure") {
+    func close(code : Int = 1000, reason : String = "Normal Closure") {
         let f = Frame()
         f.code = .Close
         f.statusCode = UInt16(truncatingBitPattern: code)
         f.utf8.text = reason
         sendFrame(f)
     }
-    private func sendFrame(f : Frame) {
+    func sendFrame(f : Frame) {
         lock()
         frames += [f]
         unlock()
         manager.signal()
     }
-    /**
-    Transmits message to the server over the WebSocket connection.
-
-    :param: message The data to be sent to the server.
-    */
-    public func send(message : Any) {
+    func send(message : Any) {
         let f = Frame()
         if let message = message as? String {
             f.code = .Text
@@ -1475,20 +1447,12 @@ public class WebSocket: Hashable {
         }
         sendFrame(f)
     }
-    /**
-    Transmits a ping to the server over the WebSocket connection.
-    */
-    public func ping() {
+    func ping() {
         let f = Frame()
         f.code = .Ping
         sendFrame(f)
     }
-    /**
-    Transmits a ping to the server over the WebSocket connection.
-
-    :param: optional message The data to be sent to the server.
-    */
-    public func ping(message : Any){
+    func ping(message : Any){
         let f = Frame()
         f.code = .Ping
         if let message = message as? String {
@@ -1505,7 +1469,7 @@ public class WebSocket: Hashable {
         sendFrame(f)
     }
 }
-public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
+private func ==(lhs: InnerWebSocket, rhs: InnerWebSocket) -> Bool {
     return lhs.id == rhs.id
 }
 
@@ -1521,13 +1485,13 @@ private class Manager {
     var once = dispatch_once_t()
     var mutex = pthread_mutex_t()
     var cond = pthread_cond_t()
-    var websockets = Set<WebSocket>()
+    var websockets = Set<InnerWebSocket>()
     var _nextId = 0
     init(){
         pthread_mutex_init(&mutex, nil)
         pthread_cond_init(&cond, nil)
         dispatch_async(dispatch_queue_create("SwiftWebSocket", nil)) {
-            var wss : [WebSocket] = []
+            var wss : [InnerWebSocket] = []
             for ;; {
                 var wait = true
                 wss.removeAll()
@@ -1551,7 +1515,7 @@ private class Manager {
             }
         }
     }
-    func checkForConnectionTimeout(ws : WebSocket) {
+    func checkForConnectionTimeout(ws : InnerWebSocket) {
         if ws.rd != nil && ws.wr != nil && (ws.rd.streamStatus == .Opening || ws.wr.streamStatus == .Opening) {
             let age = CFAbsoluteTimeGetCurrent() - ws.createdAt
             if age >= timeoutDuration {
@@ -1576,13 +1540,13 @@ private class Manager {
         pthread_cond_signal(&cond)
         pthread_mutex_unlock(&mutex)
     }
-    func add(websocket: WebSocket) {
+    func add(websocket: InnerWebSocket) {
         pthread_mutex_lock(&mutex)
         websockets.insert(websocket)
         pthread_cond_signal(&cond)
         pthread_mutex_unlock(&mutex)
     }
-    func remove(websocket: WebSocket) {
+    func remove(websocket: InnerWebSocket) {
         pthread_mutex_lock(&mutex)
         websockets.remove(websocket)
         pthread_cond_signal(&cond)
