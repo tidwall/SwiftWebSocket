@@ -6,9 +6,7 @@
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
 
-[Test results for SwiftWebSocket](https://tidwall.github.io/SwiftWebSocket/results/). You can compare to the popular [Objective-C Library](http://square.github.io/SocketRocket/results/)
-
-SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
+SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression. [Test results](https://tidwall.github.io/SwiftWebSocket/results/).
 
 ## Features
 
@@ -26,7 +24,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 ```swift
 func echoTest(){
     var messageNum = 0
-    unowned let ws = WebSocket("wss://echo.websocket.org")
+    let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
         let msg = "\(++messageNum): \(NSDate().description)"
         print("send: \(msg)")
@@ -98,7 +96,7 @@ ws.allowSelfSignedSSL = true
 
 ```swift
 // Allow socket to handle VoIP in the background.
-ws.services = [.VoIP, Background] 
+ws.services = [.VoIP, .Background] 
 ```
 
 ##Installation (iOS and OS X)
