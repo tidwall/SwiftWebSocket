@@ -746,7 +746,6 @@ private class InnerWebSocket: Hashable {
             finalError = error
             if stage == .OpenConn || stage == .ReadResponse {
                 stage = .CloseConn
-                
             } else {
                 var frame : Frame?
                 if let error = error as? WebSocketError{
@@ -789,7 +788,7 @@ private class InnerWebSocket: Hashable {
     }
     func stepBuffers() throws {
         if rd != nil {
-            if rd.streamStatus == NSStreamStatus.AtEnd  {
+            if stage != .CloseConn && rd.streamStatus == NSStreamStatus.AtEnd  {
                 if atEnd {
                     return;
                 }
@@ -965,8 +964,16 @@ private class InnerWebSocket: Hashable {
             req.setValue(val, forHTTPHeaderField: "Sec-WebSocket-Extensions")
         }
         var security = TCPConnSecurity.None
+        var report = false
         let port : Int
         if req.URL!.port != nil {
+            if req.URL!.port!.integerValue == 443 && req.URL!.scheme == "wss" {
+                report = true
+            } else if req.URL!.port!.integerValue == 80 && req.URL!.scheme == "ws" {
+                report = true
+            }
+        }
+        if req.URL!.port != nil && !report {
             port = req.URL!.port!.integerValue
         } else if req.URL!.scheme == "wss" {
             port = 443
@@ -1005,6 +1012,7 @@ private class InnerWebSocket: Hashable {
         if addr.count != 2 || Int(addr[1]) == nil {
             throw WebSocketError.InvalidAddress
         }
+
         var (rdo, wro) : (NSInputStream?, NSOutputStream?)
         var readStream:  Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?

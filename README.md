@@ -4,15 +4,14 @@
 <a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
 <a href="https://tidwall.github.io/SwiftWebSocket/docs/"><img src="https://tidwall.github.io/SwiftWebSocket/docs.png" alt="" width="65" height="20" border="0" /></a>
 
-Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
+Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in Swift.
 
-[Test results for SwiftWebSocket](https://tidwall.github.io/SwiftWebSocket/results/). You can compare to the popular [Objective-C Library](http://square.github.io/SocketRocket/results/)
-
-SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
+SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
 ## Features
 
 - High performance.
+- 100% conforms to [Autobahn Tests](http://autobahn.ws/testsuite/#test-suite-coverage). Including base, limits, compression, etc. [Test results](https://tidwall.github.io/SwiftWebSocket/results/).
 - TLS / WSS support. Self-signed certificate option.
 - The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
 - Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
@@ -26,7 +25,7 @@ SwiftWebSocket currently passes all 521 of the Autobahn's fuzzing tests, includi
 ```swift
 func echoTest(){
     var messageNum = 0
-    unowned let ws = WebSocket("wss://echo.websocket.org")
+    let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
         let msg = "\(++messageNum): \(NSDate().description)"
         print("send: \(msg)")
@@ -69,13 +68,12 @@ v2.3.0+ makes available an optional `open` method. This will allow for a `WebSoc
 For example,
 
 ```swift
-    let ws = WebSocket()
-    ws.event.close = { _ in
-        ws.open()                 // reopen the socket to the previous url
-        ws.open("ws://otherurl")  // or, reopen the socket to a new url
-    }
-    ws.open("ws://url") // call with url
+let ws = WebSocket()
+ws.event.close = { _ in
+    ws.open()                 // reopen the socket to the previous url
+    ws.open("ws://otherurl")  // or, reopen the socket to a new url
 }
+ws.open("ws://url") // call with url
 ```
 
 ## Compression
@@ -98,7 +96,7 @@ ws.allowSelfSignedSSL = true
 
 ```swift
 // Allow socket to handle VoIP in the background.
-ws.services = [.VoIP, Background] 
+ws.services = [.VoIP, .Background] 
 ```
 
 ##Installation (iOS and OS X)
