@@ -965,8 +965,16 @@ private class InnerWebSocket: Hashable {
             req.setValue(val, forHTTPHeaderField: "Sec-WebSocket-Extensions")
         }
         var security = TCPConnSecurity.None
+        var report = false
         let port : Int
         if req.URL!.port != nil {
+            if req.URL!.port!.integerValue == 443 && req.URL!.scheme == "wss" {
+                report = true
+            } else if req.URL!.port!.integerValue == 80 && req.URL!.scheme == "ws" {
+                report = true
+            }
+        }
+        if req.URL!.port != nil && !report {
             port = req.URL!.port!.integerValue
         } else if req.URL!.scheme == "wss" {
             port = 443
