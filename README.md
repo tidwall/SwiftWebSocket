@@ -4,7 +4,7 @@
 <a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
 <a href="https://tidwall.github.io/SwiftWebSocket/docs/"><img src="https://tidwall.github.io/SwiftWebSocket/docs.png" alt="" width="65" height="20" border="0" /></a>
 
-Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in pure Swift.
+Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in Swift.
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
@@ -68,13 +68,12 @@ v2.3.0+ makes available an optional `open` method. This will allow for a `WebSoc
 For example,
 
 ```swift
-    let ws = WebSocket()
-    ws.event.close = { _ in
-        ws.open()                 // reopen the socket to the previous url
-        ws.open("ws://otherurl")  // or, reopen the socket to a new url
-    }
-    ws.open("ws://url") // call with url
+let ws = WebSocket()
+ws.event.close = { _ in
+    ws.open()                 // reopen the socket to the previous url
+    ws.open("ws://otherurl")  // or, reopen the socket to a new url
 }
+ws.open("ws://url") // call with url
 ```
 
 ## Compression
