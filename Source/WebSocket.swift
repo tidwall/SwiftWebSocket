@@ -1702,6 +1702,10 @@ public class WebSocket: NSObject {
     public func open(url url: String){
         open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
+    /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
+    public func open(nsurl url: NSURL){
+        open(NSURLRequest(URL: url), subProtocols: [])
+    }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
     public func open(url url: String, subProtocols : [String]){
         open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
