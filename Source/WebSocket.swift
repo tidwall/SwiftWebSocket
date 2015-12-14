@@ -386,18 +386,18 @@ private struct z_stream {
     var next_in : UnsafePointer<UInt8> = nil
     var avail_in : CUnsignedInt = 0
     var total_in : CUnsignedLong = 0
-    
+
     var next_out : UnsafeMutablePointer<UInt8> = nil
     var avail_out : CUnsignedInt = 0
     var total_out : CUnsignedLong = 0
-    
+
     var msg : UnsafePointer<CChar> = nil
     var state : COpaquePointer = nil
-    
+
     var zalloc : COpaquePointer = nil
     var zfree : COpaquePointer = nil
     var opaque : COpaquePointer = nil
-    
+
     var data_type : CInt = 0
     var adler : CUnsignedLong = 0
     var reserved : CUnsignedLong = 0
@@ -520,7 +520,7 @@ private class InnerWebSocket: Hashable {
     var _binaryType = WebSocketBinaryType.UInt8Array
     var _readyState = WebSocketReadyState.Connecting
     var _networkTimeout = NSTimeInterval(-1)
-    
+
     var url : String {
         return request.URL!.description
     }
@@ -562,7 +562,7 @@ private class InnerWebSocket: Hashable {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
-    
+
     func copyOpen(request: NSURLRequest, subProtocols : [String] = []) -> InnerWebSocket{
         let ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
         ws.compression = compression
@@ -573,9 +573,9 @@ private class InnerWebSocket: Hashable {
         ws.binaryType = binaryType
         return ws
     }
-    
+
     var hashValue: Int { return id }
-    
+
     init(request: NSURLRequest, subProtocols : [String] = [], stub : Bool = false){
         pthread_mutex_init(&mutex, nil)
         self.id = manager.nextId()
@@ -611,7 +611,7 @@ private class InnerWebSocket: Hashable {
     @inline(__always) private func unlock(){
         pthread_mutex_unlock(&mutex)
     }
-    
+
     private var dirty : Bool {
         lock()
         defer { unlock() }
@@ -738,7 +738,7 @@ private class InnerWebSocket: Hashable {
                 manager.remove(self)
             }
         } catch WebSocketError.NeedMoreInput {
-            
+
         } catch {
             if finalError != nil {
                 return
@@ -865,7 +865,7 @@ private class InnerWebSocket: Hashable {
             block()
         }
     }
-    
+
     var readStateSaved = false
     var readStateFrame : Frame?
     var readStateFinished = false
@@ -920,7 +920,7 @@ private class InnerWebSocket: Hashable {
         readStateFinished = false
         return frame
     }
-    
+
     func closeConn() {
         rd.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         wr.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
@@ -929,14 +929,14 @@ private class InnerWebSocket: Hashable {
         rd.close()
         wr.close()
     }
-    
+
     func openConn() throws {
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
         req.setValue("Upgrade", forHTTPHeaderField: "Connection")
         req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
         req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
-        
+
         if req.URL == nil || req.URL!.host == nil{
             throw WebSocketError.InvalidAddress
         }
@@ -1058,7 +1058,7 @@ private class InnerWebSocket: Hashable {
         wr.open()
         try write(header, length: header.count)
     }
-    
+
     func write(bytes: UnsafePointer<UInt8>, length: Int) throws {
         if outputBytesStart+outputBytesLength+length > outputBytesSize {
             var size = outputBytesSize
@@ -1075,7 +1075,7 @@ private class InnerWebSocket: Hashable {
         memcpy(outputBytes+outputBytesStart+outputBytesLength, bytes, length)
         outputBytesLength += length
     }
-    
+
     func readResponse() throws {
         let end : [UInt8] = [ 0x0D, 0x0A, 0x0D, 0x0A ]
         let ptr = UnsafeMutablePointer<UInt8>(memmem(inputBytes+inputBytesStart, inputBytesLength, end, 4))
@@ -1156,7 +1156,7 @@ private class InnerWebSocket: Hashable {
             inputBytesStart += bufferCount+4
         }
     }
-    
+
     class ByteReader {
         var start : UnsafePointer<UInt8>
         var end : UnsafePointer<UInt8>
@@ -1186,7 +1186,7 @@ private class InnerWebSocket: Hashable {
             }
         }
     }
-    
+
     var fragStateSaved = false
     var fragStatePosition = 0
     var fragStateInflate = false
@@ -1210,7 +1210,7 @@ private class InnerWebSocket: Hashable {
         var payload : Payload
         var statusCode : UInt16
         var headerLen : Int
-        
+
         let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
         if fragStateSaved {
             // load state
@@ -1312,7 +1312,7 @@ private class InnerWebSocket: Hashable {
             }
             headerLen = reader.position
         }
-        
+
         let rlen : Int
         let rfin : Bool
         let chopped : Bool
@@ -1333,13 +1333,13 @@ private class InnerWebSocket: Hashable {
             (bytes, bytesLen) = (UnsafeMutablePointer<UInt8>(reader.bytes), rlen)
         }
         reader.bytes += rlen
-        
+
         if leaderCode == .Text || leaderCode == .Close {
             try utf8.append(bytes, length: bytesLen)
         } else {
             payload.append(bytes, length: bytesLen)
         }
-        
+
         if chopped {
             // save state
             fragStateHeaderLen = headerLen
@@ -1355,19 +1355,19 @@ private class InnerWebSocket: Hashable {
             fragStateSaved = true
             throw WebSocketError.NeedMoreInput
         }
-        
+
         inputBytesLength -= reader.position
         if inputBytesLength == 0 {
             inputBytesStart = 0
         } else {
             inputBytesStart += reader.position
         }
-        
+
         let f = Frame()
         (f.code, f.payload, f.utf8, f.statusCode, f.inflate, f.finished) = (code, payload, utf8, statusCode, inflate, fin)
         return f
     }
-    
+
     var head = [UInt8](count: 0xFF, repeatedValue: 0)
     func writeFrame(f : Frame) throws {
         if !f.finished{
@@ -1392,7 +1392,7 @@ private class InnerWebSocket: Hashable {
         }
         payloadLen += payloadBytes.count
         if deflate {
-            
+
         }
         var usingStatusCode = false
         if f.statusCode != 0 && payloadLen != 0 {
@@ -1586,11 +1586,11 @@ private class Manager {
 private let manager = Manager()
 
 /// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
-public class WebSocket: Hashable {
-    private var ws : InnerWebSocket
+public class WebSocket: NSObject {
+    private var ws: InnerWebSocket
     private var id = manager.nextId()
-    private var opened : Bool
-    public var hashValue: Int { return id }
+    private var opened: Bool
+    public override var hashValue: Int { return id }
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
@@ -1609,9 +1609,10 @@ public class WebSocket: Hashable {
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
     }
     /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
-    public init(){
+    public override init(){
         opened = false
         ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
+        super.init()
     }
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String{ return ws.url }
@@ -1652,15 +1653,15 @@ public class WebSocket: Hashable {
         return ws.readyState
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
-    public func open(url: String){
+    public func open(url url: String){
         open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
-    public func open(url: String, subProtocols : [String]){
+    public func open(url url: String, subProtocols : [String]){
         open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
-    public func open(url: String, subProtocol : String){
+    public func open(url url: String, subProtocol : String){
         open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
     }
     /// Opens a deferred or closed WebSocket connection from an NSURLRequest; Also include a list of protocols.
@@ -1677,7 +1678,7 @@ public class WebSocket: Hashable {
     }
     /**
      Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
-     
+
      :param: code An integer indicating the status code explaining why the connection is being closed. If this parameter is not specified, a default value of 1000 (indicating a normal closure) is assumed.
      :param: reason A human-readable string explaining why the connection is closing. This string must be no longer than 123 bytes of UTF-8 text (not characters).
      */
@@ -1690,7 +1691,7 @@ public class WebSocket: Hashable {
     }
     /**
      Transmits message to the server over the WebSocket connection.
-     
+
      :param: message The data to be sent to the server.
      */
     public func send(message : Any){
@@ -1701,7 +1702,7 @@ public class WebSocket: Hashable {
     }
     /**
      Transmits a ping to the server over the WebSocket connection.
-     
+
      :param: optional message The data to be sent to the server.
      */
     public func ping(message : Any){
@@ -1724,4 +1725,3 @@ public class WebSocket: Hashable {
 public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
     return lhs.id == rhs.id
 }
-
