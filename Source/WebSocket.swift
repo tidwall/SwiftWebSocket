@@ -97,6 +97,24 @@ private enum OpCode : UInt8, CustomStringConvertible {
     }
 }
 
+@objc
+public protocol WebSocketDelegate {
+    /// A function to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
+    func webSocketOpen()
+    /// A function to be called when the WebSocket connection's readyState changes to .Closed.
+    func webSocketClose(code: Int, reason: String, wasClean: Bool)
+    /// A function to be called when an error occurs.
+    func webSocketError(error: NSError)
+    /// A function to be called when a message (string) is received from the server.
+    optional func webSocketMessageText(text: String)
+    /// A function to be called when a message (binary) is received from the server.
+    optional func webSocketMessageData(data: NSData)
+    /// A function to be called when a pong is received from the server.
+    optional func webSocketPong()
+    /// A function to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
+    optional func webSocketEnd(code: Int, reason: String, wasClean: Bool, error: NSError?)
+}
+
 /// The WebSocketEvents struct is used by the events property and manages the events for the WebSocket connection.
 public struct WebSocketEvents {
     /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
@@ -517,6 +535,7 @@ private class InnerWebSocket: Hashable {
     var _allowSelfSignedSSL = false
     var _services = WebSocketService.None
     var _event = WebSocketEvents()
+    var _eventDelegate: WebSocketDelegate?
     var _binaryType = WebSocketBinaryType.UInt8Array
     var _readyState = WebSocketReadyState.Connecting
     var _networkTimeout = NSTimeInterval(-1)
@@ -546,6 +565,10 @@ private class InnerWebSocket: Hashable {
     var event : WebSocketEvents {
         get { lock(); defer { unlock() }; return _event }
         set { lock(); defer { unlock() }; _event = newValue }
+    }
+    var eventDelegate : WebSocketDelegate? {
+        get { lock(); defer { unlock() }; return _eventDelegate }
+        set { lock(); defer { unlock() }; _eventDelegate = newValue }
     }
     var eventQueue : dispatch_queue_t? {
         get { lock(); defer { unlock() }; return _eventQueue; }
@@ -674,6 +697,7 @@ private class InnerWebSocket: Hashable {
                 privateReadyState = .Open
                 fire {
                     self.event.open()
+                    self.eventDelegate?.webSocketOpen()
                 }
                 stage = .HandleFrames
             case .HandleFrames:
@@ -688,13 +712,24 @@ private class InnerWebSocket: Hashable {
                 case .Text:
                     fire {
                         self.event.message(data: frame.utf8.text)
+                        self.eventDelegate?.webSocketMessageText?(frame.utf8.text)
                     }
                 case .Binary:
                     fire {
                         switch self.binaryType {
-                        case .UInt8Array: self.event.message(data: frame.payload.array)
-                        case .NSData: self.event.message(data: frame.payload.nsdata)
-                        case .UInt8UnsafeBufferPointer: self.event.message(data: frame.payload.buffer)
+                        case .UInt8Array:
+                            self.event.message(data: frame.payload.array)
+                            // TODO: review
+                            let array = frame.payload.array.map({ Int($0) })
+                            self.eventDelegate?.webSocketMessageData?(NSKeyedArchiver.archivedDataWithRootObject(array))
+                        case .NSData:
+                            self.event.message(data: frame.payload.nsdata)
+                            self.eventDelegate?.webSocketMessageData?(frame.payload.nsdata)
+                        case .UInt8UnsafeBufferPointer:
+                            self.event.message(data: frame.payload.buffer)
+                            // TODO: review
+                            let array = [UInt8](frame.payload.buffer).map({ Int($0) })
+                            self.eventDelegate?.webSocketMessageData?(NSKeyedArchiver.archivedDataWithRootObject(array))
                         }
                     }
                 case .Ping:
@@ -706,10 +741,14 @@ private class InnerWebSocket: Hashable {
                 case .Pong:
                     fire {
                         switch self.binaryType {
-                        case .UInt8Array: self.event.pong(data: frame.payload.array)
-                        case .NSData: self.event.pong(data: frame.payload.nsdata)
-                        case .UInt8UnsafeBufferPointer: self.event.pong(data: frame.payload.buffer)
+                        case .UInt8Array:
+                            self.event.pong(data: frame.payload.array)
+                        case .NSData:
+                            self.event.pong(data: frame.payload.nsdata)
+                        case .UInt8UnsafeBufferPointer:
+                            self.event.pong(data: frame.payload.buffer)
                         }
+                        self.eventDelegate?.webSocketPong?()
                     }
                 case .Close:
                     lock()
@@ -721,18 +760,21 @@ private class InnerWebSocket: Hashable {
             case .CloseConn:
                 if let error = finalError {
                     self.event.error(error: error)
+                    self.eventDelegate?.webSocketError(error as NSError)
                 }
                 privateReadyState = .Closed
                 if rd != nil {
                     closeConn()
                     fire {
                         self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
+                        self.eventDelegate?.webSocketClose(Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
                     }
                 }
                 stage = .End
             case .End:
                 fire {
                     self.event.end(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError)
+                    self.eventDelegate?.webSocketEnd?(Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError as? NSError)
                 }
                 exit = true
                 manager.remove(self)
@@ -1637,6 +1679,10 @@ public class WebSocket: NSObject {
     public var event : WebSocketEvents{
         get { return ws.event }
         set { ws.event = newValue }
+    }
+    public var delegate : WebSocketDelegate? {
+        get { return ws.eventDelegate }
+        set { ws.eventDelegate = newValue }
     }
     /// The queue for firing off events. default is main_queue
     public var eventQueue : dispatch_queue_t?{
