@@ -1742,13 +1742,31 @@ public class WebSocket: NSObject {
     /**
      Transmits message to the server over the WebSocket connection.
 
-     :param: message The data to be sent to the server.
+     :param: message The message to be sent to the server.
      */
     public func send(message : Any){
         if !opened{
             return
         }
         ws.send(message)
+    }
+    /**
+     Transmits message to the server over the WebSocket connection.
+
+     :param: text The message (string) to be sent to the server.
+     */
+    @objc
+    public func send(text text: String){
+        send(text)
+    }
+    /**
+     Transmits message to the server over the WebSocket connection.
+
+     :param: data The message (binary) to be sent to the server.
+     */
+    @objc
+    public func send(data data: NSData){
+        send(data)
     }
     /**
      Transmits a ping to the server over the WebSocket connection.
