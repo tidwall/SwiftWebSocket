@@ -1614,6 +1614,10 @@ public class WebSocket: NSObject {
     public convenience init(_ url: String){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
+    /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
+    public convenience init(url: NSURL){
+        self.init(request: NSURLRequest(URL: url), subProtocols: [])
+    }
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
     public convenience init(_ url: String, subProtocols : [String]){
         self.init(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
