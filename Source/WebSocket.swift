@@ -97,24 +97,6 @@ private enum OpCode : UInt8, CustomStringConvertible {
     }
 }
 
-@objc
-public protocol WebSocketDelegate {
-    /// A function to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
-    func webSocketOpen()
-    /// A function to be called when the WebSocket connection's readyState changes to .Closed.
-    func webSocketClose(code: Int, reason: String, wasClean: Bool)
-    /// A function to be called when an error occurs.
-    func webSocketError(error: NSError)
-    /// A function to be called when a message (string) is received from the server.
-    optional func webSocketMessageText(text: String)
-    /// A function to be called when a message (binary) is received from the server.
-    optional func webSocketMessageData(data: NSData)
-    /// A function to be called when a pong is received from the server.
-    optional func webSocketPong()
-    /// A function to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
-    optional func webSocketEnd(code: Int, reason: String, wasClean: Bool, error: NSError?)
-}
-
 /// The WebSocketEvents struct is used by the events property and manages the events for the WebSocket connection.
 public struct WebSocketEvents {
     /// An event to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
@@ -719,17 +701,12 @@ private class InnerWebSocket: Hashable {
                         switch self.binaryType {
                         case .UInt8Array:
                             self.event.message(data: frame.payload.array)
-                            // TODO: review
-                            let array = frame.payload.array.map({ Int($0) })
-                            self.eventDelegate?.webSocketMessageData?(NSKeyedArchiver.archivedDataWithRootObject(array))
                         case .NSData:
                             self.event.message(data: frame.payload.nsdata)
+                            // The WebSocketDelegate is necessary to add Objective-C compability and it is only possible to send binary data with NSData.
                             self.eventDelegate?.webSocketMessageData?(frame.payload.nsdata)
                         case .UInt8UnsafeBufferPointer:
                             self.event.message(data: frame.payload.buffer)
-                            // TODO: review
-                            let array = [UInt8](frame.payload.buffer).map({ Int($0) })
-                            self.eventDelegate?.webSocketMessageData?(NSKeyedArchiver.archivedDataWithRootObject(array))
                         }
                     }
                 case .Ping:
@@ -1680,10 +1657,6 @@ public class WebSocket: NSObject {
         get { return ws.event }
         set { ws.event = newValue }
     }
-    public var delegate : WebSocketDelegate? {
-        get { return ws.eventDelegate }
-        set { ws.eventDelegate = newValue }
-    }
     /// The queue for firing off events. default is main_queue
     public var eventQueue : dispatch_queue_t?{
         get { return ws.eventQueue }
@@ -1751,24 +1724,6 @@ public class WebSocket: NSObject {
         ws.send(message)
     }
     /**
-     Transmits message to the server over the WebSocket connection.
-
-     :param: text The message (string) to be sent to the server.
-     */
-    @objc
-    public func send(text text: String){
-        send(text)
-    }
-    /**
-     Transmits message to the server over the WebSocket connection.
-
-     :param: data The message (binary) to be sent to the server.
-     */
-    @objc
-    public func send(data data: NSData){
-        send(data)
-    }
-    /**
      Transmits a ping to the server over the WebSocket connection.
 
      :param: optional message The data to be sent to the server.
@@ -1792,4 +1747,50 @@ public class WebSocket: NSObject {
 
 public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
     return lhs.id == rhs.id
+}
+
+// MARK: - Objective-C
+
+@objc
+public protocol WebSocketDelegate {
+    /// A function to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
+    func webSocketOpen()
+    /// A function to be called when the WebSocket connection's readyState changes to .Closed.
+    func webSocketClose(code: Int, reason: String, wasClean: Bool)
+    /// A function to be called when an error occurs.
+    func webSocketError(error: NSError)
+    /// A function to be called when a message (string) is received from the server.
+    optional func webSocketMessageText(text: String)
+    /// A function to be called when a message (binary) is received from the server.
+    optional func webSocketMessageData(data: NSData)
+    /// A function to be called when a pong is received from the server.
+    optional func webSocketPong()
+    /// A function to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
+    optional func webSocketEnd(code: Int, reason: String, wasClean: Bool, error: NSError?)
+}
+
+extension WebSocket {
+    /// The events of the WebSocket using a delegate.
+    public var delegate : WebSocketDelegate? {
+        get { return ws.eventDelegate }
+        set { ws.eventDelegate = newValue }
+    }
+    /**
+     Transmits message to the server over the WebSocket connection.
+
+     :param: text The message (string) to be sent to the server.
+     */
+    @objc
+    public func send(text text: String){
+        send(text)
+    }
+    /**
+     Transmits message to the server over the WebSocket connection.
+
+     :param: data The message (binary) to be sent to the server.
+     */
+    @objc
+    public func send(data data: NSData){
+        send(data)
+    }
 }
