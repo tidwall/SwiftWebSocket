@@ -491,6 +491,24 @@ private class Deflater {
     }
 }
 
+/// WebSocketDelegate is an Objective-C alternative to WebSocketEvents and is used to delegate the events for the WebSocket connection.
+@objc public protocol WebSocketDelegate {
+    /// A function to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
+    func webSocketOpen()
+    /// A function to be called when the WebSocket connection's readyState changes to .Closed.
+    func webSocketClose(code: Int, reason: String, wasClean: Bool)
+    /// A function to be called when an error occurs.
+    func webSocketError(error: NSError)
+    /// A function to be called when a message (string) is received from the server.
+    optional func webSocketMessageText(text: String)
+    /// A function to be called when a message (binary) is received from the server.
+    optional func webSocketMessageData(data: NSData)
+    /// A function to be called when a pong is received from the server.
+    optional func webSocketPong()
+    /// A function to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
+    optional func webSocketEnd(code: Int, reason: String, wasClean: Bool, error: NSError?)
+}
+
 /// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
 private class InnerWebSocket: Hashable {
     var id : Int
@@ -1751,26 +1769,6 @@ public class WebSocket: NSObject {
 
 public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
     return lhs.id == rhs.id
-}
-
-// MARK: - Objective-C
-
-@objc
-public protocol WebSocketDelegate {
-    /// A function to be called when the WebSocket connection's readyState changes to .Open; this indicates that the connection is ready to send and receive data.
-    func webSocketOpen()
-    /// A function to be called when the WebSocket connection's readyState changes to .Closed.
-    func webSocketClose(code: Int, reason: String, wasClean: Bool)
-    /// A function to be called when an error occurs.
-    func webSocketError(error: NSError)
-    /// A function to be called when a message (string) is received from the server.
-    optional func webSocketMessageText(text: String)
-    /// A function to be called when a message (binary) is received from the server.
-    optional func webSocketMessageData(data: NSData)
-    /// A function to be called when a pong is received from the server.
-    optional func webSocketPong()
-    /// A function to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
-    optional func webSocketEnd(code: Int, reason: String, wasClean: Bool, error: NSError?)
 }
 
 extension WebSocket {
