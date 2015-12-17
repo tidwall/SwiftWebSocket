@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D78C402F1C232C3800EB72AA"
+               BuildableName = "Test-ObjectiveC.xctest"
+               BlueprintName = "Test-ObjectiveC"
+               ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "03D1E7021B20897100AC49AC"
+            BuildableName = "SwiftWebSocket.framework"
+            BlueprintName = "SwiftWebSocket-iOS"
+            ReferencedContainer = "container:SwiftWebSocket.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
