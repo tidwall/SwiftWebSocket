@@ -19,6 +19,7 @@ SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict 
 - Strict UTF-8 processing. 
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
 - Zero asserts. All networking, stream, and protocol errors are routed through the `error` event.
+- Objective-C compatibility.
 
 ## Example
 
