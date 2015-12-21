@@ -529,6 +529,7 @@ private class InnerWebSocket: Hashable {
     var inputBytesLength : Int = 0
     var createdAt = CFAbsoluteTimeGetCurrent()
     var connectionTimeout = false
+    var eclose : ()->() = {}
     var _eventQueue : dispatch_queue_t? = dispatch_get_main_queue()
     var _subProtocol = ""
     var _compression = WebSocketCompression()
@@ -539,6 +540,7 @@ private class InnerWebSocket: Hashable {
     var _binaryType = WebSocketBinaryType.UInt8Array
     var _readyState = WebSocketReadyState.Connecting
     var _networkTimeout = NSTimeInterval(-1)
+
 
     var url : String {
         return request.URL!.description
@@ -588,6 +590,7 @@ private class InnerWebSocket: Hashable {
 
     func copyOpen(request: NSURLRequest, subProtocols : [String] = []) -> InnerWebSocket{
         let ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
+        ws.eclose = eclose
         ws.compression = compression
         ws.allowSelfSignedSSL = allowSelfSignedSSL
         ws.services = services
@@ -761,6 +764,7 @@ private class InnerWebSocket: Hashable {
                 if rd != nil {
                     closeConn()
                     fire {
+                        self.eclose()
                         self.event.close(code: Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
                         self.eventDelegate?.webSocketClose(Int(self.closeCode), reason: self.closeReason, wasClean: self.closeFinal)
                     }
@@ -1654,6 +1658,9 @@ public class WebSocket: NSObject {
         opened = false
         ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
         super.init()
+        ws.eclose = {
+            self.opened = false
+        }
     }
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String{ return ws.url }
@@ -1694,23 +1701,23 @@ public class WebSocket: NSObject {
         return ws.readyState
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
-    public func open(url url: String){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
+    public func open(url: String){
+        open(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [])
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public func open(nsurl url: NSURL){
-        open(NSURLRequest(URL: url), subProtocols: [])
+        open(request: NSURLRequest(URL: url), subProtocols: [])
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a list of protocols.
-    public func open(url url: String, subProtocols : [String]){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
+    public func open(url: String, subProtocols : [String]){
+        open(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: subProtocols)
     }
     /// Opens a deferred or closed WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond. Also include a protocol.
-    public func open(url url: String, subProtocol : String){
-        open(NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
+    public func open(url: String, subProtocol : String){
+        open(request: NSURLRequest(URL: NSURL(string: url)!), subProtocols: [subProtocol])
     }
     /// Opens a deferred or closed WebSocket connection from an NSURLRequest; Also include a list of protocols.
-    public func open(request: NSURLRequest, subProtocols : [String] = []){
+    public func open(request request: NSURLRequest, subProtocols : [String] = []){
         if opened{
             return
         }
@@ -1719,7 +1726,7 @@ public class WebSocket: NSObject {
     }
     /// Opens a closed WebSocket connection from an NSURLRequest; Uses the same request and protocols as previously closed WebSocket
     public func open(){
-        open(ws.request, subProtocols: ws.subProtocols)
+        open(request: ws.request, subProtocols: ws.subProtocols)
     }
     /**
      Closes the WebSocket connection or connection attempt, if any. If the connection is already closed or in the state of closing, this method does nothing.
