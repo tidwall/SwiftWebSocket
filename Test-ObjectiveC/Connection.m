@@ -28,12 +28,14 @@
     _webSocket = [[WebSocket alloc] init:@"ws://localhost:9000"];
     _webSocket.delegate = self;
     [_webSocket open];
+    NSAssert(_webSocket.readyState == WebSocketReadyStateConnecting, @"WebSocket is not connecting");
 }
 
 - (void)webSocketOpen {
     NSLog(@"Open");
     [_webSocket sendWithText:@"test"];
     [_webSocket sendWithData:[@"test" dataUsingEncoding:NSUTF8StringEncoding]];
+    NSAssert(_webSocket.readyState == WebSocketReadyStateOpen, @"WebSocket is not ready to communicate");
     [_webSocket close:0 reason:@""];
 }
 

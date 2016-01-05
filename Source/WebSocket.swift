@@ -131,7 +131,7 @@ public enum WebSocketBinaryType : CustomStringConvertible {
 }
 
 /// The WebSocketReadyState enum is used by the readyState property to describe the status of the WebSocket connection.
-public enum WebSocketReadyState : Int, CustomStringConvertible {
+@objc public enum WebSocketReadyState : Int, CustomStringConvertible {
     /// The connection is not yet open.
     case Connecting = 0
     /// The connection is open and ready to communicate.
