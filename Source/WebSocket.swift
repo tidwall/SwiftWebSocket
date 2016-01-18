@@ -1053,15 +1053,8 @@ private class InnerWebSocket: Hashable {
         rdo = readStream!.takeRetainedValue()
         wro = writeStream!.takeRetainedValue()
         (rd, wr) = (rdo!, wro!)
-        let securityLevel : String
-        switch security {
-        case .None:
-            securityLevel = NSStreamSocketSecurityLevelNone
-        case .NegoticatedSSL:
-            securityLevel = NSStreamSocketSecurityLevelNegotiatedSSL
-        }
-        rd.setProperty(securityLevel, forKey: NSStreamSocketSecurityLevelKey)
-        wr.setProperty(securityLevel, forKey: NSStreamSocketSecurityLevelKey)
+        rd.setProperty(security.level, forKey: NSStreamSocketSecurityLevelKey)
+		wr.setProperty(security.level, forKey: NSStreamSocketSecurityLevelKey)
         if services.contains(.VoIP) {
             rd.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
             wr.setProperty(NSStreamNetworkServiceTypeVoIP, forKey: NSStreamNetworkServiceType)
@@ -1532,6 +1525,13 @@ private func ==(lhs: InnerWebSocket, rhs: InnerWebSocket) -> Bool {
 private enum TCPConnSecurity {
     case None
     case NegoticatedSSL
+	
+	var level: String {
+		switch self {
+		case .None: return NSStreamSocketSecurityLevelNone
+		case .NegoticatedSSL: return NSStreamSocketSecurityLevelNegotiatedSSL
+		}
+	}
 }
 
 // Manager class is used to minimize the number of dispatches and cycle through network events
