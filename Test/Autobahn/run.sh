@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/Library/Developer/Toolchains/swift-latest.xctoolchain/usr/bin:"${PATH}"
+
 cd $(dirname "${BASH_SOURCE[0]}")
 WSTEST=$(ls $HOME/Library/Python/2.*/bin/wstest 2>/dev/null)
 set -e
