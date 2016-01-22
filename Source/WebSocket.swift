@@ -1139,10 +1139,11 @@ private class InnerWebSocket: Hashable {
                         value = trim(line.substringFromIndex(r.endIndex))
                     }
                 }
-                switch key {
-                case "Sec-WebSocket-SubProtocol":
+                
+                switch key.lowercaseString {
+                case "sec-websocket-subprotocol":
                     privateSubProtocol = value
-                case "Sec-WebSocket-Extensions":
+                case "sec-websocket-extensions":
                     let parts = value.componentsSeparatedByString(";")
                     for p in parts {
                         let part = trim(p)
