@@ -14,7 +14,7 @@ SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict 
 - 100% conforms to [Autobahn Tests](http://autobahn.ws/testsuite/#test-suite-coverage). Including base, limits, compression, etc. [Test results](https://tidwall.github.io/SwiftWebSocket/results/).
 - TLS / WSS support. Self-signed certificate option.
 - The API is modeled after the [Javascript API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
-- Reads compressed messages (`permessage-deflate`). [IETF Draft](https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-21)
+- Reads compressed messages (`permessage-deflate`). [RFC](https://tools.ietf.org/html/rfc7692)
 - Send pings and receive pong events.
 - Strict UTF-8 processing. 
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
