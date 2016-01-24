@@ -975,7 +975,9 @@ private class InnerWebSocket: Hashable {
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
         req.setValue("Upgrade", forHTTPHeaderField: "Connection")
-        req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
+        if req.valueForHTTPHeaderField("User-Agent") == nil {
+                req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
+        }
         req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
 
         if req.URL == nil || req.URL!.host == nil{
