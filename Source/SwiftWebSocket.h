@@ -1,19 +1,15 @@
-//
-//  SwiftWebSocket.h
-//  SwiftWebSocket
-//
-//  Created by Josh Baker on 6/4/15.
-//  Copyright (c) 2015 ONcast, LLC. All rights reserved.
-//
+/*
+ * SwiftWebSocket (swiftwebsocket.h)
+ *
+ * Copyright (C) Josh Baker. All Rights Reserved.
+ * Contact: @tidwall, joshbaker77@gmail.com
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ *
+ */
 
 #import <Foundation/Foundation.h>
 
-//! Project version number for SwiftWebSocket.
 FOUNDATION_EXPORT double SwiftWebSocketVersionNumber;
-
-//! Project version string for SwiftWebSocket.
 FOUNDATION_EXPORT const unsigned char SwiftWebSocketVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <SwiftWebSocket/PublicHeader.h>
-
-
