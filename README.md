@@ -4,14 +4,12 @@
 <a href="https://developer.apple.com/swift/"><img src="https://tidwall.github.io/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
 <a href="https://tidwall.github.io/SwiftWebSocket/docs/"><img src="https://tidwall.github.io/SwiftWebSocket/docs.png" alt="" width="65" height="20" border="0" /></a>
 
-Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library implemented in Swift.
+Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library for iOS and Mac OSX.
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
 **Important: Xcode 7.3 beta2 and Swift 2.2**  
 Xcode 7.3 and Swift 2.2 are still in beta. If you are developing in either environment then please use the `swift/2.2` branch. Once Xcode 7.3 goes live to the public the swift/2.2 branch will be merged with master.
-
-
 
 ## Features
 
@@ -24,7 +22,7 @@ Xcode 7.3 and Swift 2.2 are still in beta. If you are developing in either envir
 - Strict UTF-8 processing. 
 - `binaryType` property to choose between `[UInt8]` or `NSData` messages.
 - Zero asserts. All networking, stream, and protocol errors are routed through the `error` event.
-- Objective-C compatibility.
+- iOS / Objective-C support.
 
 ## Example
 
@@ -153,4 +151,4 @@ Josh Baker [@tidwall](http://twitter.com/tidwall)
 
 ## License
 
-The SwiftWebSocket source code is available under the MIT License.
+SwiftWebSocket source code is available under the MIT License.
