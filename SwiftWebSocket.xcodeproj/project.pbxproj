@@ -490,6 +490,8 @@
 		03957A421C5A71DC005CC1DB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
+				ENABLE_BITCODE = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -510,6 +512,8 @@
 		03957A431C5A71DC005CC1DB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
+				ENABLE_BITCODE = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -788,6 +792,7 @@
 				03957A431C5A71DC005CC1DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		03D1E6FD1B20897100AC49AC /* Build configuration list for PBXProject "SwiftWebSocket" */ = {
 			isa = XCConfigurationList;
