@@ -844,7 +844,6 @@ private class InnerWebSocket: Hashable {
                         size *= 2
                     }
                     if size > inputBytesSize {
-                        print("resize: \(size)")
                         let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
                         if ptr == nil {
                             throw WebSocketError.Memory
