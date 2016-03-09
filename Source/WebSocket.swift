@@ -684,13 +684,15 @@ private class InnerWebSocket: Hashable {
     var closeFinal = false
     var finalError : ErrorType?
     var exit = false
+    var more = true
     func step(){
         if exit {
             return
         }
         do {
-            try stepBuffers()
+            try stepBuffers(more)
             try stepStreamErrors()
+            more = false
             switch stage {
             case .OpenConn:
                 try openConn()
@@ -779,7 +781,7 @@ private class InnerWebSocket: Hashable {
                 manager.remove(self)
             }
         } catch WebSocketError.NeedMoreInput {
-
+            more = true
         } catch {
             if finalError != nil {
                 return
@@ -827,7 +829,7 @@ private class InnerWebSocket: Hashable {
             }
         }
     }
-    func stepBuffers() throws {
+    func stepBuffers(more: Bool) throws {
         if rd != nil {
             if stage != .CloseConn && rd.streamStatus == NSStreamStatus.AtEnd  {
                 if atEnd {
@@ -835,22 +837,25 @@ private class InnerWebSocket: Hashable {
                 }
                 throw WebSocketError.Network(atEndDetails)
             }
-            while rd.hasBytesAvailable {
-                var size = inputBytesSize
-                while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
-                    size *= 2
-                }
-                if size > inputBytesSize {
-                    let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
-                    if ptr == nil {
-                        throw WebSocketError.Memory
+            if more {
+                while rd.hasBytesAvailable {
+                    var size = inputBytesSize
+                    while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
+                        size *= 2
                     }
-                    inputBytes = ptr
-                    inputBytesSize = size
-                }
-                let n = rd.read(inputBytes+inputBytesStart+inputBytesLength, maxLength: inputBytesSize-inputBytesStart-inputBytesLength)
-                if n > 0 {
-                    inputBytesLength += n
+                    if size > inputBytesSize {
+                        print("resize: \(size)")
+                        let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
+                        if ptr == nil {
+                            throw WebSocketError.Memory
+                        }
+                        inputBytes = ptr
+                        inputBytesSize = size
+                    }
+                    let n = rd.read(inputBytes+inputBytesStart+inputBytesLength, maxLength: inputBytesSize-inputBytesStart-inputBytesLength)
+                    if n > 0 {
+                        inputBytesLength += n
+                    }
                 }
             }
         }
