@@ -270,7 +270,7 @@ private class UTF8 {
         if codepoint > 0x10FFFF || (codepoint >= 0xD800 && codepoint <= 0xDFFF) {
             throw WebSocketError.PayloadError("invalid codepoint: out of bounds")
         }
-        procd++
+        procd += 1
         if procd == count {
             if codepoint <= 0x7FF && count > 2 {
                 throw WebSocketError.PayloadError("invalid codepoint: overlong")
@@ -290,7 +290,7 @@ private class UTF8 {
         }
         if count == 0 {
             var ascii = true
-            for var i = 0; i < length; i++ {
+            for i in 0 ..< length {
                 if bytes[i] > 0x7F {
                     ascii = false
                     break
@@ -302,7 +302,7 @@ private class UTF8 {
                 return
             }
         }
-        for var i = 0; i < length; i++ {
+        for i in 0 ..< length {
             try append(bytes[i])
         }
         bcount += length
@@ -355,15 +355,15 @@ private class Delegate : NSObject, NSStreamDelegate {
 }
 
 
-@asmname("zlibVersion") private func zlibVersion() -> COpaquePointer
-@asmname("deflateInit2_") private func deflateInit2(strm : UnsafeMutablePointer<Void>, level : CInt, method : CInt, windowBits : CInt, memLevel : CInt, strategy : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("deflateInit_") private func deflateInit(strm : UnsafeMutablePointer<Void>, level : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("deflateEnd") private func deflateEnd(strm : UnsafeMutablePointer<Void>) -> CInt
-@asmname("deflate") private func deflate(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
-@asmname("inflateInit2_") private func inflateInit2(strm : UnsafeMutablePointer<Void>, windowBits : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("inflateInit_") private func inflateInit(strm : UnsafeMutablePointer<Void>, version : COpaquePointer, stream_size : CInt) -> CInt
-@asmname("inflate") private func inflateG(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
-@asmname("inflateEnd") private func inflateEndG(strm : UnsafeMutablePointer<Void>) -> CInt
+@_silgen_name("zlibVersion") private func zlibVersion() -> COpaquePointer
+@_silgen_name("deflateInit2_") private func deflateInit2(strm : UnsafeMutablePointer<Void>, level : CInt, method : CInt, windowBits : CInt, memLevel : CInt, strategy : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@_silgen_name("deflateInit_") private func deflateInit(strm : UnsafeMutablePointer<Void>, level : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@_silgen_name("deflateEnd") private func deflateEnd(strm : UnsafeMutablePointer<Void>) -> CInt
+@_silgen_name("deflate") private func deflate(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
+@_silgen_name("inflateInit2_") private func inflateInit2(strm : UnsafeMutablePointer<Void>, windowBits : CInt, version : COpaquePointer, stream_size : CInt) -> CInt
+@_silgen_name("inflateInit_") private func inflateInit(strm : UnsafeMutablePointer<Void>, version : COpaquePointer, stream_size : CInt) -> CInt
+@_silgen_name("inflate") private func inflateG(strm : UnsafeMutablePointer<Void>, flush : CInt) -> CInt
+@_silgen_name("inflateEnd") private func inflateEndG(strm : UnsafeMutablePointer<Void>) -> CInt
 
 private func zerror(res : CInt) -> ErrorType? {
     var err = ""
@@ -428,7 +428,7 @@ private class Inflater {
         var buf = buffer
         var bufsiz = bufferSize
         var buflen = 0
-        for var i = 0; i < 2; i++ {
+        for i in 0 ..< 2{
             if i == 0 {
                 strm.avail_in = CUnsignedInt(length)
                 strm.next_in = UnsafePointer<UInt8>(bufin)
@@ -439,7 +439,7 @@ private class Inflater {
                 strm.avail_in = CUnsignedInt(inflateEnd.count)
                 strm.next_in = UnsafePointer<UInt8>(inflateEnd)
             }
-            for ;; {
+            while true {
                 strm.avail_out = CUnsignedInt(bufsiz)
                 strm.next_out = buf
                 inflateG(&strm, flush: 0)
@@ -1037,7 +1037,7 @@ private class InnerWebSocket: Hashable {
             }
         }
         var keyb = [UInt32](count: 4, repeatedValue: 0)
-        for var i = 0; i < 4; i++ {
+        for i in 0 ..< 4 {
             keyb[i] = arc4random()
         }
         let rkey = NSData(bytes: keyb, length: 16).base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0))
@@ -1128,7 +1128,7 @@ private class InnerWebSocket: Hashable {
         let trim : (String)->(String) = { (text) in return text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())}
         let eqval : (String,String)->(String) = { (line, del) in return trim(line.componentsSeparatedByString(del)[1]) }
         let lines = header.componentsSeparatedByString("\r\n")
-        for var i = 0; i < lines.count; i++ {
+        for i in 0 ..< lines.count {
             let line = trim(lines[i])
             if i == 0  {
                 if !line.hasPrefix("HTTP/1.1 101"){
@@ -1204,7 +1204,7 @@ private class InnerWebSocket: Hashable {
                 throw WebSocketError.NeedMoreInput
             }
             let b = bytes.memory
-            bytes++
+            bytes += 1
             return b
         }
         var length : Int {
@@ -1233,7 +1233,7 @@ private class InnerWebSocket: Hashable {
     var fragStateHeaderLen = 0
     var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
     var reusedPayload = Payload()
-    func readFrameFragment(var leader : Frame?) throws -> Frame {
+    func readFrameFragment(leader : Frame?) throws -> Frame {
         var inflate : Bool
         var len : Int
         var fin = false
@@ -1243,6 +1243,7 @@ private class InnerWebSocket: Hashable {
         var payload : Payload
         var statusCode : UInt16
         var headerLen : Int
+        var leader = leader
 
         let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
         if fragStateSaved {
@@ -1296,9 +1297,11 @@ private class InnerWebSocket: Hashable {
                     throw WebSocketError.ProtocolError("invalid payload size for control frame")
                 }
                 len64 = 0
-                for var i = bcount-1; i >= 0; i-- {
+                var i = bcount-1
+                while i >= 0 {
                     b = try reader.readByte()
                     len64 += Int64(b) << Int64(i*8)
+                    i -= 1
                 }
             }
             len = Int(len64)
@@ -1415,7 +1418,8 @@ private class InnerWebSocket: Hashable {
                 // b |= 0x40
             }
         }
-        head[hlen++] = b | f.code.rawValue
+        head[hlen] = b | f.code.rawValue
+        hlen += 1
         var payloadBytes : [UInt8]
         var payloadLen = 0
         if f.utf8.text != "" {
@@ -1433,36 +1437,48 @@ private class InnerWebSocket: Hashable {
             usingStatusCode = true
         }
         if payloadLen < 126 {
-            head[hlen++] = 0x80 | UInt8(payloadLen)
+            head[hlen] = 0x80 | UInt8(payloadLen)
+            hlen += 1
         } else if payloadLen <= 0xFFFF {
-            head[hlen++] = 0x80 | 126
-            for var i = 1; i >= 0; i-- {
-                head[hlen++] = UInt8((UInt16(payloadLen) >> UInt16(i*8)) & 0xFF)
+            head[hlen] = 0x80 | 126
+            hlen += 1
+            var i = 1
+            while i >= 0 {
+                head[hlen] = UInt8((UInt16(payloadLen) >> UInt16(i*8)) & 0xFF)
+                hlen += 1
+                i -= 1
             }
         } else {
-            head[hlen++] = UInt8((0x1 << 7) + 127)
-            for var i = 7; i >= 0; i-- {
-                head[hlen++] = UInt8((UInt64(payloadLen) >> UInt64(i*8)) & 0xFF)
+            head[hlen] = UInt8((0x1 << 7) + 127)
+            hlen += 1
+            var i = 7
+            while i >= 0 {
+                head[hlen] = UInt8((UInt64(payloadLen) >> UInt64(i*8)) & 0xFF)
+                hlen += 1
+                i -= 1
             }
         }
         let r = arc4random()
         var maskBytes : [UInt8] = [UInt8(r >> 0 & 0xFF), UInt8(r >> 8 & 0xFF), UInt8(r >> 16 & 0xFF), UInt8(r >> 24 & 0xFF)]
-        for var i = 0; i < 4; i++ {
-            head[hlen++] = maskBytes[i]
+        for i in 0 ..< 4 {
+            head[hlen] = maskBytes[i]
+            hlen += 1
         }
         if payloadLen > 0 {
             if usingStatusCode {
                 var sc = [UInt8(f.statusCode >> 8 & 0xFF), UInt8(f.statusCode >> 0 & 0xFF)]
-                for var i = 0; i < 2; i++ {
+                for i in 0 ..< 2 {
                     sc[i] ^= maskBytes[i % 4]
                 }
-                head[hlen++] = sc[0]
-                head[hlen++] = sc[1]
-                for var i = 2; i < payloadLen; i++ {
+                head[hlen] = sc[0]
+                hlen += 1
+                head[hlen] = sc[1]
+                hlen += 1
+                for i in 2 ..< payloadLen {
                     payloadBytes[i-2] ^= maskBytes[i % 4]
                 }
             } else {
-                for var i = 0; i < payloadLen; i++ {
+                for i in 0 ..< payloadLen {
                     payloadBytes[i] ^= maskBytes[i % 4]
                 }
             }
@@ -1556,7 +1572,7 @@ private class Manager {
         pthread_cond_init(&cond, nil)
         dispatch_async(dispatch_queue_create("SwiftWebSocket", nil)) {
             var wss : [InnerWebSocket] = []
-            for ;; {
+            while true {
                 var wait = true
                 wss.removeAll()
                 pthread_mutex_lock(&self.mutex)
@@ -1619,7 +1635,8 @@ private class Manager {
     func nextId() -> Int {
         pthread_mutex_lock(&mutex)
         defer { pthread_mutex_unlock(&mutex) }
-        return ++_nextId
+        _nextId += 1
+        return _nextId
     }
 }
 
