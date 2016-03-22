@@ -428,7 +428,7 @@ private class Inflater {
         var buf = buffer
         var bufsiz = bufferSize
         var buflen = 0
-        for i in 0 ..< 2 {
+        for i in 0 ..< 2{
             if i == 0 {
                 strm.avail_in = CUnsignedInt(length)
                 strm.next_in = UnsafePointer<UInt8>(bufin)
@@ -684,13 +684,15 @@ private class InnerWebSocket: Hashable {
     var closeFinal = false
     var finalError : ErrorType?
     var exit = false
+    var more = true
     func step(){
         if exit {
             return
         }
         do {
-            try stepBuffers()
+            try stepBuffers(more)
             try stepStreamErrors()
+            more = false
             switch stage {
             case .OpenConn:
                 try openConn()
@@ -779,7 +781,7 @@ private class InnerWebSocket: Hashable {
                 manager.remove(self)
             }
         } catch WebSocketError.NeedMoreInput {
-
+            more = true
         } catch {
             if finalError != nil {
                 return
@@ -827,7 +829,7 @@ private class InnerWebSocket: Hashable {
             }
         }
     }
-    func stepBuffers() throws {
+    func stepBuffers(more: Bool) throws {
         if rd != nil {
             if stage != .CloseConn && rd.streamStatus == NSStreamStatus.AtEnd  {
                 if atEnd {
@@ -835,22 +837,24 @@ private class InnerWebSocket: Hashable {
                 }
                 throw WebSocketError.Network(atEndDetails)
             }
-            while rd.hasBytesAvailable {
-                var size = inputBytesSize
-                while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
-                    size *= 2
-                }
-                if size > inputBytesSize {
-                    let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
-                    if ptr == nil {
-                        throw WebSocketError.Memory
+            if more {
+                while rd.hasBytesAvailable {
+                    var size = inputBytesSize
+                    while size-(inputBytesStart+inputBytesLength) < windowBufferSize {
+                        size *= 2
                     }
-                    inputBytes = ptr
-                    inputBytesSize = size
-                }
-                let n = rd.read(inputBytes+inputBytesStart+inputBytesLength, maxLength: inputBytesSize-inputBytesStart-inputBytesLength)
-                if n > 0 {
-                    inputBytesLength += n
+                    if size > inputBytesSize {
+                        let ptr = UnsafeMutablePointer<UInt8>(realloc(inputBytes, size))
+                        if ptr == nil {
+                            throw WebSocketError.Memory
+                        }
+                        inputBytes = ptr
+                        inputBytesSize = size
+                    }
+                    let n = rd.read(inputBytes+inputBytesStart+inputBytesLength, maxLength: inputBytesSize-inputBytesStart-inputBytesLength)
+                    if n > 0 {
+                        inputBytesLength += n
+                    }
                 }
             }
         }
@@ -975,7 +979,9 @@ private class InnerWebSocket: Hashable {
         let req = request.mutableCopy() as! NSMutableURLRequest
         req.setValue("websocket", forHTTPHeaderField: "Upgrade")
         req.setValue("Upgrade", forHTTPHeaderField: "Connection")
-        req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
+        if req.valueForHTTPHeaderField("User-Agent") == nil {
+                req.setValue("SwiftWebSocket", forHTTPHeaderField: "User-Agent")
+        }
         req.setValue("13", forHTTPHeaderField: "Sec-WebSocket-Version")
 
         if req.URL == nil || req.URL!.host == nil{
@@ -1139,10 +1145,11 @@ private class InnerWebSocket: Hashable {
                         value = trim(line.substringFromIndex(r.endIndex))
                     }
                 }
-                switch key {
-                case "Sec-WebSocket-SubProtocol":
+                
+                switch key.lowercaseString {
+                case "sec-websocket-subprotocol":
                     privateSubProtocol = value
-                case "Sec-WebSocket-Extensions":
+                case "sec-websocket-extensions":
                     let parts = value.componentsSeparatedByString(";")
                     for p in parts {
                         let part = trim(p)
@@ -1197,7 +1204,7 @@ private class InnerWebSocket: Hashable {
                 throw WebSocketError.NeedMoreInput
             }
             let b = bytes.memory
-            bytes = bytes.successor()
+            bytes += 1
             return b
         }
         var length : Int {
@@ -1226,7 +1233,7 @@ private class InnerWebSocket: Hashable {
     var fragStateHeaderLen = 0
     var buffer = [UInt8](count: windowBufferSize, repeatedValue: 0)
     var reusedPayload = Payload()
-    func readFrameFragment(leaderIn : Frame?) throws -> Frame {
+    func readFrameFragment(leader : Frame?) throws -> Frame {
         var inflate : Bool
         var len : Int
         var fin = false
@@ -1236,7 +1243,7 @@ private class InnerWebSocket: Hashable {
         var payload : Payload
         var statusCode : UInt16
         var headerLen : Int
-        var leader = leaderIn
+        var leader = leader
 
         let reader = ByteReader(bytes: inputBytes+inputBytesStart, length: inputBytesLength)
         if fragStateSaved {
@@ -1291,7 +1298,7 @@ private class InnerWebSocket: Hashable {
                 }
                 len64 = 0
                 var i = bcount-1
-                while i >= 0  {
+                while i >= 0 {
                     b = try reader.readByte()
                     len64 += Int64(b) << Int64(i*8)
                     i -= 1

@@ -1,13 +1,20 @@
 package main
 
 import (
+	"crypto/rand"
 	"flag"
 	"fmt"
-	"github.com/gorilla/websocket"
+	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
+
+const rapidSize = 250 * 1024
+const rapidFPS = 25
 
 var port int
 var crt, key string
@@ -21,7 +28,7 @@ func main() {
 	flag.StringVar(&crt, "crt", "", "ssl cert file")
 	flag.StringVar(&key, "key", "", "ssl key file")
 	flag.StringVar(&host, "host", "localhost", "listening server host")
-	flag.StringVar(&_case, "case", "", "choose a specialized case, (hang)")
+	flag.StringVar(&_case, "case", "", "choose a specialized case, (hang,rapid)")
 	flag.IntVar(&port, "port", 6789, "listening server port")
 	flag.Parse()
 
@@ -37,8 +44,13 @@ func main() {
 	http.HandleFunc("/echo", socket)
 	log.Printf("Running server on %s:%d\n", host, port)
 	switch _case {
+	default:
+		log.Fatalf("case: %s is unknown", _case)
+	case "":
 	case "hang":
 		log.Printf("case: %s (long connection hanging)\n", _case)
+	case "rapid":
+		log.Printf("case: %s (rapid (250 fps) large (2048 bytes) random text messages)\n", _case)
 	}
 	log.Printf("ws%s://%s%s/echo      (echo socket)\n", s, host, ports)
 	log.Printf("http%s://%s%s/client  (javascript test client)\n", s, host, ports)
@@ -69,6 +81,36 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		ws.Close()
 		log.Print("connection closed")
 	}()
+	var mu sync.Mutex
+	go func() {
+		defer func() {
+			ws.Close()
+		}()
+		msg := make([]byte, rapidSize)
+		b := make([]byte, 2048)
+		for {
+			time.Sleep(time.Second / rapidFPS)
+			i := 0
+		outer:
+			for {
+				rand.Read(b)
+				for _, c := range b {
+					if i == len(msg) {
+						break outer
+					}
+					msg[i] = (c % (126 - 32)) + 32 // ascii #32-126
+					i++
+				}
+			}
+			copy(msg, []byte(time.Now().String()+"\n"))
+			mu.Lock()
+			if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
+				mu.Unlock()
+				return
+			}
+			mu.Unlock()
+		}
+	}()
 	for {
 		msgt, msg, err := ws.ReadMessage()
 		if err != nil {
@@ -76,19 +118,43 @@ func socket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Print("rcvd: '" + string(msg) + "'")
+		mu.Lock()
 		ws.WriteMessage(msgt, msg)
+		mu.Unlock()
 	}
 }
 
 func client(w http.ResponseWriter, r *http.Request) {
 	log.Print("client request")
 	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`
+	if _case != "" {
+		fmt.Fprintf(w, "<div style='color:green'>["+_case+"]</div>")
+	}
+
+	io.WriteString(w, `
 		<pre id="out"></pre>
 		<script>
 		var console={log:function(s){document.getElementById("out").innerHTML+=s+"\n";}};
 		var messageNum = 0;
-		var ws = new WebSocket("` + fmt.Sprintf("ws%s://%s%s/echo", s, host, ports) + `")
+		var ws = new WebSocket("`+fmt.Sprintf("ws%s://%s%s/echo", s, host, ports)+`")
+        ws.onerror = function(ev){
+            console.log("error " + ev)
+        }
+        ws.onclose = function(){
+            console.log("close")
+        }
+	`)
+	if _case == "rapid" {
+		io.WriteString(w, `
+        ws.onopen = function(){
+        	console.log("opened")
+        }
+        ws.onmessage = function(msg){
+        	document.getElementById("out").innerHTML = "recv: [" + msg.data.length + " bytes] " + msg.data.slice(0, msg.data.indexOf('\n')) + "\n"
+        }
+		`)
+	} else {
+		io.WriteString(w, `
 		function send(){
 			messageNum++;
             var msg = messageNum + ": " + new Date()
@@ -99,12 +165,6 @@ func client(w http.ResponseWriter, r *http.Request) {
         	console.log("opened")
             send()
         }
-        ws.onclose = function(){
-            console.log("close")
-        }
-        ws.onerror = function(ev){
-            console.log("error " + ev)
-        }
         ws.onmessage = function(msg){
             console.log("recv: " + msg.data)
             if (messageNum == 10) {
@@ -113,6 +173,8 @@ func client(w http.ResponseWriter, r *http.Request) {
                 send()
             }
         }
-		</script>
-	`))
+		`)
+	}
+	io.WriteString(w, `</script>`)
+
 }

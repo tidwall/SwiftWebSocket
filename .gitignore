@@ -29,7 +29,6 @@ xcuserdata
 *.hmap
 *.ipa
 
-docs/
+docsb/
 .build/
-
 
