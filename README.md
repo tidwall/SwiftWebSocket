@@ -9,7 +9,7 @@ Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client li
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
 **Important: Xcode 7.2 and Swift 2.0 Users**  
-If you are developing in either environment then please use the `swift/2.0` branch.
+If you are developing in Xcode 7.2 or Swift 2.0 then please use the `swift/2.0` branch.
 
 ## Features
 
