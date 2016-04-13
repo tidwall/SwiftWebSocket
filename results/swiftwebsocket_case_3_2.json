@@ -9,7 +9,7 @@
    "description": "Send small text message, then send again with <b>RSV = 2</b>, then send Ping.",
    "droppedByMe": true,
    "duration": 1,
-   "expectation": "Echo for first message is received, but then connection is failed immediately, since RSV must be 0, when no extension defining RSV meaning has been negoiated. The Pong is not received.",
+   "expectation": "Echo for first message is received, but then connection is failed immediately, since RSV must be 0, when no extension defining RSV meaning has been negotiated. The Pong is not received.",
    "expected": {
       "NON-STRICT": [],
       "OK": [
@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=29&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=29&agent=SwiftWebSocket\r\nSec-WebSocket-Key: YIAybN16XA6a+xNz5RklTQ==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ii9sOka0FIDCHLhyaIX0epyjctU=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=29&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=29&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: 0OByIxLViyHVgKjLvyRmiA==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: WsATRjGo/EdQSDpx9nlwUy/vUWg=\r\n\r\n",
    "id": "3.2",
    "isServer": true,
    "localCloseCode": 1000,
@@ -52,11 +52,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "19": 1,
-      "22": 1,
+      "41": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:44.393Z",
+   "started": "2016-04-13T16:10:15.575Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -79,7 +78,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3239266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3239266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -163,8 +162,8 @@
       [
          "RO",
          [
-            19,
-            "818d8bcfe786c3aa8beae4e3c7f1e4bd8be2aa"
+            41,
+            "818daa66de22e203b24ec54afe55c514b2468b8890f04599a9f3afc9db9f31f6ca9f29b9cc8237f6db"
          ]
       ],
       [
@@ -177,14 +176,7 @@
          true,
          0,
          true,
-         "8bcfe786"
-      ],
-      [
-         "RO",
-         [
-            22,
-            "88907c55361f7fbf666d1321597c1339167a0e27596d"
-         ]
+         "aa66de22"
       ],
       [
          "RF",
@@ -196,7 +188,7 @@
          true,
          0,
          true,
-         "7c55361f"
+         "f04599a9"
       ],
       [
          "TF",

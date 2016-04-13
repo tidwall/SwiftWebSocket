@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 16, auto-fragment to 0 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(True, 8), (True, 0), (False, 0)]",
    "droppedByMe": true,
-   "duration": 229,
+   "duration": 203,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 60 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=504&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=504&agent=SwiftWebSocket\r\nSec-WebSocket-Key: a9eggW1XvPDPqQbtj3OxfQ==\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; server_no_context_takeover; client_max_window_bits; server_max_window_bits=8\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: VIbfkJIQrGmWQzALfeiV7NMsStI=\r\nSec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover; server_max_window_bits=8; client_no_context_takeover; client_max_window_bits=8\r\n\r\n",
+   "httpRequest": "GET /runCase?case=504&agent=SwiftWebSocket HTTP/1.1\r\nSec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; server_no_context_takeover; client_max_window_bits; server_max_window_bits=8\r\nUpgrade: websocket\r\nUser-Agent: SwiftWebSocket\r\nOrigin: ws://localhost:9001/runCase?case=504&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nSec-WebSocket-Key: 8fAPfta6u0yVMElFflj08g==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: SDBZoxKIiilwkFrLB57WwS9iiZY=\r\nSec-WebSocket-Extensions: permessage-deflate; server_no_context_takeover; server_max_window_bits=8; client_no_context_takeover; client_max_window_bits=8\r\n\r\n",
    "id": "13.7.1",
    "isServer": true,
    "localCloseCode": 1000,
@@ -37,12 +37,11 @@
       "8": 1
    },
    "rxOctetStats": {
-      "6": 62,
-      "16": 61,
-      "22": 939,
+      "6": 1,
+      "22": 1000,
       "437": 1
    },
-   "started": "2015-05-26T20:40:29.306Z",
+   "started": "2016-04-13T16:19:21.370Z",
    "trafficStats": {
       "incomingCompressionRatio": 1.0,
       "incomingOctetsAppLevel": 16000,
@@ -51,13 +50,13 @@
       "incomingWebSocketFrames": 1000,
       "incomingWebSocketMessages": 1000,
       "incomingWebSocketOverhead": 0.375,
-      "outgoingCompressionRatio": 0.992625,
+      "outgoingCompressionRatio": 0.9851875,
       "outgoingOctetsAppLevel": 16000,
-      "outgoingOctetsWebSocketLevel": 15882,
-      "outgoingOctetsWireLevel": 17882,
+      "outgoingOctetsWebSocketLevel": 15763,
+      "outgoingOctetsWireLevel": 17763,
       "outgoingWebSocketFrames": 1000,
       "outgoingWebSocketMessages": 1000,
-      "outgoingWebSocketOverhead": 0.1259287243420224,
+      "outgoingWebSocketOverhead": 0.12687940112922666,
       "preopenIncomingOctetsWireLevel": 437,
       "preopenOutgoingOctetsWireLevel": 360
    },
@@ -67,14 +66,15 @@
    },
    "txOctetStats": {
       "4": 1,
-      "13": 13,
-      "14": 163,
-      "15": 64,
-      "16": 42,
+      "12": 10,
+      "13": 6,
+      "14": 179,
+      "15": 58,
+      "16": 52,
       "17": 111,
-      "18": 67,
-      "19": 94,
-      "20": 446,
+      "18": 57,
+      "19": 96,
+      "20": 431,
       "360": 1
    },
    "wasClean": true,
@@ -87,7 +87,7 @@
          "RO",
          [
             437,
-            "474554202f72756e436173653f636173653d353034266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d353034266167656e743d5377696674576562536f636b657420485454502f312e310d0a5365632d576562536f636b ..."
          ]
       ],
       [
@@ -136,7 +136,7 @@
          "RO",
          [
             6,
-            "8880bc0ac588"
+            "8880f479e19c"
          ]
       ],
       [
@@ -149,7 +149,7 @@
          true,
          0,
          true,
-         "bc0ac588"
+         "f479e19c"
       ]
    ]
 }

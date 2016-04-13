@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=38&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=38&agent=SwiftWebSocket\r\nSec-WebSocket-Key: tYg/holoiVsiJah4ddO3og==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: RiZDdeQUqwxjo89/SMwIDZUswhg=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=38&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=38&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: zvSeHMDdGJC2yglR8XE7lQ==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: DtgUtK/nxnoUbRXSLRSwboG24wY=\r\n\r\n",
    "id": "4.1.4",
    "isServer": true,
    "localCloseCode": 1000,
@@ -52,11 +52,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "14": 1,
-      "27": 1,
+      "41": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:44.453Z",
+   "started": "2016-04-13T16:10:15.737Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -80,7 +79,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3338266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3338266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -164,8 +163,8 @@
       [
          "RO",
          [
-            27,
-            "818d828d229fcae84ef3eda102e8edff4efba38890df44fe56dcae"
+            41,
+            "818db5cc3c22fda9504edae01c55dabe504694889047dd82e64437d29428a9ed8528b1a28335afed94"
          ]
       ],
       [
@@ -178,14 +177,7 @@
          true,
          0,
          true,
-         "828d229f"
-      ],
-      [
-         "RO",
-         [
-            14,
-            "ae24b0309135b028de33ad369124"
-         ]
+         "b5cc3c22"
       ],
       [
          "RF",
@@ -197,7 +189,7 @@
          true,
          0,
          true,
-         "df44fe56"
+         "47dd82e6"
       ],
       [
          "TF",

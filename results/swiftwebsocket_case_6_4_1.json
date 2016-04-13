@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send invalid UTF-8 text message in 3 fragments (frames).\nFirst frame payload is valid, then wait, then 2nd frame which contains the payload making the sequence invalid, then wait, then 3rd frame with rest.\nNote that PART1 and PART3 are valid UTF-8 in themselves, PART2 is a 0x110000 encoded as in the UTF-8 integer encoding scheme, but the codepoint is invalid (out of range).\n<br><br>MESSAGE PARTS:<br>\nPART1 = cebae1bdb9cf83cebcceb5<br>\nPART2 = f4908080<br>\nPART3 = 656469746564<br>\n",
    "droppedByMe": true,
-   "duration": 1002,
+   "duration": 1001,
    "expectation": "The first frame is accepted, we expect to timeout on the first wait. The 2nd frame should be rejected immediately (fail fast on UTF-8). If we timeout, we expect the connection is failed at least then, since the complete message payload is not valid UTF-8.",
    "expected": {
       "NON-STRICT": [
@@ -37,8 +37,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=74&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=74&agent=SwiftWebSocket\r\nSec-WebSocket-Key: 7sH/JrwQIQtiKAOiuF6ywg==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: kAE2fD5Sp2cwhbayoFu6fRiWfGs=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=74&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=74&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: QbJbpGmqOyJJdIaAMkirHg==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: o+inu5yh3n4g35CzQ8Heum35huY=\r\n\r\n",
    "id": "6.4.1",
    "isServer": true,
    "localCloseCode": 1000,
@@ -50,7 +50,7 @@
       ]
    ],
    "remoteCloseCode": 1007,
-   "remoteCloseReason": "Invalid frame payload data",
+   "remoteCloseReason": "Payload error",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -59,10 +59,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "34": 1,
+      "21": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:46.684Z",
+   "started": "2016-04-13T16:10:19.547Z",
    "trafficStats": null,
    "txFrameStats": {
       "0": 1,
@@ -85,7 +85,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3734266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3734266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -157,21 +157,21 @@
       [
          "RO",
          [
-            34,
-            "889cbc99a9b9bf76e0d7caf8c5d0d8b9cfcbddf4cc99ccf8d0d5d3f8cd99d8f8ddd8"
+            21,
+            "888fcb072618c8e87679b26b4979af27436ab96854"
          ]
       ],
       [
          "RF",
          [
-            28,
-            "0x03ef496e76616c6964206672616d65207061796c6f61642064617461"
+            15,
+            "0x03ef5061796c6f6164206572726f72"
          ],
          8,
          true,
          0,
          true,
-         "bc99a9b9"
+         "cb072618"
       ],
       [
          "TF",

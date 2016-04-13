@@ -21,8 +21,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=62&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=62&agent=SwiftWebSocket\r\nSec-WebSocket-Key: 1kF6CfGXjzpi6T5EfyZX/g==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: +0IqZ88H9/CnuS16PUhGQ+XpqYo=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=62&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=62&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: 8+mxK8cJV+cFTFC7FNCDDw==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: gLjeN22XjFedLpkXyukPus8rTEA=\r\n\r\n",
    "id": "5.18",
    "isServer": true,
    "localCloseCode": 1000,
@@ -41,7 +41,7 @@
       "22": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:44.600Z",
+   "started": "2016-04-13T16:10:17.288Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -62,7 +62,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3632266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3632266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -125,7 +125,7 @@
          "RO",
          [
             22,
-            "8890c0553f37c3bf6f45af215054af391f52b2275045"
+            "8890a3d0f998a03aa9eacca496fbccbcd9fdd1a296ea"
          ]
       ],
       [
@@ -138,7 +138,7 @@
          true,
          0,
          true,
-         "c0553f37"
+         "a3d0f998"
       ],
       [
          "TF",

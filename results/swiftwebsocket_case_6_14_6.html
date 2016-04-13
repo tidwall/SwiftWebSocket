@@ -202,7 +202,7 @@ pre.wirelog_tcp_closed_by_peer {color: #fff; margin: 0; background-color: #000; 
       <center><a href="http://autobahn.ws/testsuite" title="Autobahn WebSockets Testsuite"><img src="http://autobahn.ws/static/img/ws_protocol_test_report.png"          border="0" width="820" height="46" alt="Autobahn WebSockets Testsuite Report"></img></a></center>
       <center><a href="http://autobahn.ws"           title="Autobahn WebSockets">          <img src="http://autobahn.ws/static/img/ws_protocol_test_report_autobahn.png" border="0" width="300" height="68" alt="Autobahn WebSockets">                 </img></a></center>
       <br/>
-      <p class="case case_ok">SwiftWebSocket - <span style="font-size: 1.3em;"><b>Case 6.14.6</b></span> : Pass - <span style="font-size: 0.9em;"><b>1</b> ms @ 2015-05-26T20:31:51.036Z</a></p>
+      <p class="case case_ok">SwiftWebSocket - <span style="font-size: 1.3em;"><b>Case 6.14.6</b></span> : Pass - <span style="font-size: 0.9em;"><b>1</b> ms @ 2016-04-13T16:10:25.245Z</a></p>
       <p class="case_text_block case_desc"><b>Case Description</b><br/><br/>Send a text message with payload which is not valid UTF-8 in one fragment.<br><br>Payload: 0xdf</p>
       <p class="case_text_block case_expect"><b>Case Expectation</b><br/><br/>The connection is failed immediately, since the payload is not valid UTF-8.</p>
 
@@ -215,19 +215,19 @@ pre.wirelog_tcp_closed_by_peer {color: #fff; margin: 0; background-color: #000; 
       <br/><hr/>
       <h2>Opening Handshake</h2>
       <pre class="http_dump">GET /runCase?case=130&agent=SwiftWebSocket HTTP/1.1
-User-Agent: SwiftWebSocket
-Sec-WebSocket-Version: 13
-Upgrade: websocket
-Connection: Upgrade
 Host: localhost:9001
 Origin: ws://localhost:9001/runCase?case=130&agent=SwiftWebSocket
-Sec-WebSocket-Key: 7FMNnOIVGC2faN6YeEBeVw==</pre>
+Sec-WebSocket-Version: 13
+User-Agent: SwiftWebSocket
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: EIsLrskmxy+ehatm/qRXfw==</pre>
       <pre class="http_dump">HTTP/1.1 101 Switching Protocols
-Server: AutobahnTestSuite/0.7.1-0.10.4
-X-Powered-By: AutobahnPython/0.10.4
+Server: AutobahnTestSuite/0.7.2-0.10.9
+X-Powered-By: AutobahnPython/0.10.9
 Upgrade: WebSocket
 Connection: Upgrade
-Sec-WebSocket-Accept: OWMzbiFnDU1VNYX6ALrSzIMXEME=</pre>
+Sec-WebSocket-Accept: lSHxn19Kfg64M3TsFc+NQqdxP5A=</pre>
       <br/><hr/>
       <h2>Closing Behavior</h2>
       <table>
@@ -244,15 +244,15 @@ Sec-WebSocket-Accept: OWMzbiFnDU1VNYX6ALrSzIMXEME=</pre>
          <tr class="stats_row"><td>localCloseCode</td><td class="left">1000</td><td class="left">The close code I sent in close frame (if any).</td></tr>
          <tr class="stats_row"><td>localCloseReason</td><td class="left">None</td><td class="left">The close reason I sent in close frame (if any).</td></tr>
          <tr class="stats_row"><td>remoteCloseCode</td><td class="left">1007</td><td class="left">The close code the peer sent me in close frame (if any).</td></tr>
-         <tr class="stats_row"><td>remoteCloseReason</td><td class="left">Invalid frame payload data</td><td class="left">The close reason the peer sent me in close frame (if any).</td></tr>
+         <tr class="stats_row"><td>remoteCloseReason</td><td class="left">Payload error</td><td class="left">The close reason the peer sent me in close frame (if any).</td></tr>
       </table>      <br/><hr/>
       <h2>Wire Statistics</h2>
       <h3>Octets Received by Chop Size</h3>
       <table>
          <tr class="stats_header"><td>Chop Size</td><td>Count</td><td>Octets</td></tr>
-         <tr class="stats_row"><td>34</td><td>1</td><td>34</td></tr>
+         <tr class="stats_row"><td>21</td><td>1</td><td>21</td></tr>
          <tr class="stats_row"><td>285</td><td>1</td><td>285</td></tr>
-         <tr class="stats_total"><td>Total</td><td>2</td><td>319</td></tr>
+         <tr class="stats_total"><td>Total</td><td>2</td><td>306</td></tr>
       </table>
       <h3>Octets Transmitted by Chop Size</h3>
       <table>
@@ -279,16 +279,16 @@ Sec-WebSocket-Accept: OWMzbiFnDU1VNYX6ALrSzIMXEME=</pre>
       <h2>Wire Log</h2>
       <div id="wirelog">
          <pre class="wirelog_rx_octets">000 RX OCTETS: 474554202f72756e436173653f636173653d313330266167656e743d5377696674576562536f636b657420485454502f312e</pre>
-         <pre class="wirelog_rx_octets">               310d0a557365722d4167656e743a ...</pre>
+         <pre class="wirelog_rx_octets">               310d0a486f73743a206c6f63616c ...</pre>
          <pre class="wirelog_tx_octets">001 TX OCTETS: 485454502f312e312031303120537769746368696e672050726f746f636f6c730d0a5365727665723a204175746f6261686e</pre>
          <pre class="wirelog_tx_octets">               5465737453756974652f302e372e ...</pre>
          <pre class="wirelog_tx_frame">002 TX FRAME : OPCODE=1, FIN=True, RSV=0, PAYLOAD-LEN=1, MASK=None, PAYLOAD-REPEAT-LEN=None, CHOPSIZE=None, SYNC=False</pre>
          <pre class="wirelog_tx_frame">               0xdf</pre>
          <pre class="wirelog_tx_octets">003 TX OCTETS: 8101df</pre>
          <pre class="wirelog_kill_after">004 FAIL CONNECTION AFTER 0.500000 sec</pre>
-         <pre class="wirelog_rx_octets">005 RX OCTETS: 889c65bcda616653930f13ddb608019cbc1304d1bf4115dda30d0addbe4101ddae00</pre>
-         <pre class="wirelog_rx_frame">006 RX FRAME : OPCODE=8, FIN=True, RSV=0, PAYLOAD-LEN=28, MASKED=True, MASK=3635626364613631</pre>
-         <pre class="wirelog_rx_frame">               0x03ef496e76616c6964206672616d65207061796c6f61642064617461</pre>
+         <pre class="wirelog_rx_octets">005 RX OCTETS: 888f38f3237c3b1c731d419f4c1d5cd3460e4a9c51</pre>
+         <pre class="wirelog_rx_frame">006 RX FRAME : OPCODE=8, FIN=True, RSV=0, PAYLOAD-LEN=15, MASKED=True, MASK=3338663332333763</pre>
+         <pre class="wirelog_rx_frame">               0x03ef5061796c6f6164206572726f72</pre>
          <pre class="wirelog_tx_frame">007 TX FRAME : OPCODE=8, FIN=True, RSV=0, PAYLOAD-LEN=2, MASK=None, PAYLOAD-REPEAT-LEN=None, CHOPSIZE=None, SYNC=False</pre>
          <pre class="wirelog_tx_frame">               0x03e8</pre>
          <pre class="wirelog_tx_octets">008 TX OCTETS: 880203e8</pre>

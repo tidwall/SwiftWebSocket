@@ -3,7 +3,7 @@
       "1.1.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_1_1.json"
       },
@@ -38,7 +38,7 @@
       "1.1.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3,
+         "duration": 2,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_1_6.json"
       },
@@ -59,7 +59,7 @@
       "1.2.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 2,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_2_1.json"
       },
@@ -94,21 +94,21 @@
       "1.2.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 23,
+         "duration": 24,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_2_6.json"
       },
       "1.2.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 23,
+         "duration": 24,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_2_7.json"
       },
       "1.2.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 28,
+         "duration": 27,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_1_2_8.json"
       },
@@ -122,1533 +122,1533 @@
       "12.1.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 247,
+         "duration": 191,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_1.json"
       },
       "12.1.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3438,
+         "duration": 2913,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_10.json"
       },
       "12.1.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 426,
+         "duration": 460,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_11.json"
       },
       "12.1.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 684,
+         "duration": 713,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_12.json"
       },
       "12.1.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1118,
+         "duration": 1156,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_13.json"
       },
       "12.1.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2058,
+         "duration": 2024,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_14.json"
       },
       "12.1.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3869,
+         "duration": 3741,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_15.json"
       },
       "12.1.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3635,
+         "duration": 3409,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_16.json"
       },
       "12.1.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3820,
+         "duration": 3201,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_17.json"
       },
       "12.1.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3377,
+         "duration": 2865,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_18.json"
       },
       "12.1.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 229,
+         "duration": 200,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_2.json"
       },
       "12.1.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 238,
+         "duration": 197,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_3.json"
       },
       "12.1.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 249,
+         "duration": 218,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_4.json"
       },
       "12.1.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 332,
+         "duration": 292,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_5.json"
       },
       "12.1.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 383,
+         "duration": 408,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_6.json"
       },
       "12.1.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 546,
+         "duration": 621,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_7.json"
       },
       "12.1.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 924,
+         "duration": 969,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_8.json"
       },
       "12.1.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1694,
+         "duration": 1637,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_1_9.json"
       },
       "12.2.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 247,
+         "duration": 172,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_1.json"
       },
       "12.2.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7998,
+         "duration": 6861,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_10.json"
       },
       "12.2.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1322,
+         "duration": 1375,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_11.json"
       },
       "12.2.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2270,
+         "duration": 2332,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_12.json"
       },
       "12.2.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4235,
+         "duration": 4069,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_13.json"
       },
       "12.2.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8289,
+         "duration": 7754,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_14.json"
       },
       "12.2.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 16461,
+         "duration": 17054,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_15.json"
       },
       "12.2.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 10097,
+         "duration": 9680,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_16.json"
       },
       "12.2.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8451,
+         "duration": 7314,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_17.json"
       },
       "12.2.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7799,
+         "duration": 6752,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_18.json"
       },
       "12.2.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 246,
+         "duration": 182,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_2.json"
       },
       "12.2.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 271,
+         "duration": 215,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_3.json"
       },
       "12.2.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 359,
+         "duration": 311,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_4.json"
       },
       "12.2.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 505,
+         "duration": 510,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_5.json"
       },
       "12.2.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 858,
+         "duration": 738,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_6.json"
       },
       "12.2.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1331,
+         "duration": 1124,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_7.json"
       },
       "12.2.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2143,
+         "duration": 1908,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_8.json"
       },
       "12.2.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4075,
+         "duration": 3541,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_2_9.json"
       },
       "12.3.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 233,
+         "duration": 193,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_1.json"
       },
       "12.3.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 10939,
+         "duration": 10523,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_10.json"
       },
       "12.3.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1206,
+         "duration": 1239,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_11.json"
       },
       "12.3.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2139,
+         "duration": 2120,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_12.json"
       },
       "12.3.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3876,
+         "duration": 3901,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_13.json"
       },
       "12.3.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7430,
+         "duration": 9079,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_14.json"
       },
       "12.3.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 14508,
+         "duration": 14505,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_15.json"
       },
       "12.3.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 11997,
+         "duration": 11723,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_16.json"
       },
       "12.3.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 11284,
+         "duration": 15826,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_17.json"
       },
       "12.3.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 10505,
+         "duration": 10391,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_18.json"
       },
       "12.3.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 231,
+         "duration": 195,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_2.json"
       },
       "12.3.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 263,
+         "duration": 215,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_3.json"
       },
       "12.3.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 357,
+         "duration": 307,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_4.json"
       },
       "12.3.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 561,
+         "duration": 606,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_5.json"
       },
       "12.3.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 925,
+         "duration": 964,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_6.json"
       },
       "12.3.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1701,
+         "duration": 2788,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_7.json"
       },
       "12.3.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3159,
+         "duration": 3215,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_8.json"
       },
       "12.3.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 5728,
+         "duration": 5330,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_3_9.json"
       },
       "12.4.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 215,
+         "duration": 182,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_1.json"
       },
       "12.4.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8342,
+         "duration": 5479,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_10.json"
       },
       "12.4.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 504,
+         "duration": 544,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_11.json"
       },
       "12.4.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 889,
+         "duration": 801,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_12.json"
       },
       "12.4.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1446,
+         "duration": 1309,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_13.json"
       },
       "12.4.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2398,
+         "duration": 2295,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_14.json"
       },
       "12.4.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4706,
+         "duration": 4152,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_15.json"
       },
       "12.4.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4529,
+         "duration": 3750,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_16.json"
       },
       "12.4.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6084,
+         "duration": 4328,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_17.json"
       },
       "12.4.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8406,
+         "duration": 5249,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_18.json"
       },
       "12.4.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 218,
+         "duration": 198,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_2.json"
       },
       "12.4.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 229,
+         "duration": 190,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_3.json"
       },
       "12.4.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 250,
+         "duration": 213,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_4.json"
       },
       "12.4.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 327,
+         "duration": 307,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_5.json"
       },
       "12.4.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 435,
+         "duration": 421,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_6.json"
       },
       "12.4.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 685,
+         "duration": 691,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_7.json"
       },
       "12.4.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1319,
+         "duration": 1156,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_8.json"
       },
       "12.4.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2980,
+         "duration": 2216,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_4_9.json"
       },
       "12.5.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 220,
+         "duration": 249,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_1.json"
       },
       "12.5.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6273,
+         "duration": 5628,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_10.json"
       },
       "12.5.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1157,
+         "duration": 1122,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_11.json"
       },
       "12.5.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2076,
+         "duration": 1956,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_12.json"
       },
       "12.5.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4092,
+         "duration": 3734,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_13.json"
       },
       "12.5.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7760,
+         "duration": 6724,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_14.json"
       },
       "12.5.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 12801,
+         "duration": 13345,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_15.json"
       },
       "12.5.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7379,
+         "duration": 7289,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_16.json"
       },
       "12.5.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6109,
+         "duration": 5453,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_17.json"
       },
       "12.5.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 5622,
+         "duration": 5067,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_18.json"
       },
       "12.5.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 235,
+         "duration": 278,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_2.json"
       },
       "12.5.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 278,
+         "duration": 314,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_3.json"
       },
       "12.5.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 331,
+         "duration": 387,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_4.json"
       },
       "12.5.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 453,
+         "duration": 559,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_5.json"
       },
       "12.5.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 642,
+         "duration": 718,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_6.json"
       },
       "12.5.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 978,
+         "duration": 986,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_7.json"
       },
       "12.5.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1669,
+         "duration": 1725,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_8.json"
       },
       "12.5.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3103,
+         "duration": 2814,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_12_5_9.json"
       },
       "13.1.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 210,
+         "duration": 207,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_1.json"
       },
       "13.1.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3040,
+         "duration": 2964,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_10.json"
       },
       "13.1.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 406,
+         "duration": 433,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_11.json"
       },
       "13.1.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 633,
+         "duration": 659,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_12.json"
       },
       "13.1.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1076,
+         "duration": 1199,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_13.json"
       },
       "13.1.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1983,
+         "duration": 1985,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_14.json"
       },
       "13.1.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3716,
+         "duration": 3606,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_15.json"
       },
       "13.1.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3430,
+         "duration": 3277,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_16.json"
       },
       "13.1.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3358,
+         "duration": 3224,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_17.json"
       },
       "13.1.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3478,
+         "duration": 2920,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_18.json"
       },
       "13.1.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 223,
+         "duration": 233,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_2.json"
       },
       "13.1.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 221,
+         "duration": 222,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_3.json"
       },
       "13.1.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 238,
+         "duration": 228,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_4.json"
       },
       "13.1.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 294,
+         "duration": 290,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_5.json"
       },
       "13.1.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 379,
+         "duration": 397,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_6.json"
       },
       "13.1.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 537,
+         "duration": 648,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_7.json"
       },
       "13.1.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 906,
+         "duration": 950,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_8.json"
       },
       "13.1.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1620,
+         "duration": 1665,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_1_9.json"
       },
       "13.2.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 220,
+         "duration": 196,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_1.json"
       },
       "13.2.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2989,
+         "duration": 2960,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_10.json"
       },
       "13.2.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 427,
+         "duration": 471,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_11.json"
       },
       "13.2.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 626,
+         "duration": 714,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_12.json"
       },
       "13.2.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1095,
+         "duration": 1131,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_13.json"
       },
       "13.2.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2142,
+         "duration": 1986,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_14.json"
       },
       "13.2.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3951,
+         "duration": 3640,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_15.json"
       },
       "13.2.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3437,
+         "duration": 3313,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_16.json"
       },
       "13.2.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3342,
+         "duration": 3207,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_17.json"
       },
       "13.2.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3073,
+         "duration": 2952,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_18.json"
       },
       "13.2.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 236,
+         "duration": 199,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_2.json"
       },
       "13.2.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 249,
+         "duration": 238,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_3.json"
       },
       "13.2.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 262,
+         "duration": 246,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_4.json"
       },
       "13.2.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 307,
+         "duration": 322,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_5.json"
       },
       "13.2.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 383,
+         "duration": 450,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_6.json"
       },
       "13.2.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 531,
+         "duration": 656,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_7.json"
       },
       "13.2.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 887,
+         "duration": 937,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_8.json"
       },
       "13.2.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1680,
+         "duration": 1694,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_2_9.json"
       },
       "13.3.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 263,
+         "duration": 197,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_1.json"
       },
       "13.3.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7158,
+         "duration": 7598,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_10.json"
       },
       "13.3.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 856,
+         "duration": 796,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_11.json"
       },
       "13.3.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1397,
+         "duration": 1302,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_12.json"
       },
       "13.3.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2284,
+         "duration": 2298,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_13.json"
       },
       "13.3.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 4923,
+         "duration": 4251,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_14.json"
       },
       "13.3.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8268,
+         "duration": 8304,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_15.json"
       },
       "13.3.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7150,
+         "duration": 7884,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_16.json"
       },
       "13.3.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7412,
+         "duration": 7765,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_17.json"
       },
       "13.3.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7359,
+         "duration": 7549,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_18.json"
       },
       "13.3.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 238,
+         "duration": 188,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_2.json"
       },
       "13.3.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 268,
+         "duration": 200,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_3.json"
       },
       "13.3.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 298,
+         "duration": 252,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_4.json"
       },
       "13.3.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 467,
+         "duration": 464,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_5.json"
       },
       "13.3.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 772,
+         "duration": 786,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_6.json"
       },
       "13.3.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1352,
+         "duration": 1298,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_7.json"
       },
       "13.3.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1891,
+         "duration": 2132,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_8.json"
       },
       "13.3.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3448,
+         "duration": 4028,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_3_9.json"
       },
       "13.4.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 222,
+         "duration": 194,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_1.json"
       },
       "13.4.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3114,
+         "duration": 2968,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_10.json"
       },
       "13.4.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 458,
+         "duration": 461,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_11.json"
       },
       "13.4.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 665,
+         "duration": 1305,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_12.json"
       },
       "13.4.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1080,
+         "duration": 1915,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_13.json"
       },
       "13.4.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1995,
+         "duration": 2963,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_14.json"
       },
       "13.4.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3783,
+         "duration": 3779,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_15.json"
       },
       "13.4.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3467,
+         "duration": 3305,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_16.json"
       },
       "13.4.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3299,
+         "duration": 3204,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_17.json"
       },
       "13.4.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3066,
+         "duration": 2996,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_18.json"
       },
       "13.4.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 221,
+         "duration": 194,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_2.json"
       },
       "13.4.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 251,
+         "duration": 198,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_3.json"
       },
       "13.4.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 253,
+         "duration": 217,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_4.json"
       },
       "13.4.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 301,
+         "duration": 305,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_5.json"
       },
       "13.4.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 397,
+         "duration": 395,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_6.json"
       },
       "13.4.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 541,
+         "duration": 602,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_7.json"
       },
       "13.4.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 936,
+         "duration": 975,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_8.json"
       },
       "13.4.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1644,
+         "duration": 1645,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_4_9.json"
       },
       "13.5.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 220,
+         "duration": 214,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_1.json"
       },
       "13.5.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6636,
+         "duration": 7599,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_10.json"
       },
       "13.5.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 656,
+         "duration": 774,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_11.json"
       },
       "13.5.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1131,
+         "duration": 1302,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_12.json"
       },
       "13.5.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2031,
+         "duration": 2284,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_13.json"
       },
       "13.5.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3746,
+         "duration": 4263,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_14.json"
       },
       "13.5.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7329,
+         "duration": 8212,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_15.json"
       },
       "13.5.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6971,
+         "duration": 7724,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_16.json"
       },
       "13.5.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6957,
+         "duration": 7737,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_17.json"
       },
       "13.5.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6616,
+         "duration": 7429,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_18.json"
       },
       "13.5.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 226,
+         "duration": 209,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_2.json"
       },
       "13.5.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 245,
+         "duration": 230,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_3.json"
       },
       "13.5.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 283,
+         "duration": 293,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_4.json"
       },
       "13.5.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 409,
+         "duration": 457,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_5.json"
       },
       "13.5.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 614,
+         "duration": 716,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_6.json"
       },
       "13.5.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1048,
+         "duration": 1190,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_7.json"
       },
       "13.5.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1862,
+         "duration": 2125,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_8.json"
       },
       "13.5.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3426,
+         "duration": 3945,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_5_9.json"
       },
       "13.6.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 227,
+         "duration": 204,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_1.json"
       },
       "13.6.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3007,
+         "duration": 2861,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_10.json"
       },
       "13.6.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 413,
+         "duration": 446,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_11.json"
       },
       "13.6.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 624,
+         "duration": 700,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_12.json"
       },
       "13.6.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1046,
+         "duration": 1124,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_13.json"
       },
       "13.6.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1989,
+         "duration": 1978,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_14.json"
       },
       "13.6.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3754,
+         "duration": 3586,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_15.json"
       },
       "13.6.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3376,
+         "duration": 3233,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_16.json"
       },
       "13.6.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3226,
+         "duration": 3085,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_17.json"
       },
       "13.6.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3006,
+         "duration": 2878,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_18.json"
       },
       "13.6.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 228,
+         "duration": 223,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_2.json"
       },
       "13.6.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 243,
+         "duration": 220,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_3.json"
       },
       "13.6.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 257,
+         "duration": 246,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_4.json"
       },
       "13.6.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 309,
+         "duration": 298,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_5.json"
       },
       "13.6.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 364,
+         "duration": 412,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_6.json"
       },
       "13.6.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 520,
+         "duration": 587,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_7.json"
       },
       "13.6.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 853,
+         "duration": 922,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_8.json"
       },
       "13.6.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1570,
+         "duration": 1599,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_6_9.json"
       },
       "13.7.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 229,
+         "duration": 203,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_1.json"
       },
       "13.7.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6633,
+         "duration": 7550,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_10.json"
       },
       "13.7.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 665,
+         "duration": 781,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_11.json"
       },
       "13.7.12": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1125,
+         "duration": 1315,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_12.json"
       },
       "13.7.13": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2056,
+         "duration": 2262,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_13.json"
       },
       "13.7.14": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3834,
+         "duration": 4190,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_14.json"
       },
       "13.7.15": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8684,
+         "duration": 8102,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_15.json"
       },
       "13.7.16": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 7565,
+         "duration": 7815,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_16.json"
       },
       "13.7.17": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6912,
+         "duration": 7771,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_17.json"
       },
       "13.7.18": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6682,
+         "duration": 7498,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_18.json"
       },
       "13.7.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 225,
+         "duration": 204,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_2.json"
       },
       "13.7.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 242,
+         "duration": 216,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_3.json"
       },
       "13.7.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 276,
+         "duration": 272,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_4.json"
       },
       "13.7.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 413,
+         "duration": 459,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_5.json"
       },
       "13.7.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 606,
+         "duration": 723,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_6.json"
       },
       "13.7.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1042,
+         "duration": 1222,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_7.json"
       },
       "13.7.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1857,
+         "duration": 2111,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_8.json"
       },
       "13.7.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3466,
+         "duration": 3932,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_13_7_9.json"
       },
       "2.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_2_1.json"
       },
       "2.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 3,
+         "duration": 2,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_2_10.json"
       },
       "2.11": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8,
+         "duration": 10,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_2_11.json"
       },
@@ -1683,7 +1683,7 @@
       "2.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 8,
+         "duration": 7,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_2_6.json"
       },
@@ -1733,7 +1733,7 @@
          "behavior": "OK",
          "behaviorClose": "OK",
          "duration": 1,
-         "remoteCloseCode": null,
+         "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_3_4.json"
       },
       "3.5": {
@@ -1789,7 +1789,7 @@
          "behavior": "OK",
          "behaviorClose": "OK",
          "duration": 1,
-         "remoteCloseCode": null,
+         "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_4_1_5.json"
       },
       "4.2.1": {
@@ -1823,14 +1823,14 @@
       "4.2.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_4_2_5.json"
       },
       "5.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_5_1.json"
       },
@@ -1900,7 +1900,7 @@
       "5.19": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1002,
+         "duration": 1003,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_5_19.json"
       },
@@ -1949,7 +1949,7 @@
       "5.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_5_7.json"
       },
@@ -1977,7 +1977,7 @@
       "6.1.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 22,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_1_2.json"
       },
@@ -2005,7 +2005,7 @@
       "6.10.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_10_3.json"
       },
@@ -2082,7 +2082,7 @@
       "6.12.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_12_6.json"
       },
@@ -2096,7 +2096,7 @@
       "6.12.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_12_8.json"
       },
@@ -2187,7 +2187,7 @@
       "6.14.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_14_7.json"
       },
@@ -2236,14 +2236,14 @@
       "6.17.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_17_1.json"
       },
       "6.17.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_17_2.json"
       },
@@ -2264,7 +2264,7 @@
       "6.17.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_17_5.json"
       },
@@ -2285,7 +2285,7 @@
       "6.18.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_18_3.json"
       },
@@ -2306,7 +2306,7 @@
       "6.19.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_19_1.json"
       },
@@ -2320,7 +2320,7 @@
       "6.19.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_19_3.json"
       },
@@ -2355,14 +2355,14 @@
       "6.2.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_2_3.json"
       },
       "6.2.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_2_4.json"
       },
@@ -2432,7 +2432,7 @@
       "6.21.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_21_3.json"
       },
@@ -2453,7 +2453,7 @@
       "6.21.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_21_6.json"
       },
@@ -2586,7 +2586,7 @@
       "6.22.24": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_22_24.json"
       },
@@ -2600,7 +2600,7 @@
       "6.22.26": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 2,
+         "duration": 1,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_22_26.json"
       },
@@ -2642,7 +2642,7 @@
       "6.22.31": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 2,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_6_22_31.json"
       },
@@ -2775,7 +2775,7 @@
       "6.4.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1002,
+         "duration": 1001,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_4_1.json"
       },
@@ -2789,14 +2789,14 @@
       "6.4.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1002,
+         "duration": 1001,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_4_3.json"
       },
       "6.4.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1002,
+         "duration": 1001,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_4_4.json"
       },
@@ -2901,7 +2901,7 @@
       "6.6.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1007,
          "reportfile": "swiftwebsocket_case_6_6_8.json"
       },
@@ -3020,7 +3020,7 @@
       "7.1.6": {
          "behavior": "INFORMATIONAL",
          "behaviorClose": "INFORMATIONAL",
-         "duration": 9,
+         "duration": 8,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_1_6.json"
       },
@@ -3125,7 +3125,7 @@
       "7.7.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_2.json"
       },
@@ -3139,14 +3139,14 @@
       "7.7.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_4.json"
       },
       "7.7.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_5.json"
       },
@@ -3160,21 +3160,21 @@
       "7.7.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_7.json"
       },
       "7.7.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_8.json"
       },
       "7.7.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_7_7_9.json"
       },
@@ -3188,7 +3188,7 @@
       "7.9.10": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_7_9_10.json"
       },
@@ -3265,7 +3265,7 @@
       "7.9.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 1,
+         "duration": 0,
          "remoteCloseCode": 1002,
          "reportfile": "swiftwebsocket_case_7_9_9.json"
       },
@@ -3279,35 +3279,35 @@
       "9.1.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 6,
+         "duration": 7,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_1_2.json"
       },
       "9.1.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 21,
+         "duration": 20,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_1_3.json"
       },
       "9.1.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 81,
+         "duration": 79,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_1_4.json"
       },
       "9.1.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 173,
+         "duration": 160,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_1_5.json"
       },
       "9.1.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 336,
+         "duration": 341,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_1_6.json"
       },
@@ -3328,231 +3328,231 @@
       "9.2.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 21,
+         "duration": 18,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_2_3.json"
       },
       "9.2.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 87,
+         "duration": 68,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_2_4.json"
       },
       "9.2.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 163,
+         "duration": 143,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_2_5.json"
       },
       "9.2.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 402,
+         "duration": 334,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_2_6.json"
       },
       "9.3.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 958,
+         "duration": 1422,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_1.json"
       },
       "9.3.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 334,
+         "duration": 408,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_2.json"
       },
       "9.3.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 120,
+         "duration": 141,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_3.json"
       },
       "9.3.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 67,
+         "duration": 72,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_4.json"
       },
       "9.3.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 52,
+         "duration": 56,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_5.json"
       },
       "9.3.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 55,
+         "duration": 52,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_6.json"
       },
       "9.3.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 52,
+         "duration": 57,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_7.json"
       },
       "9.3.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 53,
+         "duration": 52,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_8.json"
       },
       "9.3.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 50,
+         "duration": 43,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_3_9.json"
       },
       "9.4.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 905,
+         "duration": 1329,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_1.json"
       },
       "9.4.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 302,
+         "duration": 372,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_2.json"
       },
       "9.4.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 102,
+         "duration": 110,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_3.json"
       },
       "9.4.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 47,
+         "duration": 48,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_4.json"
       },
       "9.4.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 33,
+         "duration": 29,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_5.json"
       },
       "9.4.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 30,
+         "duration": 25,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_6.json"
       },
       "9.4.7": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 31,
+         "duration": 26,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_7.json"
       },
       "9.4.8": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 32,
+         "duration": 27,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_8.json"
       },
       "9.4.9": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 31,
+         "duration": 24,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_4_9.json"
       },
       "9.5.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 823,
+         "duration": 910,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_1.json"
       },
       "9.5.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 462,
+         "duration": 483,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_2.json"
       },
       "9.5.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 219,
+         "duration": 244,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_3.json"
       },
       "9.5.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 119,
+         "duration": 122,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_4.json"
       },
       "9.5.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 71,
+         "duration": 69,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_5.json"
       },
       "9.5.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 44,
+         "duration": 52,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_5_6.json"
       },
       "9.6.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 835,
+         "duration": 965,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_6_1.json"
       },
       "9.6.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 432,
+         "duration": 512,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_6_2.json"
       },
       "9.6.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 223,
+         "duration": 237,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_6_3.json"
       },
       "9.6.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 121,
+         "duration": 123,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_6_4.json"
       },
       "9.6.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 76,
+         "duration": 69,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_6_5.json"
       },
@@ -3566,84 +3566,84 @@
       "9.7.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 160,
+         "duration": 165,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_1.json"
       },
       "9.7.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 199,
+         "duration": 178,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_2.json"
       },
       "9.7.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 193,
+         "duration": 220,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_3.json"
       },
       "9.7.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 211,
+         "duration": 203,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_4.json"
       },
       "9.7.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 253,
+         "duration": 255,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_5.json"
       },
       "9.7.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 394,
+         "duration": 389,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_7_6.json"
       },
       "9.8.1": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 165,
+         "duration": 153,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_1.json"
       },
       "9.8.2": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 183,
+         "duration": 157,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_2.json"
       },
       "9.8.3": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 188,
+         "duration": 159,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_3.json"
       },
       "9.8.4": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 210,
+         "duration": 172,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_4.json"
       },
       "9.8.5": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 267,
+         "duration": 209,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_5.json"
       },
       "9.8.6": {
          "behavior": "OK",
          "behaviorClose": "OK",
-         "duration": 401,
+         "duration": 355,
          "remoteCloseCode": null,
          "reportfile": "swiftwebsocket_case_9_8_6.json"
       }

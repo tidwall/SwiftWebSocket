@@ -22,15 +22,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=98&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=98&agent=SwiftWebSocket\r\nSec-WebSocket-Key: oHh38fy+08/IwRo7j9JhDg==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: EElJ8b6bMzeMalV4LWnl8Mttw1k=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=98&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=98&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: BR5qeL4CGRho60mUfH3qwA==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: oQDWlYhWmnDeR0kCo3ZYaKttwjY=\r\n\r\n",
    "id": "6.8.1",
    "isServer": true,
    "localCloseCode": 1000,
    "localCloseReason": null,
    "received": [],
    "remoteCloseCode": 1007,
-   "remoteCloseReason": "Invalid frame payload data",
+   "remoteCloseReason": "Payload error",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -39,10 +39,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "34": 1,
+      "21": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:50.843Z",
+   "started": "2016-04-13T16:10:24.042Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -63,7 +63,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3938266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3938266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -103,21 +103,21 @@
       [
          "RO",
          [
-            34,
-            "889c1f6f03711c804a1f690e6f187b4f65037e0266516f0e7a1d700e67517b0e7710"
+            21,
+            "888f0a755a79099a0a18731935186e553f0b781a28"
          ]
       ],
       [
          "RF",
          [
-            28,
-            "0x03ef496e76616c6964206672616d65207061796c6f61642064617461"
+            15,
+            "0x03ef5061796c6f6164206572726f72"
          ],
          8,
          true,
          0,
          true,
-         "1f6f0371"
+         "0a755a79"
       ],
       [
          "TF",

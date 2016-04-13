@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 64, auto-fragment to 0 octets. Use permessage-deflate client offers (requestNoContextTakeover, requestMaxWindowBits): [(False, 8)]",
    "droppedByMe": true,
-   "duration": 238,
+   "duration": 188,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 60 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=433&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=433&agent=SwiftWebSocket\r\nSec-WebSocket-Key: liSZ3i5rGnMPo42GcjA9Tw==\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=8\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 4o4fG2jcEnNqnG1Z1hkh0fdTNos=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=8; client_max_window_bits=8\r\n\r\n",
+   "httpRequest": "GET /runCase?case=433&agent=SwiftWebSocket HTTP/1.1\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=8\r\nUpgrade: websocket\r\nUser-Agent: SwiftWebSocket\r\nOrigin: ws://localhost:9001/runCase?case=433&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nSec-WebSocket-Key: AWKDesAAZqtahXn6eF5vCg==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: hy6/beRMZQMdjA9Lo2rJ+wVWLzE=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=8; client_max_window_bits=8\r\n\r\n",
    "id": "13.3.2",
    "isServer": true,
    "localCloseCode": 1000,
@@ -37,12 +37,11 @@
       "8": 1
    },
    "rxOctetStats": {
-      "6": 58,
-      "64": 57,
-      "70": 943,
+      "6": 1,
+      "70": 1000,
       "381": 1
    },
-   "started": "2015-05-26T20:37:52.144Z",
+   "started": "2016-04-13T16:16:28.477Z",
    "trafficStats": {
       "incomingCompressionRatio": 1.0,
       "incomingOctetsAppLevel": 64000,
@@ -51,13 +50,13 @@
       "incomingWebSocketFrames": 1000,
       "incomingWebSocketMessages": 1000,
       "incomingWebSocketOverhead": 0.09375,
-      "outgoingCompressionRatio": 0.12396875,
+      "outgoingCompressionRatio": 0.12553125,
       "outgoingOctetsAppLevel": 64000,
-      "outgoingOctetsWebSocketLevel": 7934,
-      "outgoingOctetsWireLevel": 9934,
+      "outgoingOctetsWebSocketLevel": 8034,
+      "outgoingOctetsWireLevel": 10034,
       "outgoingWebSocketFrames": 1000,
       "outgoingWebSocketMessages": 1000,
-      "outgoingWebSocketOverhead": 0.25207965717166625,
+      "outgoingWebSocketOverhead": 0.24894199651481205,
       "preopenIncomingOctetsWireLevel": 381,
       "preopenOutgoingOctetsWireLevel": 304
    },
@@ -67,24 +66,23 @@
    },
    "txOctetStats": {
       "4": 1,
-      "7": 335,
-      "8": 14,
-      "9": 28,
-      "10": 326,
-      "11": 48,
-      "12": 54,
-      "13": 122,
-      "14": 17,
-      "15": 41,
-      "16": 3,
-      "17": 5,
-      "18": 1,
+      "7": 312,
+      "8": 22,
+      "9": 17,
+      "10": 340,
+      "11": 35,
+      "12": 76,
+      "13": 133,
+      "14": 11,
+      "15": 36,
+      "16": 4,
+      "17": 8,
       "19": 1,
-      "25": 1,
-      "31": 1,
+      "24": 1,
+      "32": 1,
       "37": 1,
       "38": 1,
-      "49": 1,
+      "51": 1,
       "304": 1
    },
    "wasClean": true,
@@ -97,7 +95,7 @@
          "RO",
          [
             381,
-            "474554202f72756e436173653f636173653d343333266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d343333266167656e743d5377696674576562536f636b657420485454502f312e310d0a5365632d576562536f636b ..."
          ]
       ],
       [
@@ -146,7 +144,7 @@
          "RO",
          [
             6,
-            "88802ae962f6"
+            "888067afdd3f"
          ]
       ],
       [
@@ -159,7 +157,7 @@
          true,
          0,
          true,
-         "2ae962f6"
+         "67afdd3f"
       ]
    ]
 }

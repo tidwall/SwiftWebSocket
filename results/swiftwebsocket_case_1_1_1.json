@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send text message with payload 0.",
    "droppedByMe": true,
-   "duration": 2,
+   "duration": 1,
    "expectation": "Receive echo'ed text message (with empty payload). Clean close with normal code.",
    "expected": {
       "OK": [
@@ -27,8 +27,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=1&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=1&agent=SwiftWebSocket\r\nSec-WebSocket-Key: CrHGUVChmLfMVJKRcyMAIA==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: BnIhYS/i3EnKEwgguIBgJGTohK8=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=1&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=1&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: IARdPjSGXeHN1aG+pLV6Lg==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: osIPuzYW77/cJF6JWBiNYhPk8MA=\r\n\r\n",
    "id": "1.1.1",
    "isServer": true,
    "localCloseCode": 1000,
@@ -54,7 +54,7 @@
       "6": 2,
       "281": 1
    },
-   "started": "2015-05-26T20:31:44.117Z",
+   "started": "2016-04-13T16:10:15.149Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -75,7 +75,7 @@
          "RO",
          [
             281,
-            "474554202f72756e436173653f636173653d31266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a2053 ..."
+            "474554202f72756e436173653f636173653d31266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c686f ..."
          ]
       ],
       [
@@ -116,7 +116,7 @@
          "RO",
          [
             6,
-            "818051eddf93"
+            "81804cccfaa4"
          ]
       ],
       [
@@ -129,7 +129,7 @@
          true,
          0,
          true,
-         "51eddf93"
+         "4cccfaa4"
       ],
       [
          "TF",
@@ -157,7 +157,7 @@
          "RO",
          [
             6,
-            "8880d754720b"
+            "888058c29539"
          ]
       ],
       [
@@ -170,7 +170,7 @@
          true,
          0,
          true,
-         "d754720b"
+         "58c29539"
       ]
    ]
 }

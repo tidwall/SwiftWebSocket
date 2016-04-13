@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 32768, auto-fragment to 0 octets. Use default permessage-deflate offer.",
    "droppedByMe": true,
-   "duration": 2143,
+   "duration": 1908,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=331&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=331&agent=SwiftWebSocket\r\nSec-WebSocket-Key: rVOHgpXlx3eh6HBOBOIpyA==\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=15\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: xrdavkIANuYhrlJgrvW2wj0JXFU=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=15\r\n\r\n",
+   "httpRequest": "GET /runCase?case=331&agent=SwiftWebSocket HTTP/1.1\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=15\r\nUpgrade: websocket\r\nUser-Agent: SwiftWebSocket\r\nOrigin: ws://localhost:9001/runCase?case=331&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nSec-WebSocket-Key: AY2a4XWUr1IF/DJvfa4AOw==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: Cfb9oW7esq752bOf3uU4CRqitAk=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=15\r\n\r\n",
    "id": "12.2.8",
    "isServer": true,
    "localCloseCode": 1000,
@@ -38,16 +38,10 @@
    },
    "rxOctetStats": {
       "6": 1,
-      "8": 18,
-      "104": 6,
       "382": 1,
-      "16340": 5,
-      "16436": 5,
-      "32672": 6,
-      "32768": 18,
-      "32776": 971
+      "32776": 1000
    },
-   "started": "2015-05-26T20:32:34.245Z",
+   "started": "2016-04-13T16:11:15.686Z",
    "trafficStats": {
       "incomingCompressionRatio": 1.0,
       "incomingOctetsAppLevel": 32768000,
@@ -785,7 +779,7 @@
          "RO",
          [
             382,
-            "474554202f72756e436173653f636173653d333331266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d333331266167656e743d5377696674576562536f636b657420485454502f312e310d0a5365632d576562536f636b ..."
          ]
       ],
       [
@@ -834,7 +828,7 @@
          "RO",
          [
             6,
-            "888011099984"
+            "8880aece3132"
          ]
       ],
       [
@@ -847,7 +841,7 @@
          true,
          0,
          true,
-         "11099984"
+         "aece3132"
       ]
    ]
 }

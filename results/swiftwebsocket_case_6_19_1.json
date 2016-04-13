@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send a text message with payload which is not valid UTF-8 in one fragment.<br><br>Payload: 0xc080",
    "droppedByMe": true,
-   "duration": 1,
+   "duration": 0,
    "expectation": "The connection is failed immediately, since the payload is not valid UTF-8.",
    "expected": {
       "OK": []
@@ -22,15 +22,15 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=149&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=149&agent=SwiftWebSocket\r\nSec-WebSocket-Key: mnXNo3YUy7xcGzVeCzESYw==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: CNzSiHBuezbMFC4/q2CK5LX2fXA=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=149&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=149&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: V0rmy6FNqugsmKPj17wmdQ==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 26yLvUvO0ptrDqYPhkDzihbd9wg=\r\n\r\n",
    "id": "6.19.1",
    "isServer": true,
    "localCloseCode": 1000,
    "localCloseReason": null,
    "received": [],
    "remoteCloseCode": 1007,
-   "remoteCloseReason": "Invalid frame payload data",
+   "remoteCloseReason": "Payload error",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -39,10 +39,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "34": 1,
+      "21": 1,
       "285": 1
    },
-   "started": "2015-05-26T20:31:51.147Z",
+   "started": "2016-04-13T16:10:25.828Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -62,7 +62,7 @@
          "RO",
          [
             285,
-            "474554202f72756e436173653f636173653d313439266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d313439266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c ..."
          ]
       ],
       [
@@ -102,21 +102,21 @@
       [
          "RO",
          [
-            34,
-            "889c18f80fa01b1746ce6e9963c97cd869d279956a80689976cc77996b807c997bc1"
+            21,
+            "888f1e2066d21dcf36b3674c09b37a0003a06c4f14"
          ]
       ],
       [
          "RF",
          [
-            28,
-            "0x03ef496e76616c6964206672616d65207061796c6f61642064617461"
+            15,
+            "0x03ef5061796c6f6164206572726f72"
          ],
          8,
          true,
          0,
          true,
-         "18f80fa0"
+         "1e2066d2"
       ],
       [
          "TF",

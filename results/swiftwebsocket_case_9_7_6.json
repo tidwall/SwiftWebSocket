@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 text messages of payload size 4096 to measure implementation/network RTT (round trip time) / latency.",
    "droppedByMe": true,
-   "duration": 394,
+   "duration": 389,
    "expectation": "Receive echo'ed text messages (with payload as sent). Timeout case after 480 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=298&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=298&agent=SwiftWebSocket\r\nSec-WebSocket-Key: TmdMeoflNmsUzpmjTZpytA==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: rH4odTPfzz0QPFhbRq0RpvwW4bw=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=298&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=298&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: izHtkllD3mo5bQ50nQ6UKQ==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: QO9+4abZJHQLfa2unvJyQ+QMFaE=\r\n\r\n",
    "id": "9.7.6",
    "isServer": true,
    "localCloseCode": 1000,
@@ -38,12 +38,10 @@
    },
    "rxOctetStats": {
       "6": 1,
-      "8": 6,
       "285": 1,
-      "4096": 6,
-      "4104": 994
+      "4104": 1000
    },
-   "started": "2015-05-26T20:32:01.125Z",
+   "started": "2016-04-13T16:10:44.037Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1000,
@@ -64,7 +62,7 @@
          "RO",
          [
             285,
-            "474554202f72756e436173653f636173653d323938266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d323938266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c ..."
          ]
       ],
       [
@@ -113,7 +111,7 @@
          "RO",
          [
             6,
-            "8880e4b642f9"
+            "8880156c4d5b"
          ]
       ],
       [
@@ -126,7 +124,7 @@
          true,
          0,
          true,
-         "e4b642f9"
+         "156c4d5b"
       ]
    ]
 }

@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Same as Case 6.4.1, but we send message not in 3 frames, but in 3 chops of the same message frame.\n<br><br>MESSAGE PARTS:<br>\nPART1 = cebae1bdb9cf83cebcceb5<br>\nPART2 = f4908080<br>\nPART3 = 656469746564<br>\n",
    "droppedByMe": true,
-   "duration": 1002,
+   "duration": 1001,
    "expectation": "The first chop is accepted, we expect to timeout on the first wait. The 2nd chop should be rejected immediately (fail fast on UTF-8). If we timeout, we expect the connection is failed at least then, since the complete message payload is not valid UTF-8.",
    "expected": {
       "NON-STRICT": [
@@ -37,8 +37,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=76&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=76&agent=SwiftWebSocket\r\nSec-WebSocket-Key: HXHOq/1xd2QJRc5YAMae+A==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 8S/RYnfQIsA4doFCekbH3xZ1MOs=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=76&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=76&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: 7NUtPb49mClvoE74y4YvtA==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: njveFXnnRthZOkY5EBmd2/D/XPg=\r\n\r\n",
    "id": "6.4.3",
    "isServer": true,
    "localCloseCode": 1000,
@@ -50,7 +50,7 @@
       ]
    ],
    "remoteCloseCode": 1007,
-   "remoteCloseReason": "Invalid frame payload data",
+   "remoteCloseReason": "Payload error",
    "reportCompressionRatio": false,
    "reportTime": false,
    "result": "Actual events match at least one expected.",
@@ -59,10 +59,10 @@
       "8": 1
    },
    "rxOctetStats": {
-      "34": 1,
+      "21": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:48.702Z",
+   "started": "2016-04-13T16:10:21.563Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -83,7 +83,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3736266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3736266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -135,21 +135,21 @@
       [
          "RO",
          [
-            34,
-            "889ced2fc950eec0803e9b4ea539890faf228c42ac709d4eb03c824ead70894ebd31"
+            21,
+            "888fbc1b1d14bff44d75c5777275d83b7866ce746f"
          ]
       ],
       [
          "RF",
          [
-            28,
-            "0x03ef496e76616c6964206672616d65207061796c6f61642064617461"
+            15,
+            "0x03ef5061796c6f6164206572726f72"
          ],
          8,
          true,
          0,
          true,
-         "ed2fc950"
+         "bc1b1d14"
       ],
       [
          "TF",

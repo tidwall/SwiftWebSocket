@@ -8,7 +8,7 @@
    "createWirelog": true,
    "description": "Send 1000 compressed messages each of payload size 16, auto-fragment to 0 octets. Use default permessage-deflate offer.",
    "droppedByMe": true,
-   "duration": 247,
+   "duration": 191,
    "expectation": "Receive echo'ed messages (with payload as sent). Timeout case after 60 secs.",
    "expected": {},
    "expectedClose": {
@@ -19,8 +19,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=306&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=306&agent=SwiftWebSocket\r\nSec-WebSocket-Key: 5aCR78Ec3FcUI+5aH/uulw==\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=15\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 7Q6YUyzkt9JB/28IJJXYdzxh6fY=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=15\r\n\r\n",
+   "httpRequest": "GET /runCase?case=306&agent=SwiftWebSocket HTTP/1.1\r\nSec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=15\r\nUpgrade: websocket\r\nUser-Agent: SwiftWebSocket\r\nOrigin: ws://localhost:9001/runCase?case=306&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nSec-WebSocket-Key: /Y8Qf1T5hqWD+LQqP0pLMw==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 6fkqkdx783UDOD2zZZ81p7YV2/8=\r\nSec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=15\r\n\r\n",
    "id": "12.1.1",
    "isServer": true,
    "localCloseCode": 1000,
@@ -37,12 +37,11 @@
       "8": 1
    },
    "rxOctetStats": {
-      "6": 91,
-      "16": 90,
-      "22": 910,
+      "6": 1,
+      "22": 1000,
       "382": 1
    },
-   "started": "2015-05-26T20:32:02.981Z",
+   "started": "2016-04-13T16:10:46.102Z",
    "trafficStats": {
       "incomingCompressionRatio": 1.0,
       "incomingOctetsAppLevel": 16000,
@@ -51,13 +50,13 @@
       "incomingWebSocketFrames": 1000,
       "incomingWebSocketMessages": 1000,
       "incomingWebSocketOverhead": 0.375,
-      "outgoingCompressionRatio": 0.3031875,
+      "outgoingCompressionRatio": 0.3001875,
       "outgoingOctetsAppLevel": 16000,
-      "outgoingOctetsWebSocketLevel": 4851,
-      "outgoingOctetsWireLevel": 6851,
+      "outgoingOctetsWebSocketLevel": 4803,
+      "outgoingOctetsWireLevel": 6803,
       "outgoingWebSocketFrames": 1000,
       "outgoingWebSocketMessages": 1000,
-      "outgoingWebSocketOverhead": 0.4122861265718409,
+      "outgoingWebSocketOverhead": 0.41640641265875494,
       "preopenIncomingOctetsWireLevel": 382,
       "preopenOutgoingOctetsWireLevel": 279
    },
@@ -67,18 +66,19 @@
    },
    "txOctetStats": {
       "4": 1,
-      "6": 614,
-      "7": 202,
-      "8": 34,
-      "9": 96,
-      "10": 33,
-      "11": 6,
-      "12": 4,
-      "13": 4,
-      "14": 2,
-      "16": 1,
+      "6": 644,
+      "7": 173,
+      "8": 37,
+      "9": 99,
+      "10": 32,
+      "11": 4,
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 3,
+      "17": 1,
       "18": 1,
-      "19": 1,
       "20": 2,
       "279": 1
    },
@@ -92,7 +92,7 @@
          "RO",
          [
             382,
-            "474554202f72756e436173653f636173653d333036266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d333036266167656e743d5377696674576562536f636b657420485454502f312e310d0a5365632d576562536f636b ..."
          ]
       ],
       [
@@ -141,7 +141,7 @@
          "RO",
          [
             6,
-            "888042ba41ad"
+            "8880b40dadac"
          ]
       ],
       [
@@ -154,7 +154,7 @@
          true,
          0,
          true,
-         "42ba41ad"
+         "b40dadac"
       ]
    ]
 }

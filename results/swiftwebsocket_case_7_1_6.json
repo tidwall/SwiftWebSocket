@@ -8,8 +8,8 @@
    "createWirelog": true,
    "description": "Send 256K message followed by close then a ping",
    "droppedByMe": true,
-   "duration": 9,
-   "expectation": "Case outcome depends on implimentation defined close behavior. Message and close frame are sent back to back. If the close frame is processed before the text message write is complete (as can happen in asyncronous processing models) the close frame is processed first and the text message may not be recieved or may only be partially recieved.",
+   "duration": 8,
+   "expectation": "Case outcome depends on implementation defined close behavior. Message and close frame are sent back to back. If the close frame is processed before the text message write is complete (as can happen in asynchronous processing models) the close frame is processed first and the text message may not be received or may only be partially recieved.",
    "expected": {
       "NON-STRICT": [],
       "OK": [
@@ -28,8 +28,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=215&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=215&agent=SwiftWebSocket\r\nSec-WebSocket-Key: zXcfrJfhrOG1WTTOuDx2+w==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: aL0nLZxIB/srJojnX11XPV66r5E=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=215&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=215&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: fd7JyAjDUtdfD40yNpxwKA==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: w+7zdq+dmmhbCJowgv6SeMJnnbA=\r\n\r\n",
    "id": "7.1.6",
    "isServer": true,
    "localCloseCode": 1000,
@@ -38,6 +38,11 @@
       [
          "message",
          "BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd7&jh23BAsd ...",
+         false
+      ],
+      [
+         "message",
+         "Hello World!",
          false
       ]
    ],
@@ -48,15 +53,15 @@
    "result": "Actual events differ from any expected.",
    "resultClose": "Connection was properly closed",
    "rxFrameStats": {
-      "1": 1,
+      "1": 2,
       "8": 1
    },
    "rxOctetStats": {
-      "20": 1,
+      "38": 1,
       "285": 1,
       "65536": 4
    },
-   "started": "2015-05-26T20:31:51.565Z",
+   "started": "2016-04-13T16:10:29.675Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 2,
@@ -80,7 +85,7 @@
          "RO",
          [
             285,
-            "474554202f72756e436173653f636173653d323135266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d323135266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c ..."
          ]
       ],
       [
@@ -187,35 +192,35 @@
          "RO",
          [
             65536,
-            "81ff00000000000400006c5857a42e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b ..."
+            "81ff0000000000040000250c9bc2674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173f ..."
          ]
       ],
       [
          "RO",
          [
             65536,
-            "24c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e ..."
+            "e8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122a ..."
          ]
       ],
       [
          "RO",
          [
             65536,
-            "65972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e19 ..."
+            "a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674d ..."
          ]
       ],
       [
          "RO",
          [
             65536,
-            "6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c6082063065972e1924c05b7e3dcc5e6b15e51f3c60820630 ..."
+            "ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64a9f1674de8a6122af1aa173fd9835668ace44f64 ..."
          ]
       ],
       [
          "RO",
          [
-            20,
-            "15e51f3c6082063065972e1924c08880586a69b8"
+            38,
+            "d9835668ace44f64a9f1674de8a6818c9ee9d7dad68cbbb6f1c980b5ec85b3fb888011f9174f"
          ]
       ],
       [
@@ -228,7 +233,19 @@
          true,
          0,
          true,
-         "6c5857a4"
+         "250c9bc2"
+      ],
+      [
+         "RF",
+         [
+            12,
+            "Hello World!"
+         ],
+         1,
+         true,
+         0,
+         true,
+         "9ee9d7da"
       ],
       [
          "RF",
@@ -240,7 +257,7 @@
          true,
          0,
          true,
-         "586a69b8"
+         "11f9174f"
       ]
    ]
 }

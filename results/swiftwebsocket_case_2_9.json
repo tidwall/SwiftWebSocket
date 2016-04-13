@@ -26,8 +26,8 @@
       "requireClean": true
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=25&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=25&agent=SwiftWebSocket\r\nSec-WebSocket-Key: 0ZXzKtJl/60JBce5YZR5Hg==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 9+MplNIG8uqtukxmKbGBUFQSQYM=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=25&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=25&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: CB8A8w92UsugDB97WJ3c1Q==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: yBUcDmFSu+UNLnpmwVUj6k91ty0=\r\n\r\n",
    "id": "2.9",
    "isServer": true,
    "localCloseCode": 1000,
@@ -53,7 +53,7 @@
       "18": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:44.359Z",
+   "started": "2016-04-13T16:10:15.542Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1,
@@ -76,7 +76,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3235266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3235266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -139,7 +139,7 @@
          "RO",
          [
             18,
-            "8a8cab4f4830db2626578b3f2949c7202954"
+            "8a8c2d97fb8d5dfe95ea0de79af441f89ae9"
          ]
       ],
       [
@@ -152,7 +152,7 @@
          true,
          0,
          true,
-         "ab4f4830"
+         "2d97fb8d"
       ],
       [
          "TF",
@@ -180,7 +180,7 @@
          "RO",
          [
             6,
-            "8880a20c170d"
+            "8880d97b54d0"
          ]
       ],
       [
@@ -193,7 +193,7 @@
          true,
          0,
          true,
-         "a20c170d"
+         "d97b54d0"
       ]
    ]
 }

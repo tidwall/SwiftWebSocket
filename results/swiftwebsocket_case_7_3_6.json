@@ -21,8 +21,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=221&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=221&agent=SwiftWebSocket\r\nSec-WebSocket-Key: T7pnGaitkFE9shdiy8CHzA==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ovY0BBzhr1ygSIC8E5MZKM9YqJ0=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=221&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=221&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: 5phTZNTnJOK2r6Fc5Ys9/A==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: yf399rblT6JYfxcCWox9je0sWHc=\r\n\r\n",
    "id": "7.3.6",
    "isServer": true,
    "localCloseCode": 1000,
@@ -41,7 +41,7 @@
       "22": 1,
       "285": 1
    },
-   "started": "2015-05-26T20:31:51.608Z",
+   "started": "2016-04-13T16:10:29.717Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -60,7 +60,7 @@
          "RO",
          [
             285,
-            "474554202f72756e436173653f636173653d323231266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d323231266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c ..."
          ]
       ],
       [
@@ -101,7 +101,7 @@
          "RO",
          [
             22,
-            "88909f7801449c925136f00c6e27f0142121ed0a6e36"
+            "88902f9c68b92c7638cb40e807da40f048dc5dee07cb"
          ]
       ],
       [
@@ -114,7 +114,7 @@
          true,
          0,
          true,
-         "9f780144"
+         "2f9c68b9"
       ]
    ]
 }

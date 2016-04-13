@@ -21,8 +21,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=242&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=242&agent=SwiftWebSocket\r\nSec-WebSocket-Key: Yhy2igoOdFuIw+MCJaLhpg==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 9krYkulX449NdujMutjZ7IfxLqw=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=242&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=242&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: KQE7OEt1jpkr4hV7j03apQ==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 8LESW4P0QxU4OdU4XJB8iCU9beA=\r\n\r\n",
    "id": "7.9.7",
    "isServer": true,
    "localCloseCode": 1013,
@@ -41,7 +41,7 @@
       "22": 1,
       "285": 1
    },
-   "started": "2015-05-26T20:31:51.732Z",
+   "started": "2016-04-13T16:10:31.356Z",
    "trafficStats": null,
    "txFrameStats": {
       "8": 1
@@ -60,7 +60,7 @@
          "RO",
          [
             285,
-            "474554202f72756e436173653f636173653d323432266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a ..."
+            "474554202f72756e436173653f636173653d323432266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c ..."
          ]
       ],
       [
@@ -101,7 +101,7 @@
          "RO",
          [
             22,
-            "88901c6d69bb1f8739c9731906d8730149de6e1f06c9"
+            "88901948e6151aa2b667763c89767624c6706b3a8967"
          ]
       ],
       [
@@ -114,7 +114,7 @@
          true,
          0,
          true,
-         "1c6d69bb"
+         "1948e615"
       ]
    ]
 }

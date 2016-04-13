@@ -28,8 +28,8 @@
       "requireClean": false
    },
    "failedByMe": false,
-   "httpRequest": "GET /runCase?case=37&agent=SwiftWebSocket HTTP/1.1\r\nUser-Agent: SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=37&agent=SwiftWebSocket\r\nSec-WebSocket-Key: Rfthso/XM3Klx9QiIu1DSQ==\r\n\r\n",
-   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.1-0.10.4\r\nX-Powered-By: AutobahnPython/0.10.4\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: 9TciQZZ+SGnWh0Z5CH/uwNmGPwU=\r\n\r\n",
+   "httpRequest": "GET /runCase?case=37&agent=SwiftWebSocket HTTP/1.1\r\nHost: localhost:9001\r\nOrigin: ws://localhost:9001/runCase?case=37&agent=SwiftWebSocket\r\nSec-WebSocket-Version: 13\r\nUser-Agent: SwiftWebSocket\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: aB7mbdxQZd7YtMMnhCWSAQ==\r\n\r\n",
+   "httpResponse": "HTTP/1.1 101 Switching Protocols\r\nServer: AutobahnTestSuite/0.7.2-0.10.9\r\nX-Powered-By: AutobahnPython/0.10.9\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: yurvuqw25yaeVqhXp+FSqugQBaQ=\r\n\r\n",
    "id": "4.1.3",
    "isServer": true,
    "localCloseCode": 1000,
@@ -56,7 +56,7 @@
       "22": 1,
       "283": 1
    },
-   "started": "2015-05-26T20:31:44.446Z",
+   "started": "2016-04-13T16:10:15.731Z",
    "trafficStats": null,
    "txFrameStats": {
       "1": 1,
@@ -80,7 +80,7 @@
          "RO",
          [
             283,
-            "474554202f72756e436173653f636173653d3337266167656e743d5377696674576562536f636b657420485454502f312e310d0a557365722d4167656e743a20 ..."
+            "474554202f72756e436173653f636173653d3337266167656e743d5377696674576562536f636b657420485454502f312e310d0a486f73743a206c6f63616c68 ..."
          ]
       ],
       [
@@ -165,7 +165,7 @@
          "RO",
          [
             19,
-            "818d97dade45dfbfb229f8f6fe32f8a8b221b6"
+            "818d97eda50ddf88c961f8c1857af89fc969b6"
          ]
       ],
       [
@@ -178,13 +178,13 @@
          true,
          0,
          true,
-         "97dade45"
+         "97eda50d"
       ],
       [
          "RO",
          [
             22,
-            "88900b2ae71208c0b760645e88716446c77779588860"
+            "88903db4fb953e5eabe752c094f652d8dbf04fc694e7"
          ]
       ],
       [
@@ -197,7 +197,7 @@
          true,
          0,
          true,
-         "0b2ae712"
+         "3db4fb95"
       ],
       [
          "TF",
