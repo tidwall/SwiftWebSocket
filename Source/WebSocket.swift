@@ -1669,7 +1669,7 @@ public class WebSocket: NSObject {
         opened = true
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
         super.init()
-        ws.eclose = {
+        ws.eclose = { [unowned self] in
             self.opened = false
         }
     }
@@ -1678,7 +1678,7 @@ public class WebSocket: NSObject {
         opened = false
         ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
         super.init()
-        ws.eclose = {
+        ws.eclose = { [unowned self] in
             self.opened = false
         }
     }
