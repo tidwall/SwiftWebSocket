@@ -1668,6 +1668,10 @@ public class WebSocket: NSObject {
     public init(request: NSURLRequest, subProtocols : [String] = []){
         opened = true
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
+        super.init()
+        ws.eclose = {
+            self.opened = false
+        }
     }
     /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
     public override init(){
