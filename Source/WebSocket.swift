@@ -1666,17 +1666,17 @@ public class WebSocket: NSObject {
     }
     /// Create a WebSocket connection from an NSURLRequest; Also include a list of protocols.
     public init(request: NSURLRequest, subProtocols : [String] = []){
-        opened = true
-        ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
-    }
-    /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
-    public override init(){
-        opened = false
-        ws = InnerWebSocket(request: NSURLRequest(), subProtocols: [], stub: true)
+        let hasURL = request.URL != nil
+        opened = hasURL
+        ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: !hasURL)
         super.init()
-        ws.eclose = {
+        ws.eclose = { [unowned self] in
             self.opened = false
         }
+    }
+    /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
+    public convenience override init(){
+        self.init(request: NSURLRequest(), subProtocols: [])
     }
     /// The URL as resolved by the constructor. This is always an absolute URL. Read only.
     public var url : String{ return ws.url }
