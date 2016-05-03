@@ -994,7 +994,7 @@ private class InnerWebSocket: Hashable {
         }
         req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
         if subProtocols.count > 0 {
-            req.setValue(subProtocols.joinWithSeparator(";"), forHTTPHeaderField: "Sec-WebSocket-Protocol")
+            req.setValue(subProtocols.joinWithSeparator(","), forHTTPHeaderField: "Sec-WebSocket-Protocol")
         }
         if req.URL!.scheme != "wss" && req.URL!.scheme != "ws" {
             throw WebSocketError.InvalidAddress
