@@ -519,7 +519,6 @@ private class InnerWebSocket: Hashable {
     var delegate : Delegate
     var inflater : Inflater!
     var deflater : Deflater!
-    var outer : WebSocket?
     var outputBytes : UnsafeMutablePointer<UInt8>
     var outputBytesSize : Int = 0
     var outputBytesStart : Int = 0
