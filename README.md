@@ -1,15 +1,12 @@
-#<img src="http://tidwall.com/SwiftWebSocket/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
+#<img src="/tools/res/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
-<a href="http://tidwall.com/SwiftWebSocket/results/"><img src="http://tidwall.com/SwiftWebSocket/build.png" alt="" width="93" height="20" border="0" /></a>
-<a href="https://developer.apple.com/swift/"><img src="http://tidwall.com/SwiftWebSocket/swift2.png" alt="" width="65" height="20" border="0" /></a>
-<a href="http://tidwall.com/SwiftWebSocket/docs/"><img src="http://tidwall.com/SwiftWebSocket/docs.png" alt="" width="65" height="20" border="0" /></a>
+<a href="http://tidwall.com/SwiftWebSocket/results/"><img src="/tools/res/passing.png" alt="" width="93" height="20" border="0" /></a>
+<a href="https://developer.apple.com/swift/"><img src="/tools/res/swift.png" alt="" width="65" height="20" border="0" /></a>
+<a href="http://tidwall.com/SwiftWebSocket/docs/"><img src="/tools/res/docs.png" alt="" width="65" height="20" border="0" /></a>
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library for iOS and Mac OSX.
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
-
-**Important: Xcode 7.2 and Swift 2.0 Users**  
-If you are developing in Xcode 7.2 or Swift 2.0 then please use the `swift/2.0` branch.
 
 ## Features
 
@@ -31,7 +28,7 @@ func echoTest(){
     var messageNum = 0
     let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
-        let msg = "\(++messageNum): \(NSDate().description)"
+        let msg = "\(messageNum+=1): \(NSDate().description)"
         print("send: \(msg)")
         ws.send(msg)
     }
