@@ -28,7 +28,7 @@ func main() {
 	flag.StringVar(&crt, "crt", "", "ssl cert file")
 	flag.StringVar(&key, "key", "", "ssl key file")
 	flag.StringVar(&host, "host", "localhost", "listening server host")
-	flag.StringVar(&_case, "case", "", "choose a specialized case, (hang,rapid)")
+	flag.StringVar(&_case, "case", "", "choose a specialized case, (hang,rapid,pong)")
 	flag.IntVar(&port, "port", 6789, "listening server port")
 	flag.Parse()
 
@@ -51,6 +51,8 @@ func main() {
 		log.Printf("case: %s (long connection hanging)\n", _case)
 	case "rapid":
 		log.Printf("case: %s (rapid (250 fps) large (2048 bytes) random text messages)\n", _case)
+	case "pong":
+		log.Printf("case: pong (send pong events every 3 seconds)\n")
 	}
 	log.Printf("ws%s://%s%s/echo      (echo socket)\n", s, host, ports)
 	log.Printf("http%s://%s%s/client  (javascript test client)\n", s, host, ports)
@@ -82,35 +84,53 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		log.Print("connection closed")
 	}()
 	var mu sync.Mutex
-	go func() {
-		defer func() {
-			ws.Close()
-		}()
-		msg := make([]byte, rapidSize)
-		b := make([]byte, 2048)
-		for {
-			time.Sleep(time.Second / rapidFPS)
-			i := 0
-		outer:
+	if _case == "rapid" {
+		go func() {
+			defer func() {
+				ws.Close()
+			}()
+			msg := make([]byte, rapidSize)
+			b := make([]byte, 2048)
 			for {
-				rand.Read(b)
-				for _, c := range b {
-					if i == len(msg) {
-						break outer
+				time.Sleep(time.Second / rapidFPS)
+				i := 0
+			outer:
+				for {
+					rand.Read(b)
+					for _, c := range b {
+						if i == len(msg) {
+							break outer
+						}
+						msg[i] = (c % (126 - 32)) + 32 // ascii #32-126
+						i++
 					}
-					msg[i] = (c % (126 - 32)) + 32 // ascii #32-126
-					i++
 				}
-			}
-			copy(msg, []byte(time.Now().String()+"\n"))
-			mu.Lock()
-			if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
+				copy(msg, []byte(time.Now().String()+"\n"))
+				mu.Lock()
+				if err := ws.WriteMessage(websocket.TextMessage, msg); err != nil {
+					mu.Unlock()
+					return
+				}
 				mu.Unlock()
-				return
 			}
-			mu.Unlock()
-		}
-	}()
+		}()
+	}
+	if _case == "pong" {
+		go func() {
+			defer ws.Close()
+			i := 0
+			for range time.NewTicker(time.Second).C {
+				mu.Lock()
+				err := ws.WriteControl(websocket.PongMessage,
+					[]byte(fmt.Sprintf("PONG:%d", i)), time.Now().Add(time.Second))
+				mu.Unlock()
+				if err != nil {
+					return
+				}
+				i++
+			}
+		}()
+	}
 	for {
 		msgt, msg, err := ws.ReadMessage()
 		if err != nil {
@@ -118,6 +138,7 @@ func socket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Print("rcvd: '" + string(msg) + "'")
+		time.Sleep(time.Second / 10)
 		mu.Lock()
 		ws.WriteMessage(msgt, msg)
 		mu.Unlock()
