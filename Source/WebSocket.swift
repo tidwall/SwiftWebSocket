@@ -992,7 +992,10 @@ private class InnerWebSocket: Hashable {
         } else {
             req.setValue("\(req.URL!.host!):\(req.URL!.port!.integerValue)", forHTTPHeaderField: "Host")
         }
-        req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
+        let origin = req.valueForHTTPHeaderField("Origin")
+        if origin == nil || origin! == ""{
+            req.setValue(req.URL!.absoluteString, forHTTPHeaderField: "Origin")
+        }
         if subProtocols.count > 0 {
             req.setValue(subProtocols.joinWithSeparator(","), forHTTPHeaderField: "Sec-WebSocket-Protocol")
         }
