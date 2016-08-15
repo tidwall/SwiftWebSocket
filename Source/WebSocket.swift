@@ -1673,11 +1673,12 @@ public class WebSocket: NSObject {
         opened = hasURL
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: !hasURL)
         super.init()
-        var outer : WebSocket? = self
-        ws.eclose = { [unowned self] in
-            self.opened = false
-            if outer != nil{
-                outer = nil
+        // weak/strong pattern from:
+        // http://stackoverflow.com/a/17105368/424124
+        // https://dhoerl.wordpress.com/2013/04/23/i-finally-figured-out-weakself-and-strongself/
+        ws.eclose = { [weak self] in
+            if let strongSelf = self {
+                strongSelf.opened = false
             }
         }
     }
