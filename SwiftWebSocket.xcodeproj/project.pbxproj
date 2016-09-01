@@ -333,6 +333,7 @@
 					};
 					03D1E7021B20897100AC49AC = {
 						CreatedOnToolsVersion = 6.3.2;
+						LastSwiftMigration = 0800;
 					};
 					03D70CCB1BDAC5EC00D245C3 = {
 						CreatedOnToolsVersion = 7.1;
@@ -345,6 +346,7 @@
 					};
 					D78C402F1C232C3800EB72AA = {
 						CreatedOnToolsVersion = 7.1.1;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -636,6 +638,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oncast.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = SwiftWebSocket;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -655,6 +658,7 @@
 				PRODUCT_NAME = SwiftWebSocket;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -772,6 +776,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oncast.Test-ObjectiveC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -784,6 +789,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.oncast.Test-ObjectiveC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

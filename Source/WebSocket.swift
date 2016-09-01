@@ -450,12 +450,12 @@ private class Inflater {
                     bufferSize *= 2
                     let nbuf = realloc(buffer, bufferSize).assumingMemoryBound(to: UInt8.self)
                     buffer = nbuf
-                    buf = buffer!+Int(buflen)
+                    buf = buffer+Int(buflen)
                     bufsiz = bufferSize - buflen
                 }
             }
         }
-        return (buffer!, buflen)
+        return (buffer, buflen)
     }
 }
 
@@ -1053,25 +1053,25 @@ private class InnerWebSocket: Hashable {
         rd.setProperty(security.level, forKey: Stream.PropertyKey.socketSecurityLevelKey)
 		wr.setProperty(security.level, forKey: Stream.PropertyKey.socketSecurityLevelKey)
         if services.contains(.VoIP) {
-            rd.setProperty(StreamNetworkServiceTypeValue.voIP, forKey: Stream.PropertyKey.networkServiceType)
-            wr.setProperty(StreamNetworkServiceTypeValue.voIP, forKey: Stream.PropertyKey.networkServiceType)
+            rd.setProperty(StreamNetworkServiceTypeValue.voIP.rawValue, forKey: Stream.PropertyKey.networkServiceType)
+            wr.setProperty(StreamNetworkServiceTypeValue.voIP.rawValue, forKey: Stream.PropertyKey.networkServiceType)
         }
         if services.contains(.Video) {
-            rd.setProperty(StreamNetworkServiceTypeValue.video, forKey: Stream.PropertyKey.networkServiceType)
-            wr.setProperty(StreamNetworkServiceTypeValue.video, forKey: Stream.PropertyKey.networkServiceType)
+            rd.setProperty(StreamNetworkServiceTypeValue.video.rawValue, forKey: Stream.PropertyKey.networkServiceType)
+            wr.setProperty(StreamNetworkServiceTypeValue.video.rawValue, forKey: Stream.PropertyKey.networkServiceType)
         }
         if services.contains(.Background) {
-            rd.setProperty(StreamNetworkServiceTypeValue.background, forKey: Stream.PropertyKey.networkServiceType)
-            wr.setProperty(StreamNetworkServiceTypeValue.background, forKey: Stream.PropertyKey.networkServiceType)
+            rd.setProperty(StreamNetworkServiceTypeValue.background.rawValue, forKey: Stream.PropertyKey.networkServiceType)
+            wr.setProperty(StreamNetworkServiceTypeValue.background.rawValue, forKey: Stream.PropertyKey.networkServiceType)
         }
         if services.contains(.Voice) {
-            rd.setProperty(StreamNetworkServiceTypeValue.voice, forKey: Stream.PropertyKey.networkServiceType)
-            wr.setProperty(StreamNetworkServiceTypeValue.voice, forKey: Stream.PropertyKey.networkServiceType)
+            rd.setProperty(StreamNetworkServiceTypeValue.voice.rawValue, forKey: Stream.PropertyKey.networkServiceType)
+            wr.setProperty(StreamNetworkServiceTypeValue.voice.rawValue, forKey: Stream.PropertyKey.networkServiceType)
         }
         if allowSelfSignedSSL {
             let prop: Dictionary<NSObject,NSObject> = [kCFStreamSSLPeerName: kCFNull, kCFStreamSSLValidatesCertificateChain: NSNumber(value: false)]
-            rd.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String as String))
-            wr.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String as String))
+            rd.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String))
+            wr.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String))
         }
         rd.delegate = delegate
         wr.delegate = delegate
@@ -1101,6 +1101,7 @@ private class InnerWebSocket: Hashable {
         let ptr = memmem(inputBytes!+inputBytesStart, inputBytesLength, end, 4).assumingMemoryBound(to: UInt8.self)
         let buffer = inputBytes!+inputBytesStart
         let bufferCount = ptr-(inputBytes!+inputBytesStart)
+        let string = String(bytesNoCopy: buffer, length: bufferCount, encoding: String.Encoding.utf8, freeWhenDone: true)
         if string == nil {
             throw WebSocketError.invalidHeader
         }
