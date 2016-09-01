@@ -44,5 +44,7 @@ mkdir -p /tmp/SwiftWebSocket/tests
 cat ../../Source/WebSocket.swift > /tmp/SwiftWebSocket/tests/main.swift
 echo "" >> /tmp/SwiftWebSocket/tests/main.swift
 cat autobahn.swift >> /tmp/SwiftWebSocket/tests/main.swift
-swift -Ounchecked /tmp/SwiftWebSocket/tests/main.swift
+#swift -Ounchecked /tmp/SwiftWebSocket/tests/main.swift
+swift /tmp/SwiftWebSocket/tests/main.swift
+
 SUCCESS=1
