@@ -280,7 +280,7 @@ private class UTF8 {
             }
             procd = 0
             count = 0
-            text.append(String.init(describing: UnicodeScalar(codepoint)))
+            text.append(String.init(describing: UnicodeScalar(codepoint)!))
         }
         return
     }
