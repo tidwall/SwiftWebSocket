@@ -8,9 +8,6 @@ Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client li
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
-**Important: Xcode 8 and Swift 3 Users**  
-If you are developing in Xcode 8 beta or Swift 3.0 then please use the `swift/3.0` branch. When Xcode 8 is no longer beta `swift/3.0` will be merged into the `master` branch.
-
 ## Features
 
 - High performance.
@@ -102,49 +99,6 @@ ws.allowSelfSignedSSL = true
 // Allow socket to handle VoIP in the background.
 ws.services = [.VoIP, .Background] 
 ```
-
-##Installation (iOS and OS X)
-
-### [Carthage]
-
-[Carthage]: https://github.com/Carthage/Carthage
-
-Add the following to your Cartfile:
-
-```
-github "tidwall/SwiftWebSocket"
-```
-
-Then run `carthage update`.
-
-Follow the current instructions in [Carthage's README][carthage-installation]
-for up to date installation instructions.
-
-[carthage-installation]: https://github.com/Carthage/Carthage#adding-frameworks-to-an-application
-
-The `import SwiftWebSocket` directive is required in order to access SwiftWebSocket features.
-
-### [CocoaPods]
-
-[CocoaPods]: http://cocoapods.org
-
-Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
-
-```ruby
-use_frameworks!
-pod 'SwiftWebSocket'
-```
-
-Then run `pod install` with CocoaPods 0.36 or newer.
-
-The `import SwiftWebSocket` directive is required in order to access SwiftWebSocket features.
-
-###Manually
-
-Copy the `SwiftWebSocket/WebSocket.swift` file into your project.  
-You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
-
-There is no need for `import SwiftWebSocket` when manually installing.
 
 ## Contact
 Josh Baker [@tidwall](http://twitter.com/tidwall)
