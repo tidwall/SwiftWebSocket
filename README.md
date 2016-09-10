@@ -28,7 +28,8 @@ func echoTest(){
     var messageNum = 0
     let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
-        let msg = "\(messageNum+=1): \(NSDate().description)"
+		messageNum += 1
+        let msg = "\(messageNum): \(NSDate().description)"
         print("send: \(msg)")
         ws.send(msg)
     }
