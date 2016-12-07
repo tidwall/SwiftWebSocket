@@ -100,6 +100,50 @@ ws.allowSelfSignedSSL = true
 // Allow socket to handle VoIP in the background.
 ws.services = [.VoIP, .Background] 
 ```
+##Installation (iOS and OS X)
+
+### [Carthage]
+
+[Carthage]: https://github.com/Carthage/Carthage
+
+Add the following to your Cartfile:
+
+```
+github "tidwall/SwiftWebSocket"
+```
+
+Then run `carthage update`.
+
+Follow the current instructions in [Carthage's README][carthage-installation]
+for up to date installation instructions.
+
+[carthage-installation]: https://github.com/Carthage/Carthage#adding-frameworks-to-an-application
+
+The `import SwiftWebSocket` directive is required in order to access SwiftWebSocket features.
+
+### [CocoaPods]
+
+[CocoaPods]: http://cocoapods.org
+
+Add the following to your [Podfile](http://guides.cocoapods.org/using/the-podfile.html):
+
+```ruby
+use_frameworks!
+pod 'SwiftWebSocket'
+```
+
+Then run `pod install` with CocoaPods 0.36 or newer.
+
+The `import SwiftWebSocket` directive is required in order to access SwiftWebSocket features.
+
+###Manually
+
+Copy the `SwiftWebSocket/WebSocket.swift` file into your project.  
+You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
+
+There is no need for `import SwiftWebSocket` when manually installing.
+
+
 
 ## Contact
 Josh Baker [@tidwall](http://twitter.com/tidwall)
