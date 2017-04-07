@@ -297,7 +297,7 @@ private class UTF8 {
                 }
             }
             if ascii {
-                text += NSString(bytes: bytes, length: length, encoding: String.Encoding.ascii.rawValue) as! String
+                text += NSString(bytes: bytes, length: length, encoding: String.Encoding.ascii.rawValue)! as String
                 bcount += length
                 return
             }
@@ -775,7 +775,7 @@ private class InnerWebSocket: Hashable {
             case .end:
                 fire {
                     self.event.end(Int(self.closeCode), self.closeReason, self.closeClean, self.finalError)
-                    self.eventDelegate?.webSocketEnd?(Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError as? NSError)
+                    self.eventDelegate?.webSocketEnd?(Int(self.closeCode), reason: self.closeReason, wasClean: self.closeClean, error: self.finalError as NSError?)
                 }
                 exit = true
                 manager.remove(self)
@@ -1119,7 +1119,7 @@ private class InnerWebSocket: Hashable {
         }
         let buffer = inputBytes!+inputBytesStart
         let bufferCount = ptr!.assumingMemoryBound(to: UInt8.self)-(inputBytes!+inputBytesStart)
-        let string = NSString(bytesNoCopy: buffer, length: bufferCount, encoding: String.Encoding.utf8.rawValue, freeWhenDone: false) as? String
+        let string = NSString(bytesNoCopy: buffer, length: bufferCount, encoding: String.Encoding.utf8.rawValue, freeWhenDone: false) as String?
         if string == nil {
             throw WebSocketError.invalidHeader
         }
