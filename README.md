@@ -1,4 +1,4 @@
-#<img src="/tools/res/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
+# <img src="/tools/res/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
 <a href="http://tidwall.com/SwiftWebSocket/results/"><img src="/tools/res/passing.png" alt="" width="93" height="20" border="0" /></a>
 <a href="https://developer.apple.com/swift/"><img src="/tools/res/swift.png" alt="" width="65" height="20" border="0" /></a>
