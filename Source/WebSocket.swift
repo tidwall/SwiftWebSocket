@@ -538,6 +538,7 @@ private class InnerWebSocket: Hashable {
     var _event = WebSocketEvents()
     var _eventDelegate: WebSocketDelegate?
     var _binaryType = WebSocketBinaryType.uInt8Array
+    var _pinnedPublicKeys: [SecKey]? = nil
     var _readyState = WebSocketReadyState.connecting
     var _networkTimeout = TimeInterval(-1)
 
@@ -587,6 +588,10 @@ private class InnerWebSocket: Hashable {
         get { lock(); defer { unlock() }; return _readyState }
         set { lock(); defer { unlock() }; _readyState = newValue }
     }
+    var pinnedPublicKeys: [SecKey]? {
+        get { lock(); defer { unlock() }; return _pinnedPublicKeys }
+        set { lock(); defer { unlock() }; _pinnedPublicKeys = newValue }
+    }
 
     func copyOpen(_ request: URLRequest, subProtocols : [String] = []) -> InnerWebSocket{
         let ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: false)
@@ -597,6 +602,7 @@ private class InnerWebSocket: Hashable {
         ws.event = event
         ws.eventQueue = eventQueue
         ws.binaryType = binaryType
+        ws.pinnedPublicKeys = pinnedPublicKeys
         return ws
     }
 
@@ -699,6 +705,7 @@ private class InnerWebSocket: Hashable {
                 stage = .readResponse
             case .readResponse:
                 try readResponse()
+                try verifySSLPinning()
                 privateReadyState = .open
                 fire {
                     self.event.open()
@@ -1191,6 +1198,42 @@ private class InnerWebSocket: Hashable {
         } else {
             inputBytesStart += bufferCount+4
         }
+    }
+    
+    private func verifySSLPinning() throws {
+        let keys = self._pinnedPublicKeys ?? []
+        if keys.isEmpty { return }
+        
+        let peerTrust = wr.property(forKey: kCFStreamPropertySSLPeerTrust as Stream.PropertyKey) as! SecTrust
+        
+        let serverPubKeys = publicKeys(from: peerTrust)
+        for key in keys as [AnyObject] {
+            for serverKey in serverPubKeys as [AnyObject] {
+                if key.isEqual(serverKey) {
+                    return
+                }
+            }
+        }
+        
+        throw WebSocketError.invalidResponse("Failed SSL public key pinning verification")
+    }
+    
+    private func publicKeys(from trust: SecTrust) -> [SecKey] {
+        let policy = SecPolicyCreateBasicX509()
+        let keys = (0..<SecTrustGetCertificateCount(trust)).flatMap { (index:Int) -> SecKey? in
+            let cert = SecTrustGetCertificateAtIndex(trust, index)
+            return extractPublicKey(cert!, policy: policy)
+        }
+        
+        return keys
+    }
+    
+    private func extractPublicKey(_ cert: SecCertificate, policy: SecPolicy) -> SecKey? {
+        var possibleTrust: SecTrust? = nil
+        SecTrustCreateWithCertificates(cert, policy, &possibleTrust)
+        
+        guard let trust = possibleTrust else { return nil }
+        return SecTrustCopyPublicKey(trust)
     }
 
     class ByteReader {
@@ -1722,6 +1765,13 @@ open class WebSocket: NSObject {
         get { return ws.binaryType }
         set { ws.binaryType = newValue }
     }
+    
+    /// A collection of public keys to pin the SSL connection against.  If no keys are provided, pinning is not enforced.
+    @nonobjc open var pinnedPublicKeys: [SecKey]? {
+        get { return ws.pinnedPublicKeys }
+        set { ws.pinnedPublicKeys = newValue }
+    }
+    
     /// The current state of the connection; this is one of the WebSocketReadyState constants. Read only.
     open var readyState : WebSocketReadyState{
         return ws.readyState
