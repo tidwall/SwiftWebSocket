@@ -359,7 +359,7 @@ private class Delegate : NSObject, StreamDelegate {
 @_silgen_name("deflateInit2_") private func deflateInit2(_ strm : UnsafeMutableRawPointer, level : CInt, method : CInt, windowBits : CInt, memLevel : CInt, strategy : CInt, version : OpaquePointer, stream_size : CInt) -> CInt
 @_silgen_name("deflateInit_") private func deflateInit(_ strm : UnsafeMutableRawPointer, level : CInt, version : OpaquePointer, stream_size : CInt) -> CInt
 @_silgen_name("deflateEnd") private func deflateEnd(_ strm : UnsafeMutableRawPointer) -> CInt
-@_silgen_name("deflate") private func deflate(_ strm : UnsafeMutableRawPointer, flush : CInt) -> CInt
+@_silgen_name("deflate") private func deflateG(_ strm : UnsafeMutableRawPointer, flush : CInt) -> CInt
 @_silgen_name("inflateInit2_") private func inflateInit2(_ strm : UnsafeMutableRawPointer, windowBits : CInt, version : OpaquePointer, stream_size : CInt) -> CInt
 @_silgen_name("inflateInit_") private func inflateInit(_ strm : UnsafeMutableRawPointer, version : OpaquePointer, stream_size : CInt) -> CInt
 @_silgen_name("inflate") private func inflateG(_ strm : UnsafeMutableRawPointer, flush : CInt) -> CInt
@@ -470,25 +470,48 @@ private class Deflater {
     var memLevel = 0
     var strm = z_stream()
     var bufferSize = windowBufferSize
-    var buffer = malloc(windowBufferSize)
+    var buffer = [UInt8](repeating: 0, count: windowBufferSize)
+    var headerRemoved = false
+    
     init?(windowBits : Int, memLevel : Int){
-        if buffer == nil {
-            return nil
-        }
         self.windowBits = windowBits
         self.memLevel = memLevel
-        let ret = deflateInit2(&strm, level: 6, method: 8, windowBits: -CInt(windowBits), memLevel: CInt(memLevel), strategy: 0, version: zlibVersion(), stream_size: CInt(MemoryLayout<z_stream>.size))
+        let ret = deflateInit2(&strm, level: -1, method: 8, windowBits: -CInt(windowBits), memLevel: CInt(memLevel), strategy: 0, version: zlibVersion(), stream_size: CInt(MemoryLayout<z_stream>.size))
         if ret != 0 {
             return nil
         }
     }
     deinit{
         _ = deflateEnd(&strm)
-        free(buffer)
     }
-    /*func deflate(_ bufin : UnsafePointer<UInt8>, length : Int, final : Bool) -> (p : UnsafeMutablePointer<UInt8>, n : Int, err : NSError?){
-        return (nil, 0, nil)
-    }*/
+    
+    let Z_SYNC_FLUSH:CInt = 2
+    
+    public func deflate(_ bufin : [UInt8]) -> (bytes: [UInt8], err: Error?){
+        var bytes = bufin
+        var res : CInt
+        var result = [UInt8]()
+        strm.avail_in = CUnsignedInt(bytes.count)
+        strm.next_in = &bytes+0
+        repeat {
+            strm.avail_out = CUnsignedInt(buffer.count)
+            strm.next_out = &buffer+0
+            res = deflateG(&strm, flush: Z_SYNC_FLUSH)
+            if res < 0 {
+                return ([UInt8](), zerror(res))
+            }
+            let have = buffer.count - Int(strm.avail_out)
+            if have > 0 {
+                result += Array(buffer[0...have-1])
+            }
+        } while (strm.avail_out == 0 && res != 1)
+        if strm.avail_in != 0 {
+            return ([UInt8](), zerror(-9999))
+        }
+        // Strip LEN and NLEN field added for Z_SYNC_FLUSH.
+        result.removeLast(4)
+        return (result, nil)
+    }
 }
 
 /// WebSocketDelegate is an Objective-C alternative to WebSocketEvents and is used to delegate the events for the WebSocket connection.
@@ -1413,16 +1436,13 @@ private class InnerWebSocket: Hashable {
             throw WebSocketError.libraryError("cannot send unfinished frames")
         }
         var hlen = 0
-        let b : UInt8 = 0x80
+        var b : UInt8 = 0x80
         var deflate = false
         if deflater != nil {
             if f.code == .binary || f.code == .text {
                 deflate = true
-                // b |= 0x40
             }
         }
-        head[hlen] = b | f.code.rawValue
-        hlen += 1
         var payloadBytes : [UInt8]
         var payloadLen = 0
         if f.utf8.text != "" {
@@ -1432,8 +1452,15 @@ private class InnerWebSocket: Hashable {
         }
         payloadLen += payloadBytes.count
         if deflate {
-
+            let (result, error) = deflater.deflate(payloadBytes)
+            if error == nil {
+                payloadBytes = result
+                payloadLen = payloadBytes.count
+                b |= 0x40
+            }
         }
+        head[hlen] = b | f.code.rawValue
+        hlen += 1
         var usingStatusCode = false
         if f.statusCode != 0 && payloadLen != 0 {
             payloadLen += 2
