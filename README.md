@@ -100,7 +100,7 @@ ws.allowSelfSignedSSL = true
 // Allow socket to handle VoIP in the background.
 ws.services = [.VoIP, .Background] 
 ```
-##Installation (iOS and OS X)
+## Installation (iOS and OS X)
 
 ### [Carthage]
 
@@ -136,7 +136,7 @@ Then run `pod install` with CocoaPods 0.36 or newer.
 
 The `import SwiftWebSocket` directive is required in order to access SwiftWebSocket features.
 
-###Manually
+### Manually
 
 Copy the `SwiftWebSocket/WebSocket.swift` file into your project.  
 You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
