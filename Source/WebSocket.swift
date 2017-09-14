@@ -759,8 +759,10 @@ private class InnerWebSocket: Hashable {
                 }
             case .closeConn:
                 if let error = finalError {
-                    self.event.error(error)
-                    self.eventDelegate?.webSocketError(error as NSError)
+                    fire {
+                        self.event.error(error)
+                        self.eventDelegate?.webSocketError(error as NSError)
+                    }
                 }
                 privateReadyState = .closed
                 if rd != nil {
