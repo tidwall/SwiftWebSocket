@@ -716,20 +716,20 @@ private class InnerWebSocket: Hashable {
                 switch frame.code {
                 case .text:
                     fire {
-                        self.event.message(data: frame.utf8.text)
+                        self.event.message(frame.utf8.text)
                         self.eventDelegate?.webSocketMessageText?(frame.utf8.text)
                     }
                 case .binary:
                     fire {
                         switch self.binaryType {
                         case .uInt8Array:
-                            self.event.message(data: frame.payload.array)
+                            self.event.message(frame.payload.array)
                         case .nsData:
-                            self.event.message(data: frame.payload.nsdata)
+                            self.event.message(frame.payload.nsdata)
                             // The WebSocketDelegate is necessary to add Objective-C compability and it is only possible to send binary data with NSData.
                             self.eventDelegate?.webSocketMessageData?(frame.payload.nsdata)
                         case .uInt8UnsafeBufferPointer:
-                            self.event.message(data: frame.payload.buffer)
+                            self.event.message(frame.payload.buffer)
                         }
                     }
                 case .ping:
@@ -742,11 +742,11 @@ private class InnerWebSocket: Hashable {
                     fire {
                         switch self.binaryType {
                         case .uInt8Array:
-                            self.event.pong(data: frame.payload.array)
+                            self.event.pong(frame.payload.array)
                         case .nsData:
-                            self.event.pong(data: frame.payload.nsdata)
+                            self.event.pong(frame.payload.nsdata)
                         case .uInt8UnsafeBufferPointer:
-                            self.event.pong(data: frame.payload.buffer)
+                            self.event.pong(frame.payload.buffer)
                         }
                         self.eventDelegate?.webSocketPong?()
                     }
@@ -1492,7 +1492,7 @@ private class InnerWebSocket: Hashable {
     func close(_ code : Int = 1000, reason : String = "Normal Closure") {
         let f = Frame()
         f.code = .close
-        f.statusCode = UInt16(truncatingBitPattern: code)
+        f.statusCode = UInt16(truncatingIfNeeded: code)
         f.utf8.text = reason
         sendFrame(f)
     }
