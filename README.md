@@ -28,7 +28,7 @@ func echoTest(){
     var messageNum = 0
     let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
-		messageNum += 1
+        messageNum += 1
         let msg = "\(messageNum): \(NSDate().description)"
         print("send: \(msg)")
         ws.send(msg)
@@ -58,7 +58,7 @@ func echoTest(){
 
 ## Custom Headers
 ```swift
-let request = NSMutableURLRequest(URL: NSURL(string:"ws://url")!)
+var request = URLRequest(url: URL(string:"ws://url")!)
 request.addValue("AUTH_TOKEN", forHTTPHeaderField: "Authorization")
 request.addValue("Value", forHTTPHeaderField: "X-Another-Header")
 let ws = WebSocket(request: request)
@@ -71,7 +71,7 @@ For example,
 
 ```swift
 let ws = WebSocket()
-ws.event.close = { _ in
+ws.event.close = { _,_,_ in
     ws.open()                 // reopen the socket to the previous url
     ws.open("ws://otherurl")  // or, reopen the socket to a new url
 }
