@@ -1024,7 +1024,7 @@ private class InnerWebSocket: Hashable {
 			security = .none
 		}
 
-		var path = CFURLCopyPath(req.url! as CFURL!) as String
+		var path = CFURLCopyPath(req.url! as CFURL) as String
         if path == "" {
             path = "/"
         }
@@ -1058,7 +1058,7 @@ private class InnerWebSocket: Hashable {
         var (rdo, wro) : (InputStream?, OutputStream?)
         var readStream:  Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?
-        CFStreamCreatePairWithSocketToHost(nil, addr[0] as CFString!, UInt32(Int(addr[1])!), &readStream, &writeStream);
+        CFStreamCreatePairWithSocketToHost(nil, addr[0] as CFString, UInt32(Int(addr[1])!), &readStream, &writeStream);
         rdo = readStream!.takeRetainedValue()
         wro = writeStream!.takeRetainedValue()
         (rd, wr) = (rdo!, wro!)
@@ -1144,8 +1144,8 @@ private class InnerWebSocket: Hashable {
                 } else {
                     key = ""
                     if let r = line.range(of: ":") {
-                        key = trim(line.substring(to: r.lowerBound))
-                        value = trim(line.substring(from: r.upperBound))
+                        key = trim(String(line[..<r.lowerBound]))
+                        value = trim(String(line[r.upperBound...]))
                     }
                 }
                 
