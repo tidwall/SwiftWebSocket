@@ -94,6 +94,13 @@ let ws = WebSocket("ws://url")
 ws.allowSelfSignedSSL = true
 ```
 
+## Show Socket Transaction in iOS Simulator with Proxy
+
+```swift
+let ws = WebSocket("ws://url")
+ws.allowProxyInSimulator = true
+```
+
 ## Network Services (VoIP, Video, Background, Voice)
 
 ```swift
