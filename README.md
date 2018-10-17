@@ -8,6 +8,11 @@ Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client li
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
 
+### `Project Status`
+
+I'm looking for someone to help with or take over maintenance of this project. 
+If you are interested, please contact me at the email address listed on my GitHub profile page. 
+
 ## Features
 
 - High performance.
@@ -142,6 +147,7 @@ Copy the `SwiftWebSocket/WebSocket.swift` file into your project.
 You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
 
 There is no need for `import SwiftWebSocket` when manually installing.
+
 
 
 
