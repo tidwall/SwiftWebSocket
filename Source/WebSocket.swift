@@ -540,7 +540,7 @@ private class InnerWebSocket: Hashable {
     var _event = WebSocketEvents()
     var _eventDelegate: WebSocketDelegate?
     var _binaryType = WebSocketBinaryType.uInt8Array
-    var _readyState = WebSocketReadyState.connecting
+    var _readyState = WebSocketReadyState.closed
     var _networkTimeout = TimeInterval(-1)
 
 
@@ -1674,6 +1674,9 @@ open class WebSocket: NSObject {
         let hasURL = request.url != nil
         opened = hasURL
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: !hasURL)
+        if opened {
+            ws.privateReadyState = .connecting
+        }
         super.init()
         // weak/strong pattern from:
         // http://stackoverflow.com/a/17105368/424124
@@ -1751,6 +1754,7 @@ open class WebSocket: NSObject {
         }
         opened = true
         ws = ws.copyOpen(request, subProtocols: subProtocols)
+        ws.privateReadyState = .connecting
     }
     /// Opens a closed WebSocket connection from an NSURLRequest; Uses the same request and protocols as previously closed WebSocket
     open func open(){
