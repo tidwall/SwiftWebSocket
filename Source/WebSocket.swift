@@ -1020,7 +1020,7 @@ private class InnerWebSocket: Hashable {
 		let port : Int
 		if req.url!.scheme == "wss" {
 			port = req.url!.port ?? 443
-			security = .negoticatedSSL
+			security = .negotiatedSSL
 		} else {
 			port = req.url!.port ?? 80
 			security = .none
@@ -1552,12 +1552,12 @@ private func ==(lhs: InnerWebSocket, rhs: InnerWebSocket) -> Bool {
 
 private enum TCPConnSecurity {
     case none
-    case negoticatedSSL
+    case negotiatedSSL
 	
 	var level: String {
 		switch self {
 		case .none: return StreamSocketSecurityLevel.none.rawValue
-		case .negoticatedSSL: return StreamSocketSecurityLevel.negotiatedSSL.rawValue
+		case .negotiatedSSL: return StreamSocketSecurityLevel.negotiatedSSL.rawValue
 		}
 	}
 }
