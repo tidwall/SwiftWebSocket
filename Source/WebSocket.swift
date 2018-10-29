@@ -165,7 +165,7 @@ private let defaultMaxWindowBits = 15
 /// The WebSocketCompression struct is used by the compression property and manages the compression options for the WebSocket connection.
 public struct WebSocketCompression {
     /// Used to accept compressed messages from the server. Default is true.
-    public var on = false
+    public var on = true
     /// request no context takeover.
     public var noContextTakeover = false
     /// request max window bits.
