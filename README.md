@@ -1,12 +1,17 @@
 # <img src="/tools/res/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
-<a href="http://tidwall.com/SwiftWebSocket/results/"><img src="/tools/res/passing.png" alt="" width="93" height="20" border="0" /></a>
-<a href="https://developer.apple.com/swift/"><img src="/tools/res/swift.png" alt="" width="65" height="20" border="0" /></a>
-<a href="http://tidwall.com/SwiftWebSocket/docs/"><img src="/tools/res/docs.png" alt="" width="65" height="20" border="0" /></a>
+[![API Docs](https://img.shields.io/badge/api-docs-blue.svg?style=flat-square)](http://tidwall.com/SwiftWebSocket/docs/)
+[![Swift/4.0](https://img.shields.io/badge/swift-4.0-brightgreen.svg?style=flat-square)](https://developer.apple.com/swift/)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](http://tidwall.com/SwiftWebSocket/results/)
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library for iOS and Mac OSX.
 
 SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict UTF-8, and message compression.
+
+### `Project Status`
+
+I'm looking for someone to help with or take over maintenance of this project. 
+If you are interested, please contact me at the email address listed on my GitHub profile page. 
 
 ## Features
 
@@ -28,7 +33,7 @@ func echoTest(){
     var messageNum = 0
     let ws = WebSocket("wss://echo.websocket.org")
     let send : ()->() = {
-		messageNum += 1
+        messageNum += 1
         let msg = "\(messageNum): \(NSDate().description)"
         print("send: \(msg)")
         ws.send(msg)
@@ -58,7 +63,7 @@ func echoTest(){
 
 ## Custom Headers
 ```swift
-let request = NSMutableURLRequest(URL: NSURL(string:"ws://url")!)
+var request = URLRequest(url: URL(string:"ws://url")!)
 request.addValue("AUTH_TOKEN", forHTTPHeaderField: "Authorization")
 request.addValue("Value", forHTTPHeaderField: "X-Another-Header")
 let ws = WebSocket(request: request)
@@ -71,7 +76,7 @@ For example,
 
 ```swift
 let ws = WebSocket()
-ws.event.close = { _ in
+ws.event.close = { _,_,_ in
     ws.open()                 // reopen the socket to the previous url
     ws.open("ws://otherurl")  // or, reopen the socket to a new url
 }
@@ -142,6 +147,7 @@ Copy the `SwiftWebSocket/WebSocket.swift` file into your project.
 You must also add the `libz.dylib` library. `Project -> Target -> Build Phases -> Link Binary With Libraries`
 
 There is no need for `import SwiftWebSocket` when manually installing.
+
 
 
 
