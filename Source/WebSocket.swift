@@ -1655,7 +1655,13 @@ open class WebSocket: NSObject {
     fileprivate var ws: InnerWebSocket
     fileprivate var id = manager.nextId()
     fileprivate var opened: Bool
+
     open override var hash: Int { return id }
+    open override func isEqual(_ other: Any?) -> Bool {
+        guard let other = other as? WebSocket else { return false }
+        return self.id == other.id
+    }
+    
     /// Create a WebSocket connection to a URL; this should be the URL to which the WebSocket server will respond.
     public convenience init(_ url: String){
         self.init(request: URLRequest(url: URL(string: url)!), subProtocols: [])
