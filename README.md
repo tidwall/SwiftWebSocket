@@ -1,7 +1,7 @@
 # <img src="/tools/res/logo.png" height="45" width="60">&nbsp;SwiftWebSocket
 
 [![API Docs](https://img.shields.io/badge/api-docs-blue.svg?style=flat-square)](http://tidwall.com/SwiftWebSocket/docs/)
-[![Swift/4.0](https://img.shields.io/badge/swift-4.0-brightgreen.svg?style=flat-square)](https://developer.apple.com/swift/)
+[![Swift/5.0](https://img.shields.io/badge/swift-5.0-brightgreen.svg?style=flat-square)](https://developer.apple.com/swift/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](http://tidwall.com/SwiftWebSocket/results/)
 
 Conforming WebSocket ([RFC 6455](https://tools.ietf.org/html/rfc6455)) client library for iOS and Mac OSX.
