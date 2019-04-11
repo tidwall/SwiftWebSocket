@@ -1605,6 +1605,10 @@ private class Manager {
             }
         }
     }
+    deinit{
+        pthread_mutex_init(mutex, nil)
+        mutex.deallocate()
+    }
     func checkForConnectionTimeout(_ ws : InnerWebSocket) {
         if ws.rd != nil && ws.wr != nil && (ws.rd.streamStatus == .opening || ws.wr.streamStatus == .opening) {
             let age = CFAbsoluteTimeGetCurrent() - ws.createdAt
