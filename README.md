@@ -10,8 +10,7 @@ SwiftWebSocket passes all 521 of the Autobahn's fuzzing tests, including strict 
 
 ### `Project Status`
 
-I'm looking for someone to help with or take over maintenance of this project. 
-If you are interested, please contact me at the email address listed on my GitHub profile page. 
+I'm looking for someone to help with or take over maintenance of this project.
 
 ## Features
 
