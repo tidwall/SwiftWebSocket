@@ -769,6 +769,7 @@ private class InnerWebSocket: Hashable {
                 privateReadyState = .closed
                 if rd != nil {
                     closeConn()
+                    handleCloseCodeFromFirstCloseFrameIfNeeded()
                     fire {
                         self.eclose()
                         self.event.close(Int(self.closeCode), self.closeReason, self.closeFinal)
@@ -905,6 +906,19 @@ private class InnerWebSocket: Hashable {
             }
         }
     }
+    
+    func handleCloseCodeFromFirstCloseFrameIfNeeded() {
+        guard closeCode == 0 else { return }
+        
+        for frame in frames {
+            if frame.code == .close {
+                closeCode = frame.statusCode
+                closeReason = frame.utf8.text
+                return
+            }
+        }
+    }
+    
     @inline(__always) func fire(_ block: ()->()){
         if let queue = eventQueue {
             queue.sync {
