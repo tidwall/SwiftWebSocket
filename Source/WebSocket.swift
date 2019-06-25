@@ -111,6 +111,8 @@ public struct WebSocketEvents {
     public var pong : (_ data : Any)->() = {(data) in}
     /// An event to be called when the WebSocket process has ended; this event is guarenteed to be called once and can be used as an alternative to the "close" or "error" events.
     public var end : (_ code : Int, _ reason : String, _ wasClean : Bool, _ error : Error?)->() = {(code, reason, wasClean, error) in}
+
+    public init() {}
 }
 
 /// The WebSocketBinaryType enum is used by the binaryType property and indicates the type of binary data being transmitted by the WebSocket connection.
