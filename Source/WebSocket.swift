@@ -534,6 +534,7 @@ private class InnerWebSocket: Hashable {
     var _subProtocol = ""
     var _compression = WebSocketCompression()
     var _allowSelfSignedSSL = false
+    var _allowProxyInSimulator = false
     var _services = WebSocketService.None
     var _event = WebSocketEvents()
     var _eventDelegate: WebSocketDelegate?
@@ -559,6 +560,10 @@ private class InnerWebSocket: Hashable {
     var allowSelfSignedSSL : Bool {
         get { lock(); defer { unlock() }; return _allowSelfSignedSSL }
         set { lock(); defer { unlock() }; _allowSelfSignedSSL = newValue }
+    }
+    var allowProxyInSimulator : Bool {
+        get { lock(); defer { unlock() }; return _allowProxyInSimulator }
+        set { lock(); defer { unlock() }; _allowProxyInSimulator = newValue }
     }
     var services : WebSocketService {
         get { lock(); defer { unlock() }; return _services }
@@ -593,6 +598,7 @@ private class InnerWebSocket: Hashable {
         ws.eclose = eclose
         ws.compression = compression
         ws.allowSelfSignedSSL = allowSelfSignedSSL
+        ws.allowProxyInSimulator = allowProxyInSimulator
         ws.services = services
         ws.event = event
         ws.eventQueue = eventQueue
@@ -1088,6 +1094,12 @@ private class InnerWebSocket: Hashable {
             let prop: Dictionary<NSObject,NSObject> = [kCFStreamSSLPeerName: kCFNull, kCFStreamSSLValidatesCertificateChain: NSNumber(value: false)]
             rd.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String as String))
             wr.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySSLSettings as String as String))
+        }
+        if allowProxyInSimulator {
+            let proxyDict = CFNetworkCopySystemProxySettings()
+            let prop = CFDictionaryCreateMutableCopy(nil, 0, proxyDict!.takeRetainedValue())
+            rd.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySOCKSProxy as String as String))
+            wr.setProperty(prop, forKey: Stream.PropertyKey(rawValue: kCFStreamPropertySOCKSProxy as String as String))
         }
         rd.delegate = delegate
         wr.delegate = delegate
@@ -1712,6 +1724,11 @@ open class WebSocket: NSObject {
     open var allowSelfSignedSSL : Bool{
         get { return ws.allowSelfSignedSSL }
         set { ws.allowSelfSignedSSL = newValue }
+    }
+    /// Allow to use Proxy to capture the websocket transfer. Default is false.
+    open var allowProxyInSimulator : Bool{
+        get { return ws.allowProxyInSimulator }
+        set { ws.allowProxyInSimulator = newValue }
     }
     /// The services of the WebSocket.
     open var services : WebSocketService{
