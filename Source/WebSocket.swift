@@ -1679,7 +1679,7 @@ open class WebSocket: NSObject {
         self.init(request: URLRequest(url: URL(string: url)!), subProtocols: [subProtocol])
     }
     /// Create a WebSocket connection from an NSURLRequest; Also include a list of protocols.
-    public init(request: URLRequest, subProtocols : [String] = []){
+    public required init(request: URLRequest, subProtocols : [String] = []){
         let hasURL = request.url != nil
         opened = hasURL
         ws = InnerWebSocket(request: request, subProtocols: subProtocols, stub: !hasURL)
@@ -1694,7 +1694,7 @@ open class WebSocket: NSObject {
         }
     }
     /// Create a WebSocket object with a deferred connection; the connection is not opened until the .open() method is called.
-    public convenience override init(){
+    public required convenience override init(){
         var request = URLRequest(url: URL(string: "http://apple.com")!)
         request.url = nil
         self.init(request: request, subProtocols: [])
