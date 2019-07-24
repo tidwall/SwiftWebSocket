@@ -330,6 +330,7 @@
 				TargetAttributes = {
 					03957A3B1C5A71DB005CC1DB = {
 						CreatedOnToolsVersion = 7.2;
+						LastSwiftMigration = 0800;
 					};
 					03D1E7021B20897100AC49AC = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -507,6 +508,7 @@
 				PRODUCT_NAME = SwiftWebSocket;
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 			};
@@ -530,6 +532,7 @@
 				SDKROOT = appletvos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.1;
 			};
