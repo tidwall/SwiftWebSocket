@@ -1651,14 +1651,14 @@ private let manager = Manager()
 
 /// WebSocket objects are bidirectional network streams that communicate over HTTP. RFC 6455.
 @objcMembers
-open class WebSocket: NSObject {
+open class SWSWebSocket: NSObject {
     fileprivate var ws: InnerWebSocket
     fileprivate var id = manager.nextId()
     fileprivate var opened: Bool
 
     open override var hash: Int { return id }
     open override func isEqual(_ other: Any?) -> Bool {
-        guard let other = other as? WebSocket else { return false }
+        guard let other = other as? SWSWebSocket else { return false }
         return self.id == other.id
     }
     
@@ -1811,11 +1811,11 @@ open class WebSocket: NSObject {
     }
 }
 
-public func ==(lhs: WebSocket, rhs: WebSocket) -> Bool {
+public func ==(lhs: SWSWebSocket, rhs: SWSWebSocket) -> Bool {
     return lhs.id == rhs.id
 }
 
-extension WebSocket {
+extension SWSWebSocket {
     /// The events of the WebSocket using a delegate.
     @objc
     public var delegate : WebSocketDelegate? {

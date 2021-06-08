@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		031967101B4D96C40033860E /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
-		03285D2B1B4A9F1A0078A1AA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
+		031967101B4D96C40033860E /* SWSWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* SWSWebSocket.swift */; };
+		03285D2B1B4A9F1A0078A1AA /* SWSWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* SWSWebSocket.swift */; };
 		03957A461C5A734C005CC1DB /* SwiftWebSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D71948F11B35E5670015C529 /* SwiftWebSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		03957A471C5A7392005CC1DB /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */; };
+		03957A471C5A7392005CC1DB /* SWSWebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03285D2A1B4A9F1A0078A1AA /* SWSWebSocket.swift */; };
 		03957A4C1C5A7532005CC1DB /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 03957A4B1C5A7532005CC1DB /* libz.dylib */; };
 		03D1E7221B208A5C00AC49AC /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 03D1E7211B208A5C00AC49AC /* libz.dylib */; };
 		03D70CD11BDAC5EC00D245C3 /* SwiftWebSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D71949011B35E6130015C529 /* SwiftWebSocket.framework */; };
@@ -51,7 +51,7 @@
 
 /* Begin PBXFileReference section */
 		0319670F1B4D96B80033860E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		03285D2A1B4A9F1A0078A1AA /* SWSWebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWSWebSocket.swift; sourceTree = "<group>"; };
 		03957A3C1C5A71DB005CC1DB /* SwiftWebSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftWebSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		03957A481C5A74D9005CC1DB /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 		03957A4B1C5A7532005CC1DB /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
@@ -164,7 +164,7 @@
 				03957A481C5A74D9005CC1DB /* Info-tvOS.plist */,
 				0319670F1B4D96B80033860E /* Info.plist */,
 				D71948F11B35E5670015C529 /* SwiftWebSocket.h */,
-				03285D2A1B4A9F1A0078A1AA /* WebSocket.swift */,
+				03285D2A1B4A9F1A0078A1AA /* SWSWebSocket.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -423,7 +423,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03957A471C5A7392005CC1DB /* WebSocket.swift in Sources */,
+				03957A471C5A7392005CC1DB /* SWSWebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,7 +431,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03285D2B1B4A9F1A0078A1AA /* WebSocket.swift in Sources */,
+				03285D2B1B4A9F1A0078A1AA /* SWSWebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,7 +455,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				031967101B4D96C40033860E /* WebSocket.swift in Sources */,
+				031967101B4D96C40033860E /* SWSWebSocket.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
